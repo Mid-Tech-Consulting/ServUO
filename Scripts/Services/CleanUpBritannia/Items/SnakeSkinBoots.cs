@@ -13,6 +13,9 @@ namespace Server.Items
         {
             Hue = 0x7D9;
             Resistances.Poison = 2;
+            SAAbsorptionAttributes.EaterPoison = 5;
+            Attributes.CastRecovery = 1;
+            Attributes.RegenHits = 2;
         }
 
         public SnakeSkinBoots(Serial serial)

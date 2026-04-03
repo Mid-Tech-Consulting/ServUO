@@ -15,7 +15,10 @@ namespace Server.Items
             Attributes.NightSight = 1;
             Attributes.DefendChance = 10;
             Attributes.CastRecovery = 3;
-            Hue = 1233;           
+            Hue = 1233;
+            Attributes.Luck = 250;
+            Attributes.SpellDamage = 15;
+            Attributes.RegenMana = 2;
         }
 
         public override int BasePhysicalResistance { get { return 10; } }

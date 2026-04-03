@@ -13,6 +13,9 @@ namespace Server.Items
 		{
 			Hue = 0x674;
 			Resistances.Fire = 2;
+			SAAbsorptionAttributes.EaterFire = 5;
+			Attributes.CastRecovery = 1;
+			Attributes.RegenHits = 2;
 		}
 
 		public BootsOfTheLavaLizard( Serial serial )

@@ -10,11 +10,15 @@ namespace Server.Items
             : base()
         {
             Hue = 0x5E5;
-            Slayer = SlayerGroup.RandomSuperSlayerAOS();			
+            Slayer = SlayerGroup.RandomSuperSlayerAOS();
             Attributes.WeaponSpeed = 25;
-            Attributes.WeaponDamage = 50;			
+            Attributes.WeaponDamage = 50;
+            Attributes.Luck = 100;
             WeaponAttributes.UseBestSkill = 1;
-            WeaponAttributes.HitLeechHits = 22;
+            WeaponAttributes.HitLeechHits = 50;
+            WeaponAttributes.HitLeechMana = 50;
+            WeaponAttributes.HitFireArea = 50;
+            AosElementDamages.Fire = 100;
         }
 
         public BlackthornsKryss(Serial serial)

@@ -17,6 +17,8 @@ namespace Server.Items
             Attributes.BonusDex = 5;
             StrRequirement = 45;
             Hue = 66;
+            Attributes.Luck = 250;
+            Attributes.WeaponDamage = 25;
         }
 
         public override int BasePhysicalResistance { get { return 25; } }

@@ -15,6 +15,10 @@ namespace Server.Items
             Attributes.BonusInt = 5;
             Attributes.RegenMana = 2;
             Attributes.LowerRegCost = 10;
+            Attributes.Luck = 150;
+            Attributes.WeaponDamage = 5;
+            Attributes.SpellDamage = 5;
+            SAAbsorptionAttributes.EaterFire = 5;
             StrRequirement = 10;
             Hue = 0xe8;
         }

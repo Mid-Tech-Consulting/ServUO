@@ -13,10 +13,13 @@ namespace Server.Items
         public EpauletteBearingTheCrestOfBlackthorn6()
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
-            ItemID = 0x9985;            
-            Attributes.AttackChance = 3;
-            Attributes.DefendChance = 3;
-            Attributes.SpellDamage = 3;
+            ItemID = 0x9985;
+            Attributes.Luck = 100;
+            Attributes.AttackChance = 15;
+            Attributes.DefendChance = 15;
+            Attributes.SpellDamage = 15;
+            Attributes.EnhancePotions = 15;
+            Attributes.RegenStam = 6;
             Hue = 2019;
 
 			Layer = Layer.OuterTorso;

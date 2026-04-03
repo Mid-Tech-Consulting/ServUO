@@ -13,10 +13,11 @@ namespace Server.Items
             : base(0x2F5B)
         {
             Hue = 1923;
-            Attributes.RegenHits = 1;
-            Attributes.RegenStam = 1;
-            Attributes.RegenMana = 1;
-            Attributes.Luck = 150;
+            Attributes.LowerRegCost = 15;
+            Attributes.Luck = 300;
+            Attributes.RegenHits = 2;
+            Attributes.RegenMana = 2;
+            Attributes.RegenStam = 2;
         }
 
         public LuckyCharm(Serial serial)

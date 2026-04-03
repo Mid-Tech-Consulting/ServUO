@@ -13,6 +13,9 @@ namespace Server.Items
 		{
 			Hue = 0x47E;
 			Resistances.Energy = 2;
+			SAAbsorptionAttributes.EaterEnergy = 5;
+			Attributes.CastRecovery = 1;
+			Attributes.RegenHits = 2;
 		}
 
 		public BootsOfTheCrystalHydra( Serial serial )

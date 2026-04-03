@@ -14,9 +14,22 @@ namespace Server.Items
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
             Attributes.BonusDex = 5;
             Attributes.BonusHits = 10;
+            Attributes.BonusStam = 8;
             Attributes.RegenHits = 2;
+            Attributes.Luck = 100;
+            SAAbsorptionAttributes.EaterKinetic = 15;
             StrRequirement = 10;
             Hue = 1157;
+
+            switch (Utility.Random(6))
+            {
+                case 0: SkillBonuses.SetValues(0, SkillName.Swords, 10.0); break;
+                case 1: SkillBonuses.SetValues(0, SkillName.Macing, 10.0); break;
+                case 2: SkillBonuses.SetValues(0, SkillName.Fencing, 10.0); break;
+                case 3: SkillBonuses.SetValues(0, SkillName.Archery, 10.0); break;
+                case 4: SkillBonuses.SetValues(0, SkillName.Wrestling, 10.0); break;
+                case 5: SkillBonuses.SetValues(0, SkillName.Throwing, 10.0); break;
+            }
         }   
 
         public WoodlandBeltBearingTheCrestOfBlackthorn2(Serial serial)

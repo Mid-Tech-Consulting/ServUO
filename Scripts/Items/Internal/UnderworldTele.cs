@@ -17,18 +17,7 @@ namespace Server.Items
 
         public override bool OnMoveOver(Mobile m)
         {
-            if (m is PlayerMobile)
-            {
-                PlayerMobile player = (PlayerMobile)m;
-				
-                if (player.AbyssEntry)
-                {
-                    return base.OnMoveOver(m);
-                }
-                else
-					player.SendLocalizedMessage(1077196); // You may not enter this area.				
-            }
-            return true;
+            return base.OnMoveOver(m);
         }
 
         public override void Serialize(GenericWriter writer)
