@@ -14,10 +14,13 @@ namespace Server.Items
         public ShadowCloakOfRejuvenation()
         {
             Hue = 1884;
-            Attributes.RegenMana = 1;
-            Attributes.RegenHits = 1;
-            Attributes.RegenStam = 1;
-            Attributes.LowerManaCost = 2;
+            Attributes.RegenHits = 6;
+            Attributes.RegenStam = 6;
+            Attributes.RegenMana = 6;
+            Attributes.LowerManaCost = 10;
+            Attributes.Luck = 150;
+            Attributes.CastRecovery = 3;
+            SAAbsorptionAttributes.EaterKinetic = 15;
         }
 
         public ShadowCloakOfRejuvenation(Serial serial)
@@ -49,10 +52,13 @@ namespace Server.Items
         public GargishShadowCloakOfRejuvenation()
         {
             Hue = 1884;
-            Attributes.RegenMana = 1;
-            Attributes.RegenHits = 1;
-            Attributes.RegenStam = 1;
-            Attributes.LowerManaCost = 2;
+            Attributes.RegenHits = 6;
+            Attributes.RegenStam = 6;
+            Attributes.RegenMana = 6;
+            Attributes.LowerManaCost = 10;
+            Attributes.Luck = 150;
+            Attributes.CastRecovery = 3;
+            SAAbsorptionAttributes.EaterKinetic = 15;
         }
 
         public GargishShadowCloakOfRejuvenation(Serial serial)

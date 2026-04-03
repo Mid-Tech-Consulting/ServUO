@@ -13,9 +13,12 @@ namespace Server.Items
         public EpauletteBearingTheCrestOfBlackthorn2()
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
-            ItemID = 0x9985;            
-            Attributes.LowerManaCost = 1;
-            Attributes.BonusMana = 5;
+            ItemID = 0x9985;
+            SkillName[] skills = new SkillName[] { SkillName.Veterinary, SkillName.Fishing, SkillName.Cartography, SkillName.Begging, SkillName.Snooping };
+            SkillBonuses.SetValues(0, skills[Utility.Random(skills.Length)], 10.0);
+            Attributes.BonusMana = 10;
+            Attributes.LowerManaCost = 15;
+            Attributes.Luck = 100;
             Hue = 1306;
 
 			Layer = Layer.OuterTorso;

@@ -10,48 +10,51 @@ namespace Server.Items
         [Constructable]
         public ChainmailTunicBearingTheCrestOfBlackthorn()
         {
-            ReforgedSuffix = ReforgedSuffix.Blackthorn;                     
+            ReforgedSuffix = ReforgedSuffix.Blackthorn;
             this.Hue = 1773;
             this.Attributes.BonusMana = 10;
             this.Attributes.RegenMana = 3;
             this.Attributes.LowerManaCost = 15;
+            this.Attributes.LowerRegCost = 15;
+            this.Attributes.Luck = 150;
             this.ArmorAttributes.LowerStatReq = 100;
             this.ArmorAttributes.MageArmor = 1;
+            this.AbsorptionAttributes.EaterFire = 15;
         }
 
         public override int BasePhysicalResistance
         {
             get
             {
-                return 5;
+                return 10;
             }
         }
         public override int BaseFireResistance
         {
             get
             {
-                return 4;
+                return 10;
             }
         }
         public override int BaseColdResistance
         {
             get
             {
-                return 14;
+                return 10;
             }
         }
         public override int BasePoisonResistance
         {
             get
             {
-                return 3;
+                return 10;
             }
         }
         public override int BaseEnergyResistance
         {
             get
             {
-                return 14;
+                return 10;
             }
         }
         public override int InitMinHits

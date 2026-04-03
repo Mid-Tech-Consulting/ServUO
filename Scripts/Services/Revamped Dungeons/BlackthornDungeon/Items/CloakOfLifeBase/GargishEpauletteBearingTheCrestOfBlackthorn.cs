@@ -16,8 +16,12 @@ namespace Server.Items
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
             ItemID = 0x9986;
-            Attributes.BonusHits = 3;
-            Attributes.RegenHits = 1;
+            Attributes.Luck = 100;
+            SAAbsorptionAttributes.EaterDamage = 15;
+            Attributes.EnhancePotions = 35;
+            Attributes.BonusStr = 10;
+            Attributes.BonusHits = 10;
+            Attributes.RegenHits = 6;
             Hue = 132;
 			
 			Layer = Layer.OuterTorso;

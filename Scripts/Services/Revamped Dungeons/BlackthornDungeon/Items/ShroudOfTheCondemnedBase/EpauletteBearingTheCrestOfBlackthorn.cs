@@ -13,9 +13,13 @@ namespace Server.Items
         public EpauletteBearingTheCrestOfBlackthorn1()
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
-            ItemID = 0x9985;            
-            Attributes.BonusHits = 3;
-            Attributes.BonusInt = 5;
+            ItemID = 0x9985;
+            Attributes.RegenMana = 4;
+            Attributes.Luck = 300;
+            Attributes.DefendChance = 15;
+            Attributes.BonusStam = 8;
+            Attributes.BonusMana = 8;
+            Resistances.Fire = 15;
             Hue = 2075;
 
 			Layer = Layer.OuterTorso;			

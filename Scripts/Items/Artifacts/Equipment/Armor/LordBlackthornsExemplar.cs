@@ -10,6 +10,10 @@ namespace Server.Items
             : base()
         {
             Hue = 0x501;
+            Attributes.Luck = 250;
+            Attributes.SpellChanneling = 1;
+            Attributes.LowerManaCost = 8;
+            Attributes.RegenHits = 2;
         }
 
         public LordBlackthornsExemplar(Serial serial)

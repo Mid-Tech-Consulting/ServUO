@@ -12,9 +12,11 @@ namespace Server.Items
         {
             Weight = 2.0;
 			Hue = 0x966;
-			Attributes.DefendChance = 3;
-			Attributes.AttackChance = 3;
-			Attributes.SpellDamage = 3;
+			Attributes.AttackChance = 15;
+			Attributes.DefendChance = 15;
+			Attributes.SpellDamage = 15;
+			Attributes.EnhancePotions = 15;
+			Attributes.RegenStam = 6;
         }
 
         public CloakOfDeath(Serial serial)

@@ -14,6 +14,11 @@ namespace Server.Items
             Weight = 2.0;
 			Hue = 0x2A0;
 			SkillBonuses.SetValues(0, SkillName.Stealth, 10);
+			SkillBonuses.SetValues(1, SkillName.DetectHidden, 10);
+			SkillBonuses.SetValues(2, SkillName.Snooping, 10);
+			Attributes.Luck = 250;
+			Attributes.RegenHits = 2;
+			Attributes.RegenMana = 2;
         }
 
         public CloakOfSilence(Serial serial)

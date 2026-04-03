@@ -16,9 +16,12 @@ namespace Server.Items
             : base(0x2683)
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
-            Attributes.RegenMana = 2;
-            Attributes.DefendChance = 5;
-            Attributes.Luck = 140;
+            SkillName[] skills = new SkillName[] { SkillName.Discordance, SkillName.Musicianship, SkillName.Peacemaking, SkillName.Provocation };
+            SkillBonuses.SetValues(0, skills[Utility.Random(skills.Length)], 10.0);
+            Attributes.BonusMana = 10;
+            Attributes.BonusInt = 10;
+            Attributes.BonusHits = 5;
+            Attributes.Luck = 100;
             Hue = 1194;
         }
 

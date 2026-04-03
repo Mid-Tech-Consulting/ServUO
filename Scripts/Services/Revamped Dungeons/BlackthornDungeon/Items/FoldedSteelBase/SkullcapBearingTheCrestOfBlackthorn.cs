@@ -17,6 +17,10 @@ namespace Server.Items
             Attributes.DefendChance = 15;
             StrRequirement = 45;
             Hue = 1150;
+            Attributes.Luck = 250;
+            Attributes.RegenHits = 4;
+            SAAbsorptionAttributes.EaterDamage = 15;
+            Attributes.EnhancePotions = 15;
         }
 
         public override int BasePhysicalResistance { get { return 20; } }

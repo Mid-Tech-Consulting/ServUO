@@ -11,8 +11,17 @@ namespace Server.Items
         public CloakBearingTheCrestOfBlackthorn()
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
+            SkillName[] skills = new SkillName[] { SkillName.RemoveTrap, SkillName.Lockpicking, SkillName.Stealing, SkillName.Tracking, SkillName.Herding };
+            SkillBonuses.SetValues(0, skills[Utility.Random(skills.Length)], 10.0);
+            Attributes.Luck = 200;
+            Attributes.AttackChance = 10;
+            Attributes.SpellDamage = 10;
+            Attributes.DefendChance = 10;
+            Attributes.LowerManaCost = 10;
+            Attributes.RegenHits = 2;
+            Attributes.RegenMana = 2;
+            Resistances.Fire = 15;
             this.Hue = 1766;
-            Attributes.DefendChance = 5;
         }
 
         public CloakBearingTheCrestOfBlackthorn(Serial serial)

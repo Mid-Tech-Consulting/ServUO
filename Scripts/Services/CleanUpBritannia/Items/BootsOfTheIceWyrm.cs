@@ -13,6 +13,9 @@ namespace Server.Items
 		{
 			Hue = 0x482;
 			Resistances.Cold = 2;
+			SAAbsorptionAttributes.EaterCold = 5;
+			Attributes.CastRecovery = 1;
+			Attributes.RegenHits = 2;
 		}
 
 		public BootsOfTheIceWyrm( Serial serial )

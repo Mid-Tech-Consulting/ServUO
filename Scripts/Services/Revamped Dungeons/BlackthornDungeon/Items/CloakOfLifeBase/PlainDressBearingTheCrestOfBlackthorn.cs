@@ -12,8 +12,12 @@ namespace Server.Items
             : base()
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
-            Attributes.BonusHits = 3;
-            Attributes.RegenHits = 1;
+            Attributes.Luck = 100;
+            SAAbsorptionAttributes.EaterDamage = 15;
+            Attributes.EnhancePotions = 35;
+            Attributes.BonusStr = 10;
+            Attributes.BonusHits = 10;
+            Attributes.RegenHits = 6;
             Hue = 132;
         }
 		

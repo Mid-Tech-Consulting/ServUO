@@ -12,9 +12,11 @@ namespace Server.Items
             : base()
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
-            Attributes.BonusStr = 2;
-            Attributes.BonusDex = 2;
-            Attributes.BonusInt = 2;
+            Attributes.Luck = 100;
+            Attributes.BonusStr = 10;
+            Attributes.BonusDex = 10;
+            Attributes.BonusInt = 10;
+            Attributes.SpellDamage = 30;
             Hue = 2107;
         }
 

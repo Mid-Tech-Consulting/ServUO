@@ -12,8 +12,11 @@ namespace Server.Items
             : base()
         {
             ReforgedSuffix = ReforgedSuffix.Blackthorn;
-            Attributes.LowerManaCost = 1;
-            Attributes.BonusMana = 5;
+            SkillName[] skills = new SkillName[] { SkillName.Veterinary, SkillName.Fishing, SkillName.Cartography, SkillName.Begging, SkillName.Snooping };
+            SkillBonuses.SetValues(0, skills[Utility.Random(skills.Length)], 10.0);
+            Attributes.BonusMana = 10;
+            Attributes.LowerManaCost = 15;
+            Attributes.Luck = 100;
             Hue = 1306;            
         }
 

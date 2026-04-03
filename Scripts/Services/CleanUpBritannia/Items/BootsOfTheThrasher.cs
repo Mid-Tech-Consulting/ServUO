@@ -13,6 +13,9 @@ namespace Server.Items
 		{
 			Hue = 0x497;
 			Resistances.Physical = 2;
+			SAAbsorptionAttributes.EaterDamage = 5;
+			Attributes.CastRecovery = 1;
+			Attributes.RegenHits = 2;
 		}
 
 		public BootsOfTheThrasher( Serial serial )
