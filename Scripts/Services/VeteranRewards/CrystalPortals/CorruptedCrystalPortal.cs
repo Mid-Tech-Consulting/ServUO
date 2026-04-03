@@ -370,10 +370,15 @@ namespace Server.Items
                         map = Map.Trammel;
                     }
                     break;
+					//case "dungeon underworld":
+					//{
+					//	loc = new Point3D( 4195, 3263, 5 );
+					//	map = Map.Trammel;
+					//}
 					case "dungeon underworld":
 					{
-						loc = new Point3D( 4195, 3263, 5 );
-						map = Map.Trammel;
+						loc = new Point3D(1128, 1207, -2);
+						map = Map.TerMur;
 					}
 					break;
 					case "dungeon abyss":
