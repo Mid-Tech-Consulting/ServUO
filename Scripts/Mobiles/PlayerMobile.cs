@@ -857,6 +857,7 @@ namespace Server.Mobiles
             EventSink.UnequipMacro += UnequipMacro;
             #endregion
 
+
             if (Core.SE)
 			{
 				Timer.DelayCall(TimeSpan.Zero, CheckPets);
@@ -3525,7 +3526,7 @@ namespace Server.Mobiles
 			}
 
             BaseGump.CheckCloseGumps(this);
-            
+
 			DesignContext context = m_DesignContext;
 
 			if (context == null || m_NoRecursion)

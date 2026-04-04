@@ -5,6 +5,41 @@ namespace Server.Items
 {
     public class FirstAidBelt : Container
     {
+        // Tracks whether the gump was open at the last DisplayTo call, per mobile.
+        // Used to re-open after teleportation events that cause the client to close container gumps.
+        private static readonly System.Collections.Generic.Dictionary<int, bool> m_GumpOpen
+            = new System.Collections.Generic.Dictionary<int, bool>();
+
+        public static void Initialize()
+        {
+            EventSink.TeleportMovement += OnTeleportMovement;
+        }
+
+        private static void OnTeleportMovement(TeleportMovementEventArgs e)
+        {
+            Mobile m = e.Mobile;
+
+            if (m == null || m.NetState == null)
+                return;
+
+            FirstAidBelt belt = m.FindItemOnLayer(Layer.Waist) as FirstAidBelt;
+
+            if (belt == null)
+                return;
+
+            bool wasOpen;
+
+            if (!m_GumpOpen.TryGetValue(m.Serial, out wasOpen) || !wasOpen)
+                return;
+
+            Timer.DelayCall(TimeSpan.FromMilliseconds(250), () =>
+            {
+                if (!belt.Deleted && m.NetState != null && belt.RootParent == m)
+                    belt.DisplayTo(m);
+            });
+        }
+
+
         public override bool IsArtifact { get { return true; } }
         public override int LabelNumber { get { return 1158681; } } // First Aid Belt
 
@@ -72,6 +107,45 @@ namespace Server.Items
         }
 
         public override bool DisplaysContent { get { return false; } }
+
+        public override void DisplayTo(Mobile to)
+        {
+            base.DisplayTo(to);
+            m_GumpOpen[to.Serial] = true;
+        }
+
+        public override void OnMapChange()
+        {
+            base.OnMapChange();
+
+            Mobile owner = RootParent as Mobile;
+
+            if (owner == null || owner.NetState == null)
+                return;
+
+            bool wasOpen;
+
+            if (!m_GumpOpen.TryGetValue(owner.Serial, out wasOpen) || !wasOpen)
+                return;
+
+            // The item's map changed (cross-map teleport). Schedule re-open after the
+            // mobile's own map/location have been updated and all teleport packets flushed.
+            Timer.DelayCall(TimeSpan.FromMilliseconds(250), () =>
+            {
+                if (!Deleted && owner.NetState != null && RootParent == owner)
+                    DisplayTo(owner);
+            });
+        }
+
+        public override void OnRemoved(object parent)
+        {
+            base.OnRemoved(parent);
+
+            Mobile m = parent as Mobile;
+
+            if (m != null)
+                m_GumpOpen.Remove(m.Serial);
+        }
 
         public override void UpdateTotal(Item sender, TotalType type, int delta)
         {
