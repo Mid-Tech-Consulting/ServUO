@@ -65,13 +65,8 @@ namespace Server.Items
                 if (dropped.LootType == LootType.Blessed)
                 {
                     this.PublicOverheadMessage(Network.MessageType.Regular, 0x3B2, 1075256); // That is blessed; you cannot throw it away.
+                    return false;
                 }
-                else
-                {
-                    this.PublicOverheadMessage(Network.MessageType.Regular, 0x3B2, 1151271); // This item has no turn-in value for Clean Up Britannia.
-                }
-
-                return false;
             }
 
             this.PublicOverheadMessage(Network.MessageType.Regular, 0x3B2, Utility.Random(1042891, 8));
@@ -90,13 +85,8 @@ namespace Server.Items
                 if (item.LootType == LootType.Blessed)
                 {
                     this.PublicOverheadMessage(Network.MessageType.Regular, 0x3B2, 1075256); // That is blessed; you cannot throw it away.
+                    return false;
                 }
-                else
-                {
-                    this.PublicOverheadMessage(Network.MessageType.Regular, 0x3B2, 1151271); // This item has no turn-in value for Clean Up Britannia.
-                }
-
-                return false;
             }
 
             this.PublicOverheadMessage(Network.MessageType.Regular, 0x3B2, Utility.Random(1042891, 8));
