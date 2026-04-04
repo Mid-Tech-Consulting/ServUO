@@ -113,62 +113,60 @@ namespace Server.Items
         {
             private readonly AdvancedInteriorDecorator m_Decorator;
 
+            private string Color(string text) =>
+                String.Format("<BASEFONT COLOR=#FFFFFF>{0}</BASEFONT>", text);
+
+            private void AddCell(AdvancedInteriorDecorator decorator, AdvancedDecorateCommand cmd, int buttonID, string label, int x, int y)
+            {
+                bool selected = decorator.Command == cmd;
+                AddButton(x + 3, y + 4, selected ? 4006 : 4005, 4007, buttonID, GumpButtonType.Reply, 0);
+                AddHtml(x + 38, y + 5, 120, 20, Color(label), false, false);
+            }
+
             public InternalGump(Mobile from, AdvancedInteriorDecorator decorator)
                 : base(150, 50)
             {
                 m_Decorator = decorator;
 
-                AddPage(0);
-                AddBackground(0, 0, 400, 310, 5054);
+                const int Padding  = 10;
+                const int HeaderH  = 25;
+                const int CellW    = 180;
+                const int CellH    = 25;
+                const int Cols     = 2;
+                const int Rows     = 6;
+                int GridStartY     = Padding + HeaderH + 5;
+                int totalW         = Padding * 2 + CellW * Cols;
+                int totalH         = GridStartY + Rows * CellH + Padding;
 
-                // Header bar (matches GM toolbar style)
-                AddImageTiled(10, 10, 380, 25, 2624);
-                AddAlphaRegion(10, 10, 380, 25);
-                AddHtml(15, 15, 370, 20, "<BASEFONT COLOR=#FFFFFF>Advanced Decoration Tool</BASEFONT>", false, false);
+                AddBackground(0, 0, totalW, totalH, 5054);
 
-                int leftX = 30;
-                int rightX = 210;
-                int labelOffsetX = 35;
-                int startY = 55;
-                int spacing = 35;
+                // Header bar
+                AddImageTiled(Padding, Padding, totalW - Padding * 2, HeaderH, 2624);
+                AddAlphaRegion(Padding, Padding, totalW - Padding * 2, HeaderH);
+                AddHtml(Padding + 5, Padding + 5, totalW - Padding * 2 - 10, 20, Color("Advanced Decoration Tool"), false, false);
 
-                // Left column - first 6 options
-                AddButton(leftX, startY, (decorator.Command == AdvancedDecorateCommand.Secure ? 2154 : 2152), 2154, 1, GumpButtonType.Reply, 0);
-                AddLabel(leftX + labelOffsetX, startY + 2, 0x481, "Secure");
+                // Content area backing
+                AddImageTiled(Padding, GridStartY, totalW - Padding * 2, Rows * CellH, 2624);
+                AddAlphaRegion(Padding, GridStartY, totalW - Padding * 2, Rows * CellH);
 
-                AddButton(leftX, startY + spacing, (decorator.Command == AdvancedDecorateCommand.Lockdown ? 2154 : 2152), 2154, 2, GumpButtonType.Reply, 0);
-                AddLabel(leftX + labelOffsetX, startY + spacing + 2, 0x481, "Lockdown");
+                // Left column
+                int leftX  = Padding;
+                int rightX = Padding + CellW;
 
-                AddButton(leftX, startY + spacing * 2, (decorator.Command == AdvancedDecorateCommand.Release ? 2154 : 2152), 2154, 3, GumpButtonType.Reply, 0);
-                AddLabel(leftX + labelOffsetX, startY + spacing * 2 + 2, 0x481, "Release");
+                AddCell(decorator, AdvancedDecorateCommand.Secure,   1,  "Secure",   leftX,  GridStartY + CellH * 0);
+                AddCell(decorator, AdvancedDecorateCommand.Lockdown,  2,  "Lockdown", leftX,  GridStartY + CellH * 1);
+                AddCell(decorator, AdvancedDecorateCommand.Release,   3,  "Release",  leftX,  GridStartY + CellH * 2);
+                AddCell(decorator, AdvancedDecorateCommand.Turn,      4,  "Turn",     leftX,  GridStartY + CellH * 3);
+                AddCell(decorator, AdvancedDecorateCommand.Up,        5,  "Up",       leftX,  GridStartY + CellH * 4);
+                AddCell(decorator, AdvancedDecorateCommand.Down,      6,  "Down",     leftX,  GridStartY + CellH * 5);
 
-                AddButton(leftX, startY + spacing * 3, (decorator.Command == AdvancedDecorateCommand.Turn ? 2154 : 2152), 2154, 4, GumpButtonType.Reply, 0);
-                AddLabel(leftX + labelOffsetX, startY + spacing * 3 + 2, 0x481, "Turn");
-
-                AddButton(leftX, startY + spacing * 4, (decorator.Command == AdvancedDecorateCommand.Up ? 2154 : 2152), 2154, 5, GumpButtonType.Reply, 0);
-                AddLabel(leftX + labelOffsetX, startY + spacing * 4 + 2, 0x481, "Up");
-
-                AddButton(leftX, startY + spacing * 5, (decorator.Command == AdvancedDecorateCommand.Down ? 2154 : 2152), 2154, 6, GumpButtonType.Reply, 0);
-                AddLabel(leftX + labelOffsetX, startY + spacing * 5 + 2, 0x481, "Down");
-
-                // Right column - remaining 6 options
-                AddButton(rightX, startY, (decorator.Command == AdvancedDecorateCommand.North ? 2154 : 2152), 2154, 7, GumpButtonType.Reply, 0);
-                AddLabel(rightX + labelOffsetX, startY + 2, 0x481, "North");
-
-                AddButton(rightX, startY + spacing, (decorator.Command == AdvancedDecorateCommand.East ? 2154 : 2152), 2154, 8, GumpButtonType.Reply, 0);
-                AddLabel(rightX + labelOffsetX, startY + spacing + 2, 0x481, "East");
-
-                AddButton(rightX, startY + spacing * 2, (decorator.Command == AdvancedDecorateCommand.South ? 2154 : 2152), 2154, 9, GumpButtonType.Reply, 0);
-                AddLabel(rightX + labelOffsetX, startY + spacing * 2 + 2, 0x481, "South");
-
-                AddButton(rightX, startY + spacing * 3, (decorator.Command == AdvancedDecorateCommand.West ? 2154 : 2152), 2154, 10, GumpButtonType.Reply, 0);
-                AddLabel(rightX + labelOffsetX, startY + spacing * 3 + 2, 0x481, "West");
-
-                AddButton(rightX, startY + spacing * 4, (decorator.Command == AdvancedDecorateCommand.GetHue ? 2154 : 2152), 2154, 11, GumpButtonType.Reply, 0);
-                AddLabel(rightX + labelOffsetX, startY + spacing * 4 + 2, 0x481, "Get Hue");
-
-                AddButton(rightX, startY + spacing * 5, (decorator.Command == AdvancedDecorateCommand.Close ? 2154 : 2152), 2154, 13, GumpButtonType.Reply, 0);
-                AddLabel(rightX + labelOffsetX, startY + spacing * 5 + 2, 0x481, "Close");
+                // Right column
+                AddCell(decorator, AdvancedDecorateCommand.North,     7,  "North",    rightX, GridStartY + CellH * 0);
+                AddCell(decorator, AdvancedDecorateCommand.East,      8,  "East",     rightX, GridStartY + CellH * 1);
+                AddCell(decorator, AdvancedDecorateCommand.South,     9,  "South",    rightX, GridStartY + CellH * 2);
+                AddCell(decorator, AdvancedDecorateCommand.West,      10, "West",     rightX, GridStartY + CellH * 3);
+                AddCell(decorator, AdvancedDecorateCommand.GetHue,    11, "Get Hue",  rightX, GridStartY + CellH * 4);
+                AddCell(decorator, AdvancedDecorateCommand.Close,     13, "Close",    rightX, GridStartY + CellH * 5);
             }
 
             public override void OnResponse(NetState sender, RelayInfo info)
