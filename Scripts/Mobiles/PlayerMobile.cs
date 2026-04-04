@@ -1642,7 +1642,11 @@ namespace Server.Mobiles
 
             if (belt != null && belt.Openers != null && belt.Openers.Contains(pm))
             {
-                belt.DisplayTo(pm);
+                Timer.DelayCall(TimeSpan.FromMilliseconds(100), () =>
+                {
+                    if (!belt.Deleted && pm.NetState != null && belt.Openers != null && belt.Openers.Contains(pm))
+                        belt.DisplayTo(pm);
+                });
             }
         }
 
@@ -3547,7 +3551,13 @@ namespace Server.Mobiles
 
             if (belt != null && belt.Openers != null && belt.Openers.Contains(this))
             {
-                belt.DisplayTo(this);
+                PlayerMobile self = this;
+
+                Timer.DelayCall(TimeSpan.FromMilliseconds(100), () =>
+                {
+                    if (!belt.Deleted && self.NetState != null && belt.Openers != null && belt.Openers.Contains(self))
+                        belt.DisplayTo(self);
+                });
             }
 
 			DesignContext context = m_DesignContext;
