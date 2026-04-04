@@ -14,6 +14,7 @@ namespace Server.Items
             Weight = 7.0;
 
 
+            ArmorAttributes.MageArmor = 1;
             Attributes.BonusDex = 5;
             Attributes.BonusInt = 5;
             Attributes.BonusHits = 4;
@@ -58,11 +59,12 @@ namespace Server.Items
         [Constructable]
         public GargishAzaroksLegplates()
         {
-            Name = "Gargish Azarok's Legplates";
+            Name = "Azarok's Legplates";
             Hue = 1161;
             Weight = 7.0;
 
 
+            ArmorAttributes.MageArmor = 1;
             Attributes.BonusDex = 5;
             Attributes.BonusInt = 5;
             Attributes.BonusHits = 4;
@@ -79,6 +81,104 @@ namespace Server.Items
         }
 
         public override int AosStrReq { get { return 90; } }
+        public override int BasePhysicalResistance { get { return 20; } }
+        public override int BaseFireResistance { get { return 20; } }
+        public override int BaseColdResistance { get { return 20; } }
+        public override int BasePoisonResistance { get { return 20; } }
+        public override int BaseEnergyResistance { get { return 20; } }
+        public override int InitMinHits { get { return 255; } }
+        public override int InitMaxHits { get { return 255; } }
+
+        public override void Serialize(GenericWriter writer)
+        {
+            base.Serialize(writer);
+            writer.Write(0);
+        }
+
+        public override void Deserialize(GenericReader reader)
+        {
+            base.Deserialize(reader);
+            reader.ReadInt();
+        }
+    }
+
+    public class AzaroksStuddedLegs : StuddedLegs
+    {
+        public override bool IsArtifact { get { return true; } }
+
+        [Constructable]
+        public AzaroksStuddedLegs()
+        {
+            Name = "Azarok's Leggings";
+            Hue = 1161;
+            Weight = 5.0;
+
+            ArmorAttributes.MageArmor = 1;
+            Attributes.BonusDex = 5;
+            Attributes.BonusInt = 5;
+            Attributes.BonusHits = 4;
+            Attributes.BonusStam = 8;
+            Attributes.BonusMana = 8;
+            Attributes.LowerManaCost = 8;
+            Attributes.WeaponDamage = 20;
+            SkillBonuses.SetValues(0, SkillName.Healing, 15.0);
+        }
+
+        public AzaroksStuddedLegs(Serial serial)
+            : base(serial)
+        {
+        }
+
+        public override int AosStrReq { get { return 30; } }
+        public override int BasePhysicalResistance { get { return 20; } }
+        public override int BaseFireResistance { get { return 20; } }
+        public override int BaseColdResistance { get { return 20; } }
+        public override int BasePoisonResistance { get { return 20; } }
+        public override int BaseEnergyResistance { get { return 20; } }
+        public override int InitMinHits { get { return 255; } }
+        public override int InitMaxHits { get { return 255; } }
+
+        public override void Serialize(GenericWriter writer)
+        {
+            base.Serialize(writer);
+            writer.Write(0);
+        }
+
+        public override void Deserialize(GenericReader reader)
+        {
+            base.Deserialize(reader);
+            reader.ReadInt();
+        }
+    }
+
+    public class GargishAzaroksStoneLegs : GargishStoneLegs
+    {
+        public override bool IsArtifact { get { return true; } }
+
+        [Constructable]
+        public GargishAzaroksStoneLegs()
+        {
+            Name = "Azarok's Stone Leggings";
+            Hue = 1161;
+            Weight = 15.0;
+
+            ArmorAttributes.MageArmor = 1;
+            Attributes.BonusDex = 5;
+            Attributes.BonusInt = 5;
+            Attributes.BonusHits = 4;
+            Attributes.BonusStam = 8;
+            Attributes.BonusMana = 8;
+            Attributes.LowerManaCost = 8;
+            Attributes.WeaponDamage = 20;
+            SkillBonuses.SetValues(0, SkillName.Healing, 15.0);
+        }
+
+        public GargishAzaroksStoneLegs(Serial serial)
+            : base(serial)
+        {
+        }
+
+        public override int AosStrReq { get { return 40; } }
         public override int BasePhysicalResistance { get { return 20; } }
         public override int BaseFireResistance { get { return 20; } }
         public override int BaseColdResistance { get { return 20; } }
