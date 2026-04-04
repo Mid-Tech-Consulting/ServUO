@@ -28,6 +28,18 @@ namespace Server.Items
         {
         }
 
+        public override void OnDoubleClick(Mobile m)
+        {
+            if (m is PlayerMobile && m.InRange(GetWorldLocation(), 2))
+            {
+                BaseGump.SendGump(new ScrollOfTranscendenceBookGump((PlayerMobile)m, this));
+            }
+            else if (m.AccessLevel > AccessLevel.Player)
+            {
+                base.OnDoubleClick(m);
+            }
+        }
+
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
