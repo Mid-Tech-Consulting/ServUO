@@ -2,14 +2,14 @@ using System;
 
 namespace Server.Items
 {
-    public class DeathwardensGreaves : StuddedLegs
+    public class DeathwardensGreaves : LeatherLegs
     {
         public override bool IsArtifact { get { return true; } }
 
         [Constructable]
         public DeathwardensGreaves()
         {
-            Name = "Deathwarden's Studded Leather Greaves";
+            Name = "Deathwarden's Greaves";
             Hue = 1150;
             Weight = 4.0;
 
