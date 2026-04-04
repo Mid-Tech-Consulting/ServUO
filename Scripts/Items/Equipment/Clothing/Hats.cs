@@ -179,6 +179,7 @@ namespace Server.Items
         public JesterHatOfChuckles(int hue)
             : base(hue)
         {
+            SkillBonuses.SetValues(0, SkillName.Begging, 5.0);
             Attributes.Luck = 150;
         }
 
@@ -274,6 +275,9 @@ namespace Server.Items
             : base(hue)
         {
             Attributes.LowerManaCost = 15;
+            Attributes.BonusInt= 5;
+            Attributes.Luck = 100;
+            SkillBonuses.SetValues(0, SkillName.Meditation, 5.0);
         }
 
         public NystulsWizardsHat(Serial serial)
@@ -367,6 +371,9 @@ namespace Server.Items
         public GypsyHeaddress(int hue)
             : base(hue)
         {
+            Attributes.BonusStr = 5;
+            SkillBonuses.SetValues(0, SkillName.Tinkering, 5.0);
+            SkillBonuses.SetValues(1, SkillName.Mining, 5.0);
         }
 
         public GypsyHeaddress(Serial serial)

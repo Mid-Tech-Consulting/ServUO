@@ -1,4 +1,5 @@
 using System;
+using Server.Mobiles.MannequinProperty;
 
 namespace Server.Items
 {
@@ -10,9 +11,12 @@ namespace Server.Items
         {
             Hue = 0x58C;
             WeaponAttributes.HitLeechStam = 40;
+            WeaponAttributes.HitLightning = 30;
+            WeaponAttributes.HitLowerDefend = 30;
             Attributes.SpellChanneling = 1;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 20;
+            Velocity = 30;
             WeaponAttributes.ResistPoisonBonus = 10;
         }
 

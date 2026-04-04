@@ -25,6 +25,7 @@ namespace Server.Items
             Attributes.LowerManaCost = 10;
             Attributes.LowerRegCost = 20;
             Attributes.CastRecovery = 1;
+            ArmorAttributes.MageArmor = 1;
         }
 
         public DeathwardensGreaves(Serial serial)
@@ -77,6 +78,7 @@ namespace Server.Items
             Attributes.LowerManaCost = 10;
             Attributes.LowerRegCost = 20;
             Attributes.CastRecovery = 1;
+            ArmorAttributes.MageArmor = 1;
         }
 
         public GargishDeathwardensGreaves(Serial serial)

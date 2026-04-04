@@ -84,7 +84,6 @@ namespace Server.Items
             Attributes.LowerRegCost = 20;
             Attributes.CastSpeed = 1;
             Attributes.CastRecovery = 1;
-
             ArmorAttributes.MageArmor = 1;
         }
 

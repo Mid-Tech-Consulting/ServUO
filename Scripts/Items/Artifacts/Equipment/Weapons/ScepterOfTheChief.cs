@@ -13,13 +13,15 @@ namespace Server.Items
         public ScepterOfTheChief()
             : base()
         {
-            Hue = 0x481;			
-            Slayer = SlayerName.Exorcism;		
+            Hue = 0x481;
+            Slayer = SlayerName.Exorcism;
             Attributes.RegenHits = 2;
             Attributes.ReflectPhysical = 15;
-            Attributes.WeaponDamage = 45;		
+            Attributes.WeaponDamage = 45;
+            Attributes.Luck = 150;
             WeaponAttributes.HitDispel = 100;
             WeaponAttributes.HitLeechMana = 100;
+            WeaponAttributes.HitPoisonArea = 80;
         }
 
         public ScepterOfTheChief(Serial serial)

@@ -15,7 +15,9 @@ namespace Server.Items
             WeaponAttributes.HitFireball = 60;	
             Attributes.AttackChance = 15;
             Attributes.WeaponDamage = 50;
-            WeaponAttributes.UseBestSkill = 1;	
+            WeaponAttributes.UseBestSkill = 1;
+            Attributes.SpellChanneling = 1;
+            Attributes.Luck = 250;	
         }
 
         public DraconisWrath(Serial serial)

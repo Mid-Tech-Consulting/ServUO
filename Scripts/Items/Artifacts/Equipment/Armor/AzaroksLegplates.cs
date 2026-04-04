@@ -21,6 +21,7 @@ namespace Server.Items
             Attributes.BonusMana = 8;
             Attributes.LowerManaCost = 8;
             Attributes.WeaponDamage = 20;
+            ArmorAttributes.MageArmor = 1;
             SkillBonuses.SetValues(0, SkillName.Healing, 15.0);
         }
 
@@ -70,6 +71,7 @@ namespace Server.Items
             Attributes.BonusMana = 8;
             Attributes.LowerManaCost = 8;
             Attributes.WeaponDamage = 20;
+            ArmorAttributes.MageArmor = 1;
             SkillBonuses.SetValues(0, SkillName.Healing, 15.0);
         }
 

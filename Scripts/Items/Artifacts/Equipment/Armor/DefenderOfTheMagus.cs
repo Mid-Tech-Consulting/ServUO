@@ -8,10 +8,13 @@ namespace Server.Items
         [Constructable]
         public DefenderOfTheMagus() 
         {
-            Hue = 590;		
+            Hue = 590;
             Attributes.SpellChanneling = 1;
-            Attributes.DefendChance = 10;				
+            Attributes.DefendChance = 10;
             Attributes.CastRecovery = 1;
+            AbsorptionAttributes.SoulCharge = 30;
+            Attributes.Luck = 150;
+            Attributes.LowerRegCost = 15;
             //Random Resonance:
             switch (Utility.Random(5))
             {
