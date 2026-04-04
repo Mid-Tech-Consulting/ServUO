@@ -13,7 +13,7 @@ using System;
 
 namespace Server.Items
 {
-    public enum DecorateCommand
+    public enum AdvancedDecorateCommand
     {
         None,
         Secure,
@@ -30,14 +30,14 @@ namespace Server.Items
         Close
     }
 
-    public class InteriorDecorator : Item
+    public class AdvancedInteriorDecorator : Item
     {
 //        public override int LabelNumber { get { return 1041280; } } // an interior decorator
 
-        private DecorateCommand m_Command;
+        private AdvancedDecorateCommand m_Command;
 
         [Constructable]
-        public InteriorDecorator()
+        public AdvancedInteriorDecorator()
             : base(0xFC1)
         {
             Name = " An Advance Interior Decorator";
@@ -45,13 +45,13 @@ namespace Server.Items
             LootType = LootType.Regular;
         }
 
-        public InteriorDecorator(Serial serial)
+        public AdvancedInteriorDecorator(Serial serial)
             : base(serial)
         {
         }
 
         [CommandProperty(AccessLevel.GameMaster)]
-        public DecorateCommand Command
+        public AdvancedDecorateCommand Command
         {
             get { return m_Command; }
             set
@@ -68,7 +68,7 @@ namespace Server.Items
             return (house != null && house.IsFriend(from));
         }
 
-        public static bool CheckUse(InteriorDecorator tool, Mobile from)
+        public static bool CheckUse(AdvancedInteriorDecorator tool, Mobile from)
         {
             if (!InHouse(from))
                 from.SendLocalizedMessage(502092); // You must be in your house to do this.
@@ -82,7 +82,7 @@ namespace Server.Items
         //{
         //    base.GetProperties(list);
 
-        //    if (m_Command != DecorateCommand.None)
+        //    if (m_Command != AdvancedDecorateCommand.None)
         //        list.Add(1018322 + (int)m_Command); // Turn/Up/Down
         //}
 
@@ -103,7 +103,7 @@ namespace Server.Items
             //if (!CheckUse(this, from))
             //    return;
 
-            m_Command = DecorateCommand.None;
+            m_Command = AdvancedDecorateCommand.None;
 
             if (from.FindGump(typeof(InternalGump)) == null)
                 from.SendGump(new InternalGump(from, this));
@@ -111,9 +111,9 @@ namespace Server.Items
 
         private class InternalGump : Gump
         {
-            private readonly InteriorDecorator m_Decorator;
+            private readonly AdvancedInteriorDecorator m_Decorator;
 
-            public InternalGump(Mobile from, InteriorDecorator decorator)
+            public InternalGump(Mobile from, AdvancedInteriorDecorator decorator)
                 : base(150, 50)
             {
                 m_Decorator = decorator;
@@ -132,47 +132,47 @@ namespace Server.Items
                 int spacing = 35;
 
                 // Left column - first 6 options
-                AddButton(leftX, startY, (decorator.Command == DecorateCommand.Secure ? 2154 : 2152), 2154, 1, GumpButtonType.Reply, 0);
+                AddButton(leftX, startY, (decorator.Command == AdvancedDecorateCommand.Secure ? 2154 : 2152), 2154, 1, GumpButtonType.Reply, 0);
                 AddLabel(leftX + labelOffsetX, startY + 2, 0x481, "Secure");
 
-                AddButton(leftX, startY + spacing, (decorator.Command == DecorateCommand.Lockdown ? 2154 : 2152), 2154, 2, GumpButtonType.Reply, 0);
+                AddButton(leftX, startY + spacing, (decorator.Command == AdvancedDecorateCommand.Lockdown ? 2154 : 2152), 2154, 2, GumpButtonType.Reply, 0);
                 AddLabel(leftX + labelOffsetX, startY + spacing + 2, 0x481, "Lockdown");
 
-                AddButton(leftX, startY + spacing * 2, (decorator.Command == DecorateCommand.Release ? 2154 : 2152), 2154, 3, GumpButtonType.Reply, 0);
+                AddButton(leftX, startY + spacing * 2, (decorator.Command == AdvancedDecorateCommand.Release ? 2154 : 2152), 2154, 3, GumpButtonType.Reply, 0);
                 AddLabel(leftX + labelOffsetX, startY + spacing * 2 + 2, 0x481, "Release");
 
-                AddButton(leftX, startY + spacing * 3, (decorator.Command == DecorateCommand.Turn ? 2154 : 2152), 2154, 4, GumpButtonType.Reply, 0);
+                AddButton(leftX, startY + spacing * 3, (decorator.Command == AdvancedDecorateCommand.Turn ? 2154 : 2152), 2154, 4, GumpButtonType.Reply, 0);
                 AddLabel(leftX + labelOffsetX, startY + spacing * 3 + 2, 0x481, "Turn");
 
-                AddButton(leftX, startY + spacing * 4, (decorator.Command == DecorateCommand.Up ? 2154 : 2152), 2154, 5, GumpButtonType.Reply, 0);
+                AddButton(leftX, startY + spacing * 4, (decorator.Command == AdvancedDecorateCommand.Up ? 2154 : 2152), 2154, 5, GumpButtonType.Reply, 0);
                 AddLabel(leftX + labelOffsetX, startY + spacing * 4 + 2, 0x481, "Up");
 
-                AddButton(leftX, startY + spacing * 5, (decorator.Command == DecorateCommand.Down ? 2154 : 2152), 2154, 6, GumpButtonType.Reply, 0);
+                AddButton(leftX, startY + spacing * 5, (decorator.Command == AdvancedDecorateCommand.Down ? 2154 : 2152), 2154, 6, GumpButtonType.Reply, 0);
                 AddLabel(leftX + labelOffsetX, startY + spacing * 5 + 2, 0x481, "Down");
 
                 // Right column - remaining 6 options
-                AddButton(rightX, startY, (decorator.Command == DecorateCommand.North ? 2154 : 2152), 2154, 7, GumpButtonType.Reply, 0);
+                AddButton(rightX, startY, (decorator.Command == AdvancedDecorateCommand.North ? 2154 : 2152), 2154, 7, GumpButtonType.Reply, 0);
                 AddLabel(rightX + labelOffsetX, startY + 2, 0x481, "North");
 
-                AddButton(rightX, startY + spacing, (decorator.Command == DecorateCommand.East ? 2154 : 2152), 2154, 8, GumpButtonType.Reply, 0);
+                AddButton(rightX, startY + spacing, (decorator.Command == AdvancedDecorateCommand.East ? 2154 : 2152), 2154, 8, GumpButtonType.Reply, 0);
                 AddLabel(rightX + labelOffsetX, startY + spacing + 2, 0x481, "East");
 
-                AddButton(rightX, startY + spacing * 2, (decorator.Command == DecorateCommand.South ? 2154 : 2152), 2154, 9, GumpButtonType.Reply, 0);
+                AddButton(rightX, startY + spacing * 2, (decorator.Command == AdvancedDecorateCommand.South ? 2154 : 2152), 2154, 9, GumpButtonType.Reply, 0);
                 AddLabel(rightX + labelOffsetX, startY + spacing * 2 + 2, 0x481, "South");
 
-                AddButton(rightX, startY + spacing * 3, (decorator.Command == DecorateCommand.West ? 2154 : 2152), 2154, 10, GumpButtonType.Reply, 0);
+                AddButton(rightX, startY + spacing * 3, (decorator.Command == AdvancedDecorateCommand.West ? 2154 : 2152), 2154, 10, GumpButtonType.Reply, 0);
                 AddLabel(rightX + labelOffsetX, startY + spacing * 3 + 2, 0x481, "West");
 
-                AddButton(rightX, startY + spacing * 4, (decorator.Command == DecorateCommand.GetHue ? 2154 : 2152), 2154, 11, GumpButtonType.Reply, 0);
+                AddButton(rightX, startY + spacing * 4, (decorator.Command == AdvancedDecorateCommand.GetHue ? 2154 : 2152), 2154, 11, GumpButtonType.Reply, 0);
                 AddLabel(rightX + labelOffsetX, startY + spacing * 4 + 2, 0x481, "Get Hue");
 
-                AddButton(rightX, startY + spacing * 5, (decorator.Command == DecorateCommand.Close ? 2154 : 2152), 2154, 13, GumpButtonType.Reply, 0);
+                AddButton(rightX, startY + spacing * 5, (decorator.Command == AdvancedDecorateCommand.Close ? 2154 : 2152), 2154, 13, GumpButtonType.Reply, 0);
                 AddLabel(rightX + labelOffsetX, startY + spacing * 5 + 2, 0x481, "Close");
             }
 
             public override void OnResponse(NetState sender, RelayInfo info)
             {
-                DecorateCommand command = DecorateCommand.None;
+                AdvancedDecorateCommand command = AdvancedDecorateCommand.None;
                 Mobile m = sender.Mobile;
 
                 int cliloc = 0;
@@ -182,55 +182,55 @@ namespace Server.Items
                 {
                     case 1://secure
                         c_String = "Select an object to secure."; // Select an object to secure.
-                        command = DecorateCommand.Secure;
+                        command = AdvancedDecorateCommand.Secure;
                         break;
                     case 2://lockdown
                         c_String = "Select an object to lock down."; // Select an object to lock down.
-                        command = DecorateCommand.Lockdown;
+                        command = AdvancedDecorateCommand.Lockdown;
                         break;
                     case 3://release
                         c_String = "Select an object to release."; // Select an object to release.
-                        command = DecorateCommand.Release;
+                        command = AdvancedDecorateCommand.Release;
                         break;
                     case 4://turn
                         cliloc = 1073404; // Select an object to turn.
-                        command = DecorateCommand.Turn;
+                        command = AdvancedDecorateCommand.Turn;
                         break;
                     case 5://up
                         cliloc = 1073405; // Select an object to increase its height.
-                        command = DecorateCommand.Up;
+                        command = AdvancedDecorateCommand.Up;
                         break;
                     case 6://down
                         cliloc = 1073406; // Select an object to lower its height.
-                        command = DecorateCommand.Down;
+                        command = AdvancedDecorateCommand.Down;
                         break;
                     case 7://north
                         c_String = "Select an object to move north."; // Select an object to move north.
-                        command = DecorateCommand.North;
+                        command = AdvancedDecorateCommand.North;
                         break;
                     case 8://east
                         c_String = "Select an object to move east."; // Select an object to move east.
-                        command = DecorateCommand.East;
+                        command = AdvancedDecorateCommand.East;
                         break;
                     case 9://south
                         c_String = "Select an object to move south."; // Select an object to move south.
-                        command = DecorateCommand.South;
+                        command = AdvancedDecorateCommand.South;
                         break;
                     case 10://west
                         c_String = "Select an object to move west."; // Select an object to move west.
-                        command = DecorateCommand.West;
+                        command = AdvancedDecorateCommand.West;
                         break;
                     case 11://get hue
                         cliloc = 1158864; // Select an object to get the hue.
-                        command = DecorateCommand.GetHue;
+                        command = AdvancedDecorateCommand.GetHue;
                         break;
                     case 12://Close
                         c_String = "Close"; // Close
-                        command = DecorateCommand.Close;
+                        command = AdvancedDecorateCommand.Close;
                         break;
                 }
 
-                if (command != DecorateCommand.None & command != DecorateCommand.Close)
+                if (command != AdvancedDecorateCommand.None & command != AdvancedDecorateCommand.Close)
                 {
                     m_Decorator.Command = command;
                     m.SendGump(new InternalGump(m, m_Decorator));
@@ -251,9 +251,9 @@ namespace Server.Items
 
         private class InternalTarget : Target
         {
-            private readonly InteriorDecorator m_Decorator;
+            private readonly AdvancedInteriorDecorator m_Decorator;
 
-            public InternalTarget(InteriorDecorator decorator)
+            public InternalTarget(AdvancedInteriorDecorator decorator)
                 : base(-1, false, TargetFlags.None)
             {
                 CheckLOS = false;
@@ -279,7 +279,7 @@ namespace Server.Items
 
             protected override void OnTarget(Mobile from, object targeted)
             {
-                if (m_Decorator.Command == DecorateCommand.GetHue)
+                if (m_Decorator.Command == AdvancedDecorateCommand.GetHue)
                 {
                     int hue = 0;
 
@@ -302,7 +302,7 @@ namespace Server.Items
 
                     bool isDecorableComponent = false;
 
-                    if (m_Decorator.Command == DecorateCommand.Turn && IsKingsCollection(item))
+                    if (m_Decorator.Command == AdvancedDecorateCommand.Turn && IsKingsCollection(item))
                     {
                         isDecorableComponent = true;
                     }
@@ -336,7 +336,7 @@ namespace Server.Items
                         if (item is EnormousVenusFlytrapAddon)
                             isDecorableComponent = true;
 
-                        if (m_Decorator.Command == DecorateCommand.Turn)
+                        if (m_Decorator.Command == AdvancedDecorateCommand.Turn)
                         {
                             FlipableAddonAttribute[] attributes = (FlipableAddonAttribute[])addon.GetType().GetCustomAttributes(typeof(FlipableAddonAttribute), false);
 
@@ -344,7 +344,7 @@ namespace Server.Items
                                 isDecorableComponent = true;
                         }
                     }
-                    else if (item is Banner && m_Decorator.Command != DecorateCommand.Turn)
+                    else if (item is Banner && m_Decorator.Command != AdvancedDecorateCommand.Turn)
                     {
                         isDecorableComponent = true;
                     }
@@ -359,15 +359,15 @@ namespace Server.Items
                     }
                     else if (!house.IsLockedDown(item) && !house.IsSecure(item) && !isDecorableComponent)
                     {
-                        if (item is AddonComponent && m_Decorator.Command == DecorateCommand.Turn)
+                        if (item is AddonComponent && m_Decorator.Command == AdvancedDecorateCommand.Turn)
                             from.SendLocalizedMessage(1042273); // You cannot turn that.
-                        else if (item is AddonComponent && m_Decorator.Command == DecorateCommand.Up)
+                        else if (item is AddonComponent && m_Decorator.Command == AdvancedDecorateCommand.Up)
                             from.SendLocalizedMessage(1042274); // You cannot raise it up any higher.
-                        else if (item is AddonComponent && m_Decorator.Command == DecorateCommand.Down)
+                        else if (item is AddonComponent && m_Decorator.Command == AdvancedDecorateCommand.Down)
                             from.SendLocalizedMessage(1042275); // You cannot lower it down any further.
-                        else if (m_Decorator.Command == DecorateCommand.Secure)
+                        else if (m_Decorator.Command == AdvancedDecorateCommand.Secure)
                             Secure(item, from);
-                        else if (m_Decorator.Command == DecorateCommand.Lockdown)
+                        else if (m_Decorator.Command == AdvancedDecorateCommand.Lockdown)
                             Lockdown(item, from);
                         else
                             from.SendMessage("That is not locked down or secured.");
@@ -384,43 +384,43 @@ namespace Server.Items
                     {
                         switch (m_Decorator.Command)
                         {
-                            case DecorateCommand.None:
+                            case AdvancedDecorateCommand.None:
                                 None(item, from);
                                 break;
-                            case DecorateCommand.Secure:
+                            case AdvancedDecorateCommand.Secure:
                                 Secure(item, from);
                                 break;
-                            case DecorateCommand.Lockdown:
+                            case AdvancedDecorateCommand.Lockdown:
                                 Lockdown(item, from);
                                 break;
-                            case DecorateCommand.Release:
+                            case AdvancedDecorateCommand.Release:
                                 Release(item, from);
                                 break;
-                            case DecorateCommand.Turn:
+                            case AdvancedDecorateCommand.Turn:
                                 Turn(item, from);
                                 break;
-                            case DecorateCommand.Up:
+                            case AdvancedDecorateCommand.Up:
                                 Up(item, from);
                                 break;
-                            case DecorateCommand.Down:
+                            case AdvancedDecorateCommand.Down:
                                 Down(item, from);
                                 break;
-                            case DecorateCommand.North:
+                            case AdvancedDecorateCommand.North:
                                 North(item, from);
                                 break;
-                            case DecorateCommand.East:
+                            case AdvancedDecorateCommand.East:
                                 East(item, from);
                                 break;
-                            case DecorateCommand.South:
+                            case AdvancedDecorateCommand.South:
                                 South(item, from);
                                 break;
-                            case DecorateCommand.West:
+                            case AdvancedDecorateCommand.West:
                                 West(item, from);
                                 break;
-                            case DecorateCommand.GetHue:
+                            case AdvancedDecorateCommand.GetHue:
                                 GetHue(item, from);
                                 break;
-                            case DecorateCommand.Close:
+                            case AdvancedDecorateCommand.Close:
                                 Close(item, from);
                                 break;
                         }
@@ -433,7 +433,7 @@ namespace Server.Items
             protected override void OnTargetCancel(Mobile from, TargetCancelType cancelType)
             {
                 if (cancelType == TargetCancelType.Canceled)
-                    from.CloseGump(typeof(InteriorDecorator.InternalGump));
+                    from.CloseGump(typeof(AdvancedInteriorDecorator.InternalGump));
             }
 
             private static void None(Item item, Mobile from)
@@ -591,7 +591,7 @@ namespace Server.Items
 
             private static void Close(Item item, Mobile from)
             {
-                from.CloseGump(typeof(InteriorDecorator.InternalGump));
+                from.CloseGump(typeof(AdvancedInteriorDecorator.InternalGump));
                 Target.Cancel(from);
             }
             private static void Command(Item item, Mobile from)
