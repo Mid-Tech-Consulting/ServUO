@@ -857,7 +857,6 @@ namespace Server.Mobiles
             EventSink.UnequipMacro += UnequipMacro;
             #endregion
 
-            EventSink.TeleportMovement += OnTeleportMovement;
 
             if (Core.SE)
 			{
@@ -1629,25 +1628,6 @@ namespace Server.Mobiles
             BaseFamiliar.OnLogout(pm);
 
             BaseEscort.DeleteEscort(pm);
-        }
-
-        private static void OnTeleportMovement(TeleportMovementEventArgs e)
-        {
-            PlayerMobile pm = e.Mobile as PlayerMobile;
-
-            if (pm == null)
-                return;
-
-            FirstAidBelt belt = pm.FindItemOnLayer(Layer.Waist) as FirstAidBelt;
-
-            if (belt != null && belt.Openers != null && belt.Openers.Contains(pm))
-            {
-                Timer.DelayCall(TimeSpan.FromMilliseconds(100), () =>
-                {
-                    if (!belt.Deleted && pm.NetState != null && belt.Openers != null && belt.Openers.Contains(pm))
-                        belt.DisplayTo(pm);
-                });
-            }
         }
 
 		private static void EventSink_Connected(ConnectedEventArgs e)
@@ -3546,19 +3526,6 @@ namespace Server.Mobiles
 			}
 
             BaseGump.CheckCloseGumps(this);
-
-            FirstAidBelt belt = FindItemOnLayer(Layer.Waist) as FirstAidBelt;
-
-            if (belt != null && belt.Openers != null && belt.Openers.Contains(this))
-            {
-                PlayerMobile self = this;
-
-                Timer.DelayCall(TimeSpan.FromMilliseconds(100), () =>
-                {
-                    if (!belt.Deleted && self.NetState != null && belt.Openers != null && belt.Openers.Contains(self))
-                        belt.DisplayTo(self);
-                });
-            }
 
 			DesignContext context = m_DesignContext;
 
