@@ -122,7 +122,7 @@ namespace Server.Items
                 AddBackground(0, 0, 400, 310, 5054);
 
                 // Title
-                AddHtml(0, 15, 400, 20, "<center><BASEFONT COLOR=#FFFF00 size=7>Deco Tool</BASEFONT></center>", false, false);
+                AddHtml(0, 15, 400, 20, "<center><BASEFONT COLOR=#FFFF00 size=7>Advanced Decoration Tool</BASEFONT></center>", false, false);
                 AddImageTiled(20, 40, 360, 2, 96);
 
                 int leftX = 30;
