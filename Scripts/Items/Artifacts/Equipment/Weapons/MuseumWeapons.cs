@@ -77,6 +77,8 @@ namespace Server.Items
             Attributes.Luck = 100;			
             WeaponAttributes.UseBestSkill = 1;
             WeaponAttributes.HitLowerAttack = 60;
+            WeaponAttributes.HitColdArea = 80;
+            WeaponAttributes.HitLeechMana = 80;
         }
 
         public SwordOfJustice(Serial serial)
@@ -136,6 +138,7 @@ namespace Server.Items
             WeaponAttributes.ResistFireBonus = 10;			
             WeaponAttributes.UseBestSkill = 1;
             WeaponAttributes.HitLowerAttack = 60;
+            WeaponAttributes.HitFireball = 70;
         }
 
         public GeoffreysAxe(Serial serial)

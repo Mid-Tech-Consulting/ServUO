@@ -11,6 +11,8 @@ namespace Server.Items
         public WallOfHungryMouths()
         {
             Hue = 1034;
+            Attributes.Luck = 100;
+            Attributes.SpellChanneling = 1;
             AbsorptionAttributes.EaterEnergy = 20;
             AbsorptionAttributes.EaterPoison = 20;
             AbsorptionAttributes.EaterCold = 20;

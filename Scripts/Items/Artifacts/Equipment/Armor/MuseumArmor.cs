@@ -11,6 +11,9 @@ namespace Server.Items
         {
             Hue = 0x453;	
             Attributes.RegenMana = 2;
+            Attributes.LowerManaCost = 8;
+            Attributes.DefendChance = 5;
+            Attributes.AttackChance = 5;
             ArmorAttributes.MageArmor = 1;			
         }
 
@@ -37,7 +40,7 @@ namespace Server.Items
         {
             get
             {
-                return 5;
+                return 10;
             }
         }
         public override int BaseColdResistance
@@ -100,7 +103,9 @@ namespace Server.Items
             Hue = 0x84E;	
             Attributes.RegenHits = 3;
             Attributes.NightSight = 1;
-            ArmorAttributes.MageArmor = 1;			
+            Attributes.BonusStr = 5;
+            ArmorAttributes.MageArmor = 1;
+            SkillBonuses.SetValues(0, SkillName.Blacksmith, 20.0);			
         }
 
         public KeeoneansChainMail(Serial serial)
@@ -186,12 +191,14 @@ namespace Server.Items
         public VesperOrderShield()
             : base()
         {
-            Hue = 0x835;	
+            Hue = 0x835;
             Attributes.SpellChanneling = 1;
-            Attributes.Luck = 80;		
+            Attributes.Luck = 250;		
             Attributes.CastSpeed = -1;		
             Attributes.AttackChance = 15;		
-            Attributes.DefendChance = 15;		
+            Attributes.DefendChance = 15;
+            AbsorptionAttributes.EaterDamage = 5;
+            SkillBonuses.SetValues(0, SkillName.Cartography, 20.0);		
         }
 
         public VesperOrderShield(Serial serial)
@@ -249,11 +256,15 @@ namespace Server.Items
         public VesperChaosShield()
             : base()
         {
-            Hue = 0xFA;	
+            Hue = 0xFA;
+            Attributes.LowerRegCost = 15;
+            Attributes.LowerManaCost = 5;
+            Attributes.SpellDamage = 15;
             Attributes.SpellChanneling = 1;
             Attributes.CastRecovery = 2;	
             Attributes.CastSpeed = 1;				
             ArmorAttributes.SelfRepair = 1;
+            SkillBonuses.SetValues(0, SkillName.Discordance, 20.0);
         }
 
         public VesperChaosShield(Serial serial)
