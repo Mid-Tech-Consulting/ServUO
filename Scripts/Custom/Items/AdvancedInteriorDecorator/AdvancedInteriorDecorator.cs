@@ -121,9 +121,10 @@ namespace Server.Items
                 AddPage(0);
                 AddBackground(0, 0, 400, 310, 5054);
 
-                // Title
-                AddHtml(0, 15, 400, 20, "<center><BASEFONT COLOR=#FFFF00 size=7>Advanced Decoration Tool</BASEFONT></center>", false, false);
-                AddImageTiled(20, 40, 360, 2, 96);
+                // Header bar (matches GM toolbar style)
+                AddImageTiled(10, 10, 380, 25, 2624);
+                AddAlphaRegion(10, 10, 380, 25);
+                AddHtml(15, 15, 370, 20, "<BASEFONT COLOR=#FFFFFF>Advanced Decoration Tool</BASEFONT>", false, false);
 
                 int leftX = 30;
                 int rightX = 210;
