@@ -194,6 +194,9 @@ namespace Server
 
                         m_Mobile.NonlocalOverheadMessage(MessageType.Emote, 0x3F, 1114442, m_Mobile.Name); // * ~1_NAME~ seems resistant to the poison *
 
+                        if (m_Mobile is PlayerMobile)
+                            BuffInfo.RemoveBuff((PlayerMobile)m_Mobile, BuffIcon.Poison);
+
                         Stop();
                         return;
                     }
