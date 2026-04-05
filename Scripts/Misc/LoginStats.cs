@@ -1,6 +1,7 @@
 using System;
 using Server.Network;
 using Server.Engines.Quests;
+using Server.Gumps;
 using Server.Mobiles;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,7 @@ namespace Server.Misc
             if (m.IsStaff())
             {
                 Server.Engines.Help.PageQueue.Pages_OnCalled(m);
+                m.SendGump(new GMToolbarGump(m, false));
             }
         }
     }
