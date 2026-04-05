@@ -100,7 +100,7 @@ namespace Server.Gumps
             // Row 2 — Teleport group
             AddCell(from, 0, 2, 14, "Teleport",     AccessLevel.Counselor);
             AddCell(from, 1, 2, 15, "Stuck",        AccessLevel.Counselor);
-            AddCell(from, 2, 2, 16, "GetFollowers", AccessLevel.GameMaster);
+            AddCell(from, 2, 2, 16, "StaffRunebook", AccessLevel.Counselor);
             AddCell(from, 3, 2, 17, "Bank",         AccessLevel.GameMaster);
             AddCell(from, 4, 2, 18, "Save",         AccessLevel.Administrator);
             AddCell(from, 5, 2, 19, "Kill",         AccessLevel.GameMaster);
@@ -166,7 +166,7 @@ namespace Server.Gumps
                 // Row 2 — Teleport group
                 case 14: if (from.AccessLevel >= AccessLevel.Counselor)     CommandSystem.Handle(from, prefix + "Multi Tele");   break;
                 case 15: if (from.AccessLevel >= AccessLevel.Counselor)     CommandSystem.Handle(from, prefix + "Stuck");        break;
-                case 16: if (from.AccessLevel >= AccessLevel.GameMaster)    CommandSystem.Handle(from, prefix + "GetFollowers"); break;
+                case 16: if (from.AccessLevel >= AccessLevel.Counselor)     CommandSystem.Handle(from, prefix + "StaffRunebook"); break;
                 case 17: if (from.AccessLevel >= AccessLevel.GameMaster)    CommandSystem.Handle(from, prefix + "Bank");         break;
                 case 18: if (from.AccessLevel >= AccessLevel.Administrator) CommandSystem.Handle(from, prefix + "Save");         break;
                 case 19: if (from.AccessLevel >= AccessLevel.GameMaster)    CommandSystem.Handle(from, prefix + "Kill");         break;
