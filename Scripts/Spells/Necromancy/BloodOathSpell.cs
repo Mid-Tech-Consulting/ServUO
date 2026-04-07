@@ -173,7 +173,7 @@ namespace Server.Spells.Necromancy
                 BuffInfo.RemoveBuff(m_Caster, BuffIcon.BloodOathCaster);
                 BuffInfo.RemoveBuff(m_Target, BuffIcon.BloodOathCurse);
 
-                m_Table.Remove(m_Caster);
+                m_Table.Remove(m_Target);
             }
 
             protected override void OnTick()
