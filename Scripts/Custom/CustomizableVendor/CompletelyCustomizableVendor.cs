@@ -2269,6 +2269,15 @@ namespace System.CustomizableVendor
                 //even numbers
                 AddButton(470, (PosY + 19), 4020, 4021, ++m_ButtonNum, GumpButtonType.Reply, 1);
                 AddLabel(509, (PosY + 21), 1882, @"Delete");
+
+                // reorder arrows (left of entry; 7000+idx = move up, 7500+idx = move down)
+                int rewardIndex = EntryNum - 1;
+                int totalRewards = Vendor.Rewards.Count;
+                if (rewardIndex > 0)
+                    AddButton(186, (PosY + 25), 2152, 2151, 7000 + rewardIndex, GumpButtonType.Reply, 0);
+                if (rewardIndex < totalRewards - 1)
+                    AddButton(186, (PosY + 58), 2153, 2154, 7500 + rewardIndex, GumpButtonType.Reply, 0);
+
                 PosY += 102;
             }
             else
@@ -2331,6 +2340,32 @@ namespace System.CustomizableVendor
             if (info.ButtonID == 9999) // next page
             {
                 MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage + 1);
+                return;
+            }
+
+            if (info.ButtonID >= 7000 && info.ButtonID < 7500) // move up
+            {
+                int idx = info.ButtonID - 7000;
+                if (idx > 0 && idx < Vendor.Rewards.Count)
+                {
+                    Reward tmp = Vendor.Rewards[idx];
+                    Vendor.Rewards[idx] = Vendor.Rewards[idx - 1];
+                    Vendor.Rewards[idx - 1] = tmp;
+                }
+                MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage);
+                return;
+            }
+
+            if (info.ButtonID >= 7500 && info.ButtonID < 8000) // move down
+            {
+                int idx = info.ButtonID - 7500;
+                if (idx >= 0 && idx < Vendor.Rewards.Count - 1)
+                {
+                    Reward tmp = Vendor.Rewards[idx];
+                    Vendor.Rewards[idx] = Vendor.Rewards[idx + 1];
+                    Vendor.Rewards[idx + 1] = tmp;
+                }
+                MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage);
                 return;
             }
 
