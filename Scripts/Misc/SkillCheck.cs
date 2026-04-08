@@ -145,10 +145,19 @@ namespace Server.Misc
 				value += 1;
 
 			if (value < minSkill)
-				return false; // Too difficult
+			{
+				// Still allow gain even on "too difficult" if within 20 points
+				if (minSkill - value <= 20.0)
+					CheckSkill(from, skill, new Point2D(from.Location.X / LocationSize, from.Location.Y / LocationSize), 0.1);
+				return false;
+			}
 
 			if (value >= maxSkill)
-				return true; // No challenge
+			{
+				// Still allow gain chance even when no challenge
+				CheckSkill(from, skill, new Point2D(from.Location.X / LocationSize, from.Location.Y / LocationSize), 0.95);
+				return true;
+			}
 
 			var chance = (value - minSkill) / (maxSkill - minSkill);
 
@@ -299,10 +308,19 @@ namespace Server.Misc
 			var value = skill.Value;
 
 			if (value < minSkill)
-				return false; // Too difficult
+			{
+				// Still allow gain even on "too difficult" if within 20 points
+				if (minSkill - value <= 20.0)
+					CheckSkill(from, skill, target, 0.1);
+				return false;
+			}
 
 			if (value >= maxSkill)
-				return true; // No challenge
+			{
+				// Still allow gain chance even when no challenge
+				CheckSkill(from, skill, target, 0.95);
+				return true;
+			}
 
 			var chance = (value - minSkill) / (maxSkill - minSkill);
 
