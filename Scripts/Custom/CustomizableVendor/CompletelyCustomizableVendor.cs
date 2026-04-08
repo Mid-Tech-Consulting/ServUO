@@ -2626,12 +2626,12 @@ namespace System.CustomizableVendor
             AddImageTiled(176, 589, 436, 3, 10001);
             AddImageTiled(176, 31, 435, 3, 10001);
             AddImageTiled(609, 33, 3, 556, 10004);
-            AddLabel(348, 52, 2124, m_Vendor.GetName());
-            AddImage(210, 52, 9818);
-            AddImage(534, 52, 9818);
-            AddLabel(404, 119, 2125, @"You have:");
-            AddItem(348, 126, m_Vendor.Payment.PayID, m_Vendor.Payment.CurrHue);
-            AddLabel(404, 137, 2125, (m_CurrencyAmnt + " " + m_Vendor.Payment.PayName));
+            AddLabel(348, 38, 2124, m_Vendor.GetName());
+            AddImage(210, 38, 9818);
+            AddImage(534, 38, 9818);
+            AddLabel(404, 64, 2125, @"You have:");
+            AddItem(348, 70, m_Vendor.Payment.PayID, m_Vendor.Payment.CurrHue);
+            AddLabel(404, 82, 2125, (m_CurrencyAmnt + " " + m_Vendor.Payment.PayName));
 
 
             AddPage(1);
