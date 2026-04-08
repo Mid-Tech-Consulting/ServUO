@@ -2274,9 +2274,9 @@ namespace System.CustomizableVendor
                 int rewardIndex = EntryNum - 1;
                 int totalRewards = Vendor.Rewards.Count;
                 if (rewardIndex > 0)
-                    AddButton(186, (PosY + 25), 2152, 2151, 7000 + rewardIndex, GumpButtonType.Reply, 0);
+                    AddButton(186, (PosY + 25), 1251, 1251, 7000 + rewardIndex, GumpButtonType.Reply, 0);
                 if (rewardIndex < totalRewards - 1)
-                    AddButton(186, (PosY + 58), 2153, 2154, 7500 + rewardIndex, GumpButtonType.Reply, 0);
+                    AddButton(186, (PosY + 58), 1253, 1253, 7500 + rewardIndex, GumpButtonType.Reply, 0);
 
                 PosY += 102;
             }
