@@ -2212,11 +2212,20 @@ namespace System.CustomizableVendor
     public class ManageItemsGump : JewlRewardGump
     {
         private int m_ButtonNum;
+        private readonly AccessLevel m_AccessLevel;
+
+        private static bool CanReorder(AccessLevel level)
+        {
+            return level == AccessLevel.GameMaster
+                || level == AccessLevel.Administrator
+                || level == AccessLevel.Owner;
+        }
 
         public ManageItemsGump(IRewardVendor vendor, Mobile m)
             : base(vendor, m)
         {
             m_ButtonNum = 0;
+            m_AccessLevel = m.AccessLevel;
         }
 
         protected override void AddEntryControl(Reward r)
@@ -2273,10 +2282,13 @@ namespace System.CustomizableVendor
                 // reorder arrows (left of entry; 7000+idx = move up, 7500+idx = move down)
                 int rewardIndex = EntryNum - 1;
                 int totalRewards = Vendor.Rewards.Count;
-                if (rewardIndex > 0)
-                    AddButton(196, (PosY + 37), 2436, 2436, 7000 + rewardIndex, GumpButtonType.Reply, 0);
-                if (rewardIndex < totalRewards - 1)
-                    AddButton(196, (PosY + 55), 2438, 2438, 7500 + rewardIndex, GumpButtonType.Reply, 0);
+                if (CanReorder(m_AccessLevel))
+                {
+                    if (rewardIndex > 0)
+                        AddButton(196, (PosY + 37), 2436, 2436, 7000 + rewardIndex, GumpButtonType.Reply, 0);
+                    if (rewardIndex < totalRewards - 1)
+                        AddButton(196, (PosY + 55), 2438, 2438, 7500 + rewardIndex, GumpButtonType.Reply, 0);
+                }
 
                 PosY += 102;
             }
@@ -2345,27 +2357,33 @@ namespace System.CustomizableVendor
 
             if (info.ButtonID >= 7000 && info.ButtonID < 7500) // move up
             {
-                int idx = info.ButtonID - 7000;
-                if (idx > 0 && idx < Vendor.Rewards.Count)
+                if (CanReorder(m.AccessLevel))
                 {
-                    Reward tmp = Vendor.Rewards[idx];
-                    Vendor.Rewards[idx] = Vendor.Rewards[idx - 1];
-                    Vendor.Rewards[idx - 1] = tmp;
+                    int idx = info.ButtonID - 7000;
+                    if (idx > 0 && idx < Vendor.Rewards.Count)
+                    {
+                        Reward tmp = Vendor.Rewards[idx];
+                        Vendor.Rewards[idx] = Vendor.Rewards[idx - 1];
+                        Vendor.Rewards[idx - 1] = tmp;
+                    }
+                    MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage);
                 }
-                MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage);
                 return;
             }
 
             if (info.ButtonID >= 7500 && info.ButtonID < 8000) // move down
             {
-                int idx = info.ButtonID - 7500;
-                if (idx >= 0 && idx < Vendor.Rewards.Count - 1)
+                if (CanReorder(m.AccessLevel))
                 {
-                    Reward tmp = Vendor.Rewards[idx];
-                    Vendor.Rewards[idx] = Vendor.Rewards[idx + 1];
-                    Vendor.Rewards[idx + 1] = tmp;
+                    int idx = info.ButtonID - 7500;
+                    if (idx >= 0 && idx < Vendor.Rewards.Count - 1)
+                    {
+                        Reward tmp = Vendor.Rewards[idx];
+                        Vendor.Rewards[idx] = Vendor.Rewards[idx + 1];
+                        Vendor.Rewards[idx + 1] = tmp;
+                    }
+                    MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage);
                 }
-                MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage);
                 return;
             }
 
