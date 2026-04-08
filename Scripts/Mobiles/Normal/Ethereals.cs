@@ -195,7 +195,19 @@ namespace Server.Mobiles
         public bool NoFollowerSlot
         {
             get { return m_NoFollowerSlot; }
-            set { m_NoFollowerSlot = value; }
+            set
+            {
+                if (m_NoFollowerSlot == value)
+                    return;
+
+                if (m_Rider != null)
+                    RemoveFollowers();
+
+                m_NoFollowerSlot = value;
+
+                if (m_Rider != null)
+                    AddFollowers();
+            }
         }
 
         public virtual int FollowerSlots { get { return m_NoFollowerSlot ? 0 : 1; } }
