@@ -1,7 +1,75 @@
 //Completely Customizable Vendor
-//Cleaned up by Tresdni
 //Original Author:  krazeykow
+/*
+    How to use: In game GM command to create vendor. [add MobileRewardVendor
+    Updated on 3/23/2026 by Cork
+    Features requested and added:
+        Added feature to stay on the same menu page after selecting item to purchase
 
+    Problem:
+        The JewlRewardGump used client-side page navigation (GumpButtonType.Page),
+        which always resets to page 1 whenever the gump is recreated — after clicking
+        an item, buying, or navigating pages.
+
+    Solution: Changed to Server-side pagination instead of client based.
+
+    Changes:
+        1. IRewardVendorGump Interface
+            Added int ServerPage { get; set; } property to track the current page across gump recreations.
+
+        2. JewlRewardGump (player vendor gump)
+            Added protected int m_ServerPage field and protected const int EntriesPerPage = 4.
+                
+            Initialized m_ServerPage = 1 in the parameterless constructor.
+            
+            Added explicit interface implementation for IRewardVendorGump.ServerPage.
+            
+            AddEntryControl — converted from client-side pagination (AddPage/GumpButtonType.Page) to server-side pagination.
+                Now calculates entryPage = ((m_EntryNum - 1) / EntriesPerPage) + 1 and only renders entries
+                matching m_ServerPage. Removed all AddPage() and GumpButtonType.Page calls.
+            
+            SendControl — now calculates total pages, clamps m_ServerPage if needed,
+                and adds prev (button 9998) / next (button 9999) as GumpButtonType.Reply buttons before sending.
+            
+            OnResponse — added handling for button IDs 9998 (prev page) and 9999 (next page). Now passes m_ServerPage to
+                both MenuUploader.Display and the ViewItemGump constructor when clicking an item.
+
+        3. ManageItemsGump (staff vendor gump)
+            Removed SendControl override — now uses the base class version which adds server-side nav buttons.
+            
+            AddEntryControl — converted to server-side pagination matching the base class pattern. Only renders
+                            entries on m_ServerPage, increments m_ButtonNum += 2 for skipped entries to preserve
+                            button ID mapping. Removed client-side AddPage/GumpButtonType.Page logic.
+            OnResponse — added handling for 9998/9999 page nav buttons. Now passes m_ServerPage to
+                MenuUploader.Display and ViewItemGump when clicking Options on an item.
+            
+            DeleteReward_Callback — now receives and uses the page number via Storage (third parameter) so the
+                menu reopens on the same page after deletion. Storage comment updated from
+                (Vendor, Reward) to (Vendor, Reward, Page).
+
+        4. ViewItemGump
+            Added private readonly int m_Page field.
+            
+            Constructor now accepts int page = 1 optional parameter.
+            
+            OnResponse case 2 (Buy) — now calls m.CloseGump(m_Vendor.Menu) then
+                MenuUploader.Display(m_Vendor.Menu, m, m_Vendor,
+                true, m_Page) to reopen the vendor menu on the same page with updated currency.
+
+        5. MenuUploader
+            Display(IRewardVendorGump, Mobile, IRewardVendor) — fixed pre-existing bug where m.CloseGump(typeof(IRewardVendorGump))
+                never matched anything (interface types don't match concrete types). Changed to m.CloseGump(menu.GetType()).
+            
+            Display(Type, Mobile, IRewardVendor, bool) — now delegates to the new 5-parameter overload with page = 1.
+            
+            Added Display(Type, Mobile, IRewardVendor, bool, int page) — new overload that sets ServerPage on the created
+                gump instance. Staff path creates ManageItemsGump and sets ServerPage via interface cast. Player path sets
+                ServerPage on the Activator.CreateInstance result.
+
+        6. ClassicVendorGump
+            Added private int m_ServerPage field and explicit interface implementation for IRewardVendorGump.ServerPage (required by
+                interface, unused by this gump type).
+*/
 #region References
 
 using System.Collections;
@@ -427,10 +495,10 @@ namespace System.CustomizableVendor
 
             //explicit casts are given for clarification        
             writer.Write((int)m_Payment);
-            writer.Write(PaymentType.Name);
+            writer.Write(PaymentType == null ? "" : PaymentType.Name);
             writer.Write(m_PropertyInfo == null ? "" : m_PropertyInfo.Name);
             writer.Write(PayID);
-            writer.Write(PayName);
+            writer.Write(PayName ?? "");
         }
 
         public override void Deserialize(GenericReader reader)
@@ -1293,12 +1361,14 @@ namespace System.CustomizableVendor
     {
         private readonly IRewardVendor m_Vendor;
         private readonly Reward m_Reward;
+        private readonly int m_Page;
 
-        public ViewItemGump(Mobile m, IRewardVendor vendor, Reward r, bool viewItem)
+        public ViewItemGump(Mobile m, IRewardVendor vendor, Reward r, bool viewItem, int page = 1)
             : base(0, 0)
         {
             m_Vendor = vendor;
             m_Reward = r;
+            m_Page = page;
 
             Closable = true;
             Disposable = true;
@@ -1316,6 +1386,9 @@ namespace System.CustomizableVendor
             AddLabel(430, 263, 2101, @"Description");
             AddButton(192, 442, 4029, 4030, 2, GumpButtonType.Reply, 0); //buy
             AddLabel(231, 444, 2125, "Buy (" + r.Cost + ")");
+            AddLabel(298, 444, 2125, "Qty:");
+            AddBackground(320, 438, 40, 22, 9350);
+            AddTextEntry(323, 440, 34, 18, 0, 1, "1");
             AddButton(366, 442, 4020, 4021, 0, GumpButtonType.Reply, 0); //cancel
             AddLabel(407, 444, 2116, @"Cancel");
             AddImageTiled(184, 239, 510, 8, 9201);
@@ -1395,6 +1468,8 @@ namespace System.CustomizableVendor
             {
                 case 0:
                     {
+                        m.CloseGump(m_Vendor.Menu);
+                        MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true, m_Page);
                         break;
                     }
                 case 1:
@@ -1412,41 +1487,56 @@ namespace System.CustomizableVendor
                     }
                 case 2:
                     {
-                        Container bank = m.BankBox;
-                        Container pack = m.Backpack;
+                        if (m.BankBox == null || m.Backpack == null)
+                            break;
 
-                        if (bank == null || pack == null)
+                        string qtyText = info.GetTextEntry(1) != null ? info.GetTextEntry(1).Text : "1";
+                        int qty;
+                        if (!int.TryParse(qtyText, out qty) || qty < 1) qty = 1;
+
+                        Currency curr = m_Vendor.Payment;
+                        int totalCost = qty * m_Reward.Cost;
+
+                        if (!m_Reward.InStock(1))
                         {
+                            m.SendMessage("{0} is out of stock.", m_Reward.Title);
+                            m.CloseGump(typeof(ViewItemGump));
+                            m.SendGump(new ViewItemGump(m, m_Vendor, m_Reward, false, m_Page));
                             break;
                         }
 
-                        Currency curr = m_Vendor.Payment;
-
-                        if (m_Reward.InStock(1))
+                        if (curr.Value(m) < totalCost)
                         {
-                            if (curr.Purchase(m, m_Reward.Cost))
-                            {
-                                m_Reward.RegisterBuy(1);
-
-                                Item i = m_Reward.RewardCopy;
-
-                                if (m.PlaceInBackpack(i))//edit was  if (!m.PlaceInBackpack(i))
-                                {
-                                    bank.DropItem(i);
-                                    m.SendMessage("You are overweight, the Reward was added to your bank");
-                                }
-
-                                m.SendMessage("You bought {0} for {1} {2}.", m_Reward.Title, m_Reward.Cost, curr.PayName);
-                            }
-                            else
-                            {
-                                m.SendMessage("You cannot afford {0}", m_Reward.Title);
-                            }
+                            m.SendMessage("You cannot afford {0}x {1}. Total cost: {2} {3}, you have: {4} {3}.",
+                                qty, m_Reward.Title, totalCost, curr.PayName, curr.Value(m));
+                            m.CloseGump(typeof(ViewItemGump));
+                            m.SendGump(new ViewItemGump(m, m_Vendor, m_Reward, false, m_Page));
+                            break;
                         }
-                        else
+
+                        // Check whether the player's backpack can hold all items before opening confirm gump
+                        Item testItem = m_Reward.RewardCopy;
+                        bool canHold = m.Backpack.CheckHold(m, testItem, false, true);
+                        if (canHold && qty > 1)
                         {
-                            m.SendMessage("{0} is no longer in stock.", m_Reward.Title);
+                            int itemWeight = testItem.TotalWeight;
+                            int extraWeight = itemWeight * (qty - 1);
+                            int extraItems = qty - 1;
+                            canHold = (m.Backpack.MaxItems <= 0 || m.Backpack.TotalItems + extraItems < m.Backpack.MaxItems)
+                                   && (m.MaxWeight <= 0 || m.TotalWeight + extraWeight <= m.MaxWeight);
                         }
+                        testItem.Delete();
+
+                        if (!canHold)
+                        {
+                            m.SendMessage("You would be unable to hold this purchase");
+                            m.CloseGump(typeof(ViewItemGump));
+                            m.SendGump(new ViewItemGump(m, m_Vendor, m_Reward, false, m_Page));
+                            break;
+                        }
+
+                        m.CloseGump(typeof(ViewItemGump));
+                        m.SendGump(new BuyConfirmGump(m, m_Vendor, m_Reward, qty, m_Page));
 
                         break;
                     }
@@ -1475,7 +1565,129 @@ namespace System.CustomizableVendor
         }
     }
 
-    //Created for the usage of Warning Gump delegate 
+    public class BuyConfirmGump : Gump
+    {
+        private readonly IRewardVendor m_Vendor;
+        private readonly Reward m_Reward;
+        private readonly int m_Qty;
+        private readonly int m_Page;
+
+        public BuyConfirmGump(Mobile m, IRewardVendor vendor, Reward reward, int qty, int page)
+            : base(0, 0)
+        {
+            m_Vendor = vendor;
+            m_Reward = reward;
+            m_Qty = qty;
+            m_Page = page;
+
+            Closable = false;
+            Disposable = true;
+            Dragable = true;
+            Resizable = false;
+
+            Currency curr = vendor.Payment;
+            int totalCost = qty * reward.Cost;
+
+            AddPage(0);
+            AddImageTiled(149, 207, 548, 277, 2624);
+            AddImage(184, 300, 2328);
+            AddImage(101, 222, 10400);
+
+            // Order summary panel (right side — same position as Description)
+            string summary = string.Format(
+                "<B>Item:</B> {0}<BR><B>Quantity:</B> {1}<BR><B>Cost Each:</B> {2} {3}<BR><BR><B>Total Cost:</B> {4} {3}",
+                reward.Title, qty, reward.Cost, curr.PayName, totalCost);
+            AddHtml(428, 290, 243, 140, summary, true, true);
+
+            // Item graphic (left side)
+            AddItem(201, 311, reward.RewardInfo.ItemID, reward.RewardInfo.Hue);
+
+            // Separator and title
+            AddImageTiled(184, 239, 510, 8, 9201);
+            AddLabel(279, 263, 2116, "Please review your order and click OK to confirm.");
+
+            // Left side — cost details
+            AddLabel(279, 320, 38, "Total Cost: " + totalCost + " " + curr.PayName);
+            AddLabel(279, 340, 4,  "Quantity: " + qty);
+
+            // Payment row
+            AddItem(182, 376, m_Vendor.Payment.PayID, m_Vendor.Payment.CurrHue);
+            AddLabel(248, 369, 83, "Pay By: " + curr.PayName);
+            AddLabel(249, 398, 69, "You have: " + curr.Value(m) + " " + curr.PayName);
+
+            // Buttons — same positions as Buy/Cancel in ViewItemGump
+            AddButton(192, 442, 4029, 4030, 1, GumpButtonType.Reply, 0); // OK
+            AddLabel(231, 444, 2125, "OK");
+            AddButton(366, 442, 4020, 4021, 0, GumpButtonType.Reply, 0); // Cancel
+            AddLabel(407, 444, 2116, "Cancel");
+        }
+
+        public override void OnResponse(NetState sender, RelayInfo info)
+        {
+            Mobile m = sender.Mobile;
+
+            if (m_Vendor.IsRemoved())
+                return;
+
+            switch (info.ButtonID)
+            {
+                case 0: // Cancel — return to main menu on current page
+                    {
+                        m.CloseGump(m_Vendor.Menu);
+                        MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true, m_Page);
+                        break;
+                    }
+                case 1: // OK — execute purchase
+                    {
+                        Container bank = m.BankBox;
+                        Container pack = m.Backpack;
+
+                        if (bank == null || pack == null)
+                            break;
+
+                        Currency curr = m_Vendor.Payment;
+                        int purchased = 0;
+
+                        for (int q = 0; q < m_Qty; q++)
+                        {
+                            if (!m_Reward.InStock(1))
+                            {
+                                m.SendMessage("{0} is no longer in stock.", m_Reward.Title);
+                                break;
+                            }
+
+                            if (!curr.Purchase(m, m_Reward.Cost))
+                            {
+                                m.SendMessage("You can no longer afford {0}.", m_Reward.Title);
+                                break;
+                            }
+
+                            m_Reward.RegisterBuy(1);
+
+                            Item i = m_Reward.RewardCopy;
+
+                            if (!m.PlaceInBackpack(i))
+                            {
+                                bank.DropItem(i);
+                                m.SendMessage("You are overweight, the reward was added to your bank.");
+                            }
+
+                            purchased++;
+                        }
+
+                        if (purchased > 0)
+                            m.SendMessage("You bought {0}x {1} for {2} {3} each.", purchased, m_Reward.Title, m_Reward.Cost, curr.PayName);
+
+                        m.CloseGump(m_Vendor.Menu);
+                        MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true, m_Page);
+
+                        break;
+                    }
+            }
+        }
+    }
+
+    //Created for the usage of Warning Gump delegate
     public class Storage
     {
         private readonly object[] m_Objs;
@@ -1927,7 +2139,7 @@ namespace System.CustomizableVendor
 
         public static void Display(IRewardVendorGump menu, Mobile m, IRewardVendor vendor)
         {
-            m.CloseGump(typeof(IRewardVendorGump));
+            m.CloseGump(menu.GetType());
 
             //create 'canvas'
             menu.CreateBackground();
@@ -1943,15 +2155,21 @@ namespace System.CustomizableVendor
         }
 
         public static void Display(Type menu, Mobile m, IRewardVendor vendor, bool playerView)
-        //Note: Playerview is only relevant for Staff
+        {
+            Display(menu, m, vendor, playerView, 1);
+        }
+
+        public static void Display(Type menu, Mobile m, IRewardVendor vendor, bool playerView, int page)
         {
             try
-           {
+            {
                 if (m.AccessLevel > MobileRewardVendor.FullStaffAccessLevel)
                 {
                     if (playerView)
                     {
-                        Display(new ManageItemsGump(vendor, m), m, vendor);
+                        var mgump = new ManageItemsGump(vendor, m);
+                        ((IRewardVendorGump)mgump).ServerPage = page;
+                        Display(mgump, m, vendor);
                     }
                     else //control panel
                     {
@@ -1964,8 +2182,9 @@ namespace System.CustomizableVendor
                 }
                 else //player
                 {
-                    Display((IRewardVendorGump)Activator.CreateInstance(menu, new object[] { vendor, m }), m, vendor);
-                    //create fresh instance
+                    var gump = (IRewardVendorGump)Activator.CreateInstance(menu, new object[] { vendor, m });
+                    gump.ServerPage = page;
+                    Display(gump, m, vendor);
                 }
             }
             catch
@@ -1989,63 +2208,59 @@ namespace System.CustomizableVendor
 
         protected override void AddEntryControl(Reward r)
         {
-            ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
+            int entryPage = ((EntryNum - 1) / EntriesPerPage) + 1;
 
-            //begin time entries
-            if (r.Restock != null)
+            if (entryPage == m_ServerPage)
             {
-                if (r.Restock.RestockRate.TotalMinutes == 0)
-                {
-                    AddLabel(324, (PosY + 22), 5, "Limited");
-                }
-                else
-                {
-                    AddLabel(324, (PosY + 22), 5,
-                        r.Restock.RestockRate.Hours + " hours " + r.Restock.RestockRate.Minutes + " min");
-                }
+                ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
 
-                if (r.Restock.Maximum > 0)
+                //begin time entries
+                if (r.Restock != null)
                 {
-                    AddLabel(324, (PosY + 68), 4,
-                        "In Stock: " + r.Restock.Count + " / " + r.Restock.Maximum + ", Purchased: " + r.BuyCount);
+                    if (r.Restock.RestockRate.TotalMinutes == 0)
+                    {
+                        AddLabel(324, (PosY + 22), 5, "Limited");
+                    }
+                    else
+                    {
+                        AddLabel(324, (PosY + 22), 5,
+                            r.Restock.RestockRate.Hours + " hours " + r.Restock.RestockRate.Minutes + " min");
+                    }
+
+                    if (r.Restock.Maximum > 0)
+                    {
+                        AddLabel(324, (PosY + 68), 4,
+                            "In Stock: " + r.Restock.Count + " / " + r.Restock.Maximum + ", Purchased: " + r.BuyCount);
+                    }
+                    else
+                    {
+                        AddLabel(324, (PosY + 68), 4, "In Stock: " + r.Restock.Count + ", Purchased: " + r.BuyCount);
+                    }
                 }
                 else
                 {
-                    AddLabel(324, (PosY + 68), 4, "In Stock: " + r.Restock.Count + ", Purchased: " + r.BuyCount);
+                    AddLabel(324, (PosY + 68), 4, "Purchased: " + r.BuyCount);
                 }
+                //end
+
+                //create entry
+                AddLabel(227, PosY, 2123, r.Title);
+                AddLabel(324, (PosY + 45), 2115, "Cost: " + r.Cost);
+                //odd numbers
+                AddImageTiledButton(227, (PosY + 26), 2328, 2329, ++m_ButtonNum, GumpButtonType.Reply, 1, b.ItemID,
+                    b.Hue, 15, 10, r.Display.Header);
+                AddImageTiled(215, (PosY + 95), 359, 2, 96);
+                //odd numbers (same as above)
+                AddButton(470, (PosY + 45), 4011, 4012, m_ButtonNum, GumpButtonType.Reply, 1);
+                AddLabel(508, (PosY + 47), 1882, @"Options");
+                //even numbers
+                AddButton(470, (PosY + 19), 4020, 4021, ++m_ButtonNum, GumpButtonType.Reply, 1);
+                AddLabel(509, (PosY + 21), 1882, @"Delete");
+                PosY += 102;
             }
             else
             {
-                AddLabel(324, (PosY + 68), 4, "Purchased: " + r.BuyCount);
-            }
-            //end 
-
-            //create entry
-            AddLabel(227, PosY, 2123, r.Title);
-            AddLabel(324, (PosY + 45), 2115, "Cost: " + r.Cost);
-            //odd numbers
-            AddImageTiledButton(227, (PosY + 26), 2328, 2329, ++m_ButtonNum, GumpButtonType.Reply, PageNum, b.ItemID,
-                b.Hue, 15, 10, r.Display.Header);
-            AddImageTiled(215, (PosY + 95), 359, 2, 96);
-            //odd numbers (same as above)
-            AddButton(470, (PosY + 45), 4011, 4012, m_ButtonNum, GumpButtonType.Reply, PageNum);
-            AddLabel(508, (PosY + 47), 1882, @"Options");
-            //even numbers
-            AddButton(470, (PosY + 19), 4020, 4021, ++m_ButtonNum, GumpButtonType.Reply, PageNum);
-            AddLabel(509, (PosY + 21), 1882, @"Delete");
-            PosY += 102;
-
-            //add new page every four entries
-            if (EntryNum % 4 == 0)
-            {
-                AddButton(546, 562, 9903, 9904, -1, GumpButtonType.Page, PageNum + 1);
-
-                AddPage(++PageNum);
-
-                AddButton(221, 563, 9909, 9910, -1, GumpButtonType.Page, PageNum - 1);
-
-                //reset to top of page
-                PosY = 130;
+                m_ButtonNum += 2;
             }
 
             EntryNum++;
@@ -2062,11 +2277,12 @@ namespace System.CustomizableVendor
             {
                 return;
             }
-            //indexes -> (Vendor(0), Reward(1))
+            //indexes -> (Vendor(0), Reward(1), Page(2))
             Storage store = (Storage)state;
 
             IRewardVendor vendor = (IRewardVendor)store[0];
             Reward Reward = (Reward)store[1];
+            int page = (int)store[2];
 
             try
             {
@@ -2077,7 +2293,7 @@ namespace System.CustomizableVendor
                 @from.SendMessage("An error ocurred in the removal of this item.");
             }
 
-            MenuUploader.Display(vendor.Menu, @from, vendor, true);
+            MenuUploader.Display(vendor.Menu, @from, vendor, true, page);
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -2093,14 +2309,26 @@ namespace System.CustomizableVendor
                 return;
             }
 
+            if (info.ButtonID == 9998) // previous page
+            {
+                MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage - 1);
+                return;
+            }
+
+            if (info.ButtonID == 9999) // next page
+            {
+                MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage + 1);
+                return;
+            }
+
             if (info.ButtonID % 2 == 0) //even
             {
                 try
                 {
                     Reward r = Vendor.Rewards[(info.ButtonID / 2) - 1];
 
-                    //params -> (vendor, Reward)
-                    Storage store = new Storage(Vendor, r);
+                    //params -> (vendor, Reward, page)
+                    Storage store = new Storage(Vendor, r, m_ServerPage);
 
                     m.SendGump(new WarningGump(1060635, 30720, "Warning: Are you sure you want to remove " + r.Title,
                         0xFFC000, 420, 400, DeleteReward_Callback, store));
@@ -2114,9 +2342,9 @@ namespace System.CustomizableVendor
             {
                 try
                 {
-                    MenuUploader.Display(Vendor.Menu, m, Vendor, true);
+                    MenuUploader.Display(Vendor.Menu, m, Vendor, true, m_ServerPage);
                     m.CloseGump(typeof(ViewItemGump));
-                    m.SendGump(new ViewItemGump(m, Vendor, Vendor.Rewards[((info.ButtonID + 1) / 2) - 1], true));
+                    m.SendGump(new ViewItemGump(m, Vendor, Vendor.Rewards[((info.ButtonID + 1) / 2) - 1], true, m_ServerPage));
                 }
                 catch
                 {
@@ -2216,6 +2444,8 @@ namespace System.CustomizableVendor
         private int m_PosY;
         private IRewardVendor m_Vendor;
         private int m_CurrencyAmnt;
+        protected int m_ServerPage;
+        protected const int EntriesPerPage = 4;
 
         public static void Initialize()
         {
@@ -2231,6 +2461,7 @@ namespace System.CustomizableVendor
             m_Vendor = null;
             Mobile = null;
             m_CurrencyAmnt = 0;
+            m_ServerPage = 1;
         }
 
         public JewlRewardGump(IRewardVendor vendor, Mobile m)
@@ -2274,7 +2505,7 @@ namespace System.CustomizableVendor
             set { m_CurrencyAmnt = value; }
         }
 
-        //Interface Explicit Implementation 
+        //Interface Explicit Implementation
         void IRewardVendorGump.Send(Mobile m)
         {
             SendControl(m);
@@ -2290,8 +2521,25 @@ namespace System.CustomizableVendor
             AddEntryControl(r);
         }
 
+        int IRewardVendorGump.ServerPage
+        {
+            get { return m_ServerPage; }
+            set { m_ServerPage = value; }
+        }
+
         protected virtual void SendControl(Mobile m)
         {
+            int totalEntries = m_EntryNum - 1;
+            int totalPages = totalEntries > 0 ? ((totalEntries + EntriesPerPage - 1) / EntriesPerPage) : 1;
+
+            if (m_ServerPage > totalPages)
+                m_ServerPage = totalPages;
+
+            if (m_ServerPage > 1)
+                AddButton(221, 563, 9909, 9910, 9998, GumpButtonType.Reply, 1);
+            if (m_ServerPage < totalPages)
+                AddButton(546, 562, 9903, 9904, 9999, GumpButtonType.Reply, 1);
+
             m.SendGump(this);
         }
 
@@ -2325,49 +2573,39 @@ namespace System.CustomizableVendor
 
         protected virtual void AddEntryControl(Reward r)
         {
-            ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
+            int entryPage = ((m_EntryNum - 1) / EntriesPerPage) + 1;
 
-            //create entry
-
-            //begin time entries
-            if (r.Restock != null)
+            if (entryPage == m_ServerPage)
             {
-                if (r.Restock.RestockRate.TotalMinutes == 0)
+                ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
+
+                //begin time entries
+                if (r.Restock != null)
                 {
-                    AddLabel(324, (PosY + 22), 5, "Limited");
+                    if (r.Restock.RestockRate.TotalMinutes == 0)
+                    {
+                        AddLabel(324, (PosY + 22), 5, "Limited");
+                    }
+
+                    if (r.Restock.Maximum > 0)
+                    {
+                        AddLabel(324, (PosY + 68), 4, "In Stock: " + r.Restock.Count);
+                    }
+                    else
+                    {
+                        AddLabel(324, (PosY + 68), 4, "In Stock: " + r.Restock.Count);
+                    }
                 }
+                //end
 
-                if (r.Restock.Maximum > 0)
-                {
-                    AddLabel(324, (PosY + 68), 4, "In Stock: " + r.Restock.Count);
-                }
-                else
-                {
-                    AddLabel(324, (PosY + 68), 4, "In Stock: " + r.Restock.Count);
-                }
-            }
-            //end 
-
-            AddLabel(227, m_PosY, 2123, r.Title);
-            AddLabel(324, (m_PosY + 45), 2115, "Cost: " + r.Cost);
-            AddImageTiledButton(227, (m_PosY + 26), 2328, 2329, (m_EntryNum), GumpButtonType.Reply, m_PageNum, b.ItemID,
-                b.Hue, 15, 10, b.LocalizedTooltip);
-            AddImageTiled(215, (m_PosY + 95), 359, 2, 96);
-            AddButton(470, (PosY + 45), 4011, 4012, (m_EntryNum), GumpButtonType.Reply, m_PageNum);
-            AddLabel(508, (PosY + 47), 745, @"View Item");
-            m_PosY += 102;
-
-            //add new page every four entries
-            if (m_EntryNum % 4 == 0)
-            {
-                AddButton(546, 562, 9903, 9904, -1, GumpButtonType.Page, m_PageNum + 1);
-
-                AddPage(++m_PageNum);
-
-                AddButton(221, 563, 9909, 9910, -1, GumpButtonType.Page, m_PageNum - 1);
-
-                //reset to top of page
-                m_PosY = 130;
+                AddLabel(227, m_PosY, 2123, r.Title);
+                AddLabel(324, (m_PosY + 45), 2115, "Cost: " + r.Cost);
+                AddImageTiledButton(227, (m_PosY + 26), 2328, 2329, (m_EntryNum), GumpButtonType.Reply, 1, b.ItemID,
+                    b.Hue, 15, 10, b.LocalizedTooltip);
+                AddImageTiled(215, (m_PosY + 95), 359, 2, 96);
+                AddButton(470, (PosY + 45), 4011, 4012, (m_EntryNum), GumpButtonType.Reply, 1);
+                AddLabel(508, (PosY + 47), 745, @"View Item");
+                m_PosY += 102;
             }
 
             m_EntryNum++;
@@ -2382,12 +2620,24 @@ namespace System.CustomizableVendor
                 return;
             }
 
-            MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true);
+            if (info.ButtonID == 9998) // previous page
+            {
+                MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true, m_ServerPage - 1);
+                return;
+            }
+
+            if (info.ButtonID == 9999) // next page
+            {
+                MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true, m_ServerPage + 1);
+                return;
+            }
+
+            MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true, m_ServerPage);
 
             try
             {
                 m.CloseGump(typeof(ViewItemGump));
-                m.SendGump(new ViewItemGump(m, m_Vendor, m_Vendor.Rewards[info.ButtonID - 1], true));
+                m.SendGump(new ViewItemGump(m, m_Vendor, m_Vendor.Rewards[info.ButtonID - 1], true, m_ServerPage));
             }
             catch
             {
@@ -2619,6 +2869,13 @@ namespace System.CustomizableVendor
         private readonly BaseVendor m_BVendor;
 
         private readonly Mobile m_Mobile;
+        private int m_ServerPage;
+
+        int IRewardVendorGump.ServerPage
+        {
+            get { return m_ServerPage; }
+            set { m_ServerPage = value; }
+        }
 
         private readonly List<ObjectPropertyList> m_Opls;
         private readonly List<BuyItemState> m_List;
@@ -3388,8 +3645,7 @@ namespace System.CustomizableVendor
         void Send(Mobile m);
         void AddEntry(Reward r);
         void CreateBackground();
-
-        //add entry || background || 
+        int ServerPage { get; set; }
     }
 
 
