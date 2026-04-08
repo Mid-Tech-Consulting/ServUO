@@ -2629,9 +2629,9 @@ namespace System.CustomizableVendor
             AddLabel(348, 38, 2124, m_Vendor.GetName());
             AddImage(210, 38, 9818);
             AddImage(534, 38, 9818);
-            AddLabel(404, 64, 2125, @"You have:");
-            AddItem(348, 70, m_Vendor.Payment.PayID, m_Vendor.Payment.CurrHue);
-            AddLabel(404, 82, 2125, (m_CurrencyAmnt + " " + m_Vendor.Payment.PayName));
+            AddLabel(348, 64, 2125, @"You have:");
+            AddItem(325, 70, m_Vendor.Payment.PayID, m_Vendor.Payment.CurrHue);
+            AddLabel(348, 82, 2125, (m_CurrencyAmnt + " " + m_Vendor.Payment.PayName));
 
 
             AddPage(1);
