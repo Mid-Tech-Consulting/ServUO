@@ -2630,7 +2630,7 @@ namespace System.CustomizableVendor
             AddImage(210, 38, 9818);
             AddImage(534, 38, 9818);
             AddLabel(348, 64, 2125, @"You have:");
-            AddItem(325, 70, m_Vendor.Payment.PayID, m_Vendor.Payment.CurrHue);
+            AddItem(455, 60, m_Vendor.Payment.PayID, m_Vendor.Payment.CurrHue);
             AddLabel(348, 82, 2125, (m_CurrencyAmnt + " " + m_Vendor.Payment.PayName));
 
 
