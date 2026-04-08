@@ -22,6 +22,8 @@
 /TheBox
 /.vs
 
+Config/Database.cfg
+
 /staffHistory.xml
 /reportHistory.xml
 /firewall.cfg
