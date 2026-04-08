@@ -16,7 +16,6 @@ namespace Server.Mobiles
 
         private Mobile m_Rider;
         private bool m_IsRewardItem;
-        private bool m_NoFollowerSlot;
 
         private bool m_Transparent;
 
@@ -191,26 +190,7 @@ namespace Server.Mobiles
 
         public override bool DisplayLootType { get { return Core.AOS; } }
 
-        [CommandProperty(AccessLevel.GameMaster)]
-        public bool NoFollowerSlot
-        {
-            get { return m_NoFollowerSlot; }
-            set
-            {
-                if (m_NoFollowerSlot == value)
-                    return;
-
-                if (m_Rider != null)
-                    RemoveFollowers();
-
-                m_NoFollowerSlot = value;
-
-                if (m_Rider != null)
-                    AddFollowers();
-            }
-        }
-
-        public virtual int FollowerSlots { get { return m_NoFollowerSlot ? 0 : 1; } }
+        public virtual int FollowerSlots { get { return 0; } }
 
         [CommandProperty(AccessLevel.GameMaster)]
         public Mobile Rider
@@ -377,7 +357,7 @@ namespace Server.Mobiles
                 return false;
             }
 
-            if (!m_NoFollowerSlot && (from.Followers + FollowerSlots) > from.FollowersMax)
+            if ((from.Followers + FollowerSlots) > from.FollowersMax)
             {
                 from.SendLocalizedMessage(1049679); // You have too many followers to summon your mount.
                 return false;
@@ -411,9 +391,7 @@ namespace Server.Mobiles
         {
             base.Serialize(writer);
 
-            writer.Write(8); // version
-
-            writer.Write(m_NoFollowerSlot);
+            writer.Write(7); // version
 
             writer.Write(m_Transparent);
 
@@ -438,9 +416,6 @@ namespace Server.Mobiles
 
             switch (version)
             {
-                case 8:
-                    m_NoFollowerSlot = reader.ReadBool();
-                    goto case 7;
                 case 7:
                 case 6:
                 case 5:
