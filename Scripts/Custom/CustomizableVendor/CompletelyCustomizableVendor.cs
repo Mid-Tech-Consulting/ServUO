@@ -1514,22 +1514,15 @@ namespace System.CustomizableVendor
                             break;
                         }
 
-                        // Check whether the player's backpack can hold all items before opening confirm gump
+                        // Check whether the player can hold at least one item (pack or bank) before opening confirm gump
                         Item testItem = m_Reward.RewardCopy;
-                        bool canHold = m.Backpack.CheckHold(m, testItem, false, true);
-                        if (canHold && qty > 1)
-                        {
-                            int itemWeight = testItem.TotalWeight;
-                            int extraWeight = itemWeight * (qty - 1);
-                            int extraItems = qty - 1;
-                            canHold = (m.Backpack.MaxItems <= 0 || m.Backpack.TotalItems + extraItems < m.Backpack.MaxItems)
-                                   && (m.MaxWeight <= 0 || m.TotalWeight + extraWeight <= m.MaxWeight);
-                        }
+                        bool packCanHold = m.Backpack.CheckHold(m, testItem, false, true);
+                        bool bankCanHold = !packCanHold && m.BankBox.CheckHold(m, testItem, false, true);
                         testItem.Delete();
 
-                        if (!canHold)
+                        if (!packCanHold && !bankCanHold)
                         {
-                            m.SendMessage("You would be unable to hold this purchase");
+                            m.SendMessage("Your pack and bank are both full. You cannot make this purchase.");
                             m.CloseGump(typeof(ViewItemGump));
                             m.SendGump(new ViewItemGump(m, m_Vendor, m_Reward, false, m_Page));
                             break;
@@ -1647,12 +1640,28 @@ namespace System.CustomizableVendor
 
                         Currency curr = m_Vendor.Payment;
                         int purchased = 0;
+                        bool sentToBank = false;
 
                         for (int q = 0; q < m_Qty; q++)
                         {
                             if (!m_Reward.InStock(1))
                             {
                                 m.SendMessage("{0} is no longer in stock.", m_Reward.Title);
+                                break;
+                            }
+
+                            // Check capacity before deducting currency so we never charge without delivering
+                            Item holdCheck = m_Reward.RewardCopy;
+                            bool packFits = pack.CheckHold(m, holdCheck, false, true);
+                            bool bankFits = !packFits && bank.CheckHold(m, holdCheck, false, true);
+                            holdCheck.Delete();
+
+                            if (!packFits && !bankFits)
+                            {
+                                if (purchased == 0)
+                                    m.SendMessage("Your pack and bank are both full. You are unable to make this purchase.");
+                                else
+                                    m.SendMessage("After {0} purchase(s), both your pack and bank are full. The remaining items were not purchased.", purchased);
                                 break;
                             }
 
@@ -1669,14 +1678,18 @@ namespace System.CustomizableVendor
                             if (!m.PlaceInBackpack(i))
                             {
                                 bank.DropItem(i);
-                                m.SendMessage("You are overweight, the reward was added to your bank.");
+                                sentToBank = true;
                             }
 
                             purchased++;
                         }
 
                         if (purchased > 0)
+                        {
                             m.SendMessage("You bought {0}x {1} for {2} {3} each.", purchased, m_Reward.Title, m_Reward.Cost, curr.PayName);
+                            if (sentToBank)
+                                m.SendMessage("Your pack was full; one or more items were sent to your bank.");
+                        }
 
                         m.CloseGump(m_Vendor.Menu);
                         MenuUploader.Display(m_Vendor.Menu, m, m_Vendor, true, m_Page);
