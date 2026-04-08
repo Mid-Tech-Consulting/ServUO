@@ -416,9 +416,6 @@ namespace Server.Mobiles
 
             switch (version)
             {
-                case 8:
-                    reader.ReadBool(); // m_NoFollowerSlot (removed)
-                    goto case 7;
                 case 7:
                 case 6:
                 case 5:
