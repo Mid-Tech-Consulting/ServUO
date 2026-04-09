@@ -3337,6 +3337,7 @@ namespace System.CustomizableVendor
             if (InRange(m, 3) && InLOS(m))
             {
                 MenuUploader.Display(m_Menu, m, this, false);
+                VendorProximityEnforcer.Start(m, this);
             }
         }
 
@@ -3636,6 +3637,7 @@ namespace System.CustomizableVendor
                 m_Box_Holder.UpdateName();
             }
             MenuUploader.Display(m_Menu, m, this, false);
+            VendorProximityEnforcer.Start(m, this);
         }
 
         public override void OnMovement(Mobile m, Point3D oldLocation)
@@ -4012,6 +4014,59 @@ namespace System.CustomizableVendor
             return
                 !(str.Equals("Parent") || str.Equals("TotalWeight") || str.Equals("TotalItems") ||
                   str.Equals("TotalGold"));
+        }
+    }
+
+    public static class VendorProximityEnforcer
+    {
+        private static readonly Dictionary<Mobile, InternalTimer> _timers = new Dictionary<Mobile, InternalTimer>();
+
+        public static void Start(Mobile m, IRewardVendor vendor)
+        {
+            Stop(m);
+            var t = new InternalTimer(m, vendor);
+            _timers[m] = t;
+            t.Start();
+        }
+
+        public static void Stop(Mobile m)
+        {
+            InternalTimer t;
+            if (_timers.TryGetValue(m, out t))
+            {
+                t.Stop();
+                _timers.Remove(m);
+            }
+        }
+
+        private class InternalTimer : Timer
+        {
+            private readonly Mobile m_Mobile;
+            private readonly IRewardVendor m_Vendor;
+
+            public InternalTimer(Mobile m, IRewardVendor vendor)
+                : base(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(500))
+            {
+                m_Mobile = m;
+                m_Vendor = vendor;
+            }
+
+            protected override void OnTick()
+            {
+                if (m_Vendor.IsRemoved() || m_Mobile == null || m_Mobile.Deleted || !m_Mobile.Alive)
+                {
+                    VendorProximityEnforcer.Stop(m_Mobile);
+                    return;
+                }
+
+                if (!m_Mobile.InRange(m_Vendor.GetLocation(), 3) || m_Mobile.Map != m_Vendor.GetMap())
+                {
+                    m_Mobile.CloseGump(typeof(BuyConfirmGump));
+                    m_Mobile.CloseGump(typeof(ViewItemGump));
+                    m_Mobile.CloseGump(m_Vendor.Menu);
+                    VendorProximityEnforcer.Stop(m_Mobile);
+                }
+            }
         }
     }
 }
