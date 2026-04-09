@@ -3320,9 +3320,21 @@ namespace System.CustomizableVendor
         //end edit
         public override void OnDoubleClick(Mobile m)
         {
-            if (InRange(m, 4) && InLOS(m))
+            if (InRange(m, 3) && InLOS(m))
             {
                 MenuUploader.Display(m_Menu, m, this, false);
+            }
+        }
+
+        public override void OnMovement(Mobile m, Point3D oldLocation)
+        {
+            base.OnMovement(m, oldLocation);
+
+            if (!m.InRange(Location, 5))
+            {
+                m.CloseGump(typeof(BuyConfirmGump));
+                m.CloseGump(typeof(ViewItemGump));
+                m.CloseGump(m_Menu);
             }
         }
 
@@ -3600,6 +3612,9 @@ namespace System.CustomizableVendor
 
         public override void OnDoubleClick(Mobile m)
         {
+            if (!m.InRange(GetWorldLocation(), 3) || !m.InLOS(this))
+                return;
+
             if (m_Box_Holder != null)
             {
                 m_Box_Holder.MoveToWorld(this.Location, this.Map);
@@ -3607,6 +3622,18 @@ namespace System.CustomizableVendor
                 m_Box_Holder.UpdateName();
             }
             MenuUploader.Display(m_Menu, m, this, false);
+        }
+
+        public override void OnMovement(Mobile m, Point3D oldLocation)
+        {
+            base.OnMovement(m, oldLocation);
+
+            if (!m.InRange(GetWorldLocation(), 5))
+            {
+                m.CloseGump(typeof(BuyConfirmGump));
+                m.CloseGump(typeof(ViewItemGump));
+                m.CloseGump(m_Menu);
+            }
         }
 
         public StoneRewardVendor(Serial serial)
