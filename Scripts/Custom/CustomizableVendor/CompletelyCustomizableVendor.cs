@@ -1487,6 +1487,13 @@ namespace System.CustomizableVendor
                     }
                 case 2:
                     {
+                        if (!m.InRange(m_Vendor.GetLocation(), 3) || m.Map != m_Vendor.GetMap())
+                        {
+                            m.SendMessage("You are too far away to make a purchase.");
+                            m.CloseGump(typeof(ViewItemGump));
+                            break;
+                        }
+
                         if (m.BankBox == null || m.Backpack == null)
                             break;
 
@@ -1632,6 +1639,13 @@ namespace System.CustomizableVendor
                     }
                 case 1: // OK — execute purchase
                     {
+                        if (!m.InRange(m_Vendor.GetLocation(), 3) || m.Map != m_Vendor.GetMap())
+                        {
+                            m.SendMessage("You are too far away to make a purchase.");
+                            m.CloseGump(typeof(BuyConfirmGump));
+                            break;
+                        }
+
                         Container bank = m.BankBox;
                         Container pack = m.Backpack;
 
