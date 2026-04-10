@@ -1231,6 +1231,24 @@ namespace Server.Spells
             return true;
         }
 
+        public static bool CheckFieldWard(Point3D loc, Map map, Mobile caster)
+        {
+            IPooledEnumerable eable = map.GetItemsInRange(loc, 5);
+
+            foreach (Item item in eable)
+            {
+                if (item is Server.Items.FieldWardingStone)
+                {
+                    eable.Free();
+                    caster.SendLocalizedMessage(500946); // You cannot cast this in town!
+                    return false;
+                }
+            }
+
+            eable.Free();
+            return true;
+        }
+
         //magic reflection
         public static bool CheckReflect(int circle, Mobile caster, ref Mobile target)
         {
