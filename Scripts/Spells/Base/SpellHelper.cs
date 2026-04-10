@@ -1233,7 +1233,7 @@ namespace Server.Spells
 
         public static bool CheckFieldWard(Point3D loc, Map map, Mobile caster)
         {
-            IPooledEnumerable eable = map.GetItemsInRange(loc, 4);
+            IPooledEnumerable eable = map.GetItemsInRange(loc, 3);
 
             foreach (Item item in eable)
             {
