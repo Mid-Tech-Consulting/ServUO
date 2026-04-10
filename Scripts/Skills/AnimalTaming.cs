@@ -289,6 +289,16 @@ namespace Server.SkillHandlers
 				{
 					m_Count++;
 
+					if (m_Creature.Deleted || !m_Creature.Alive)
+					{
+						m_BeingTamed.Remove(m_Creature);
+						m_Tamer.NextSkillTime = Core.TickCount;
+						m_Creature.PrivateOverheadMessage(MessageType.Regular, 0x3B2, 502795, m_Tamer.NetState);
+							// You are too far away to continue taming.
+						Stop();
+						return;
+					}
+
 					DamageEntry de = m_Creature.FindMostRecentDamageEntry(false);
 					bool alreadyOwned = m_Creature.Owners.Contains(m_Tamer);
 
