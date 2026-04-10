@@ -13,11 +13,11 @@ namespace Server.Mobiles
 
         [Constructable]
         public EnergyVortex(bool summoned)
-            : base(AIType.AI_Melee, FightMode.Closest, 10, 1, 0.2, 0.4)
+            : base(AIType.AI_Melee, FightMode.Closest, 6, 1, 0.2, 0.4)
         {
             Name = "an energy vortex";
 
-            if (Core.SE && 0.002 > Utility.RandomDouble()) // Per OSI FoF, it's a 1/500 chance.
+            if (Core.SE && 0.001 > Utility.RandomDouble()) // Per OSI FoF, it's a 1/1000 chance.
             {
                 // Llama vortex!
                 Body = 0xDC;
@@ -34,11 +34,11 @@ namespace Server.Mobiles
             SetDex(weak ? 150 : 200);
             SetInt(100);
 
-            SetHits((Core.SE && !weak) ? 140 : 70);
+            SetHits(weak ? 70 : 150);
             SetStam(250);
             SetMana(0);
 
-            SetDamage(weak ? 10 : 14, weak ? 13 : 17);
+            SetDamage(weak ? 10 : 14, weak ? 13 : 26);
 
             SetDamageType(ResistanceType.Physical, 0);
             SetDamageType(ResistanceType.Energy, 100);
