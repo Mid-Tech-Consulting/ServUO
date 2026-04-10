@@ -189,7 +189,8 @@ namespace Server.Mobiles
         public override double DefaultWeight { get { return 1.0; } }
 
         public override bool DisplayLootType { get { return Core.AOS; } }
-        public virtual int FollowerSlots { get { return 1; } }
+
+        public virtual int FollowerSlots { get { return 0; } }
 
         [CommandProperty(AccessLevel.GameMaster)]
         public Mobile Rider
