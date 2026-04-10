@@ -42,9 +42,9 @@ namespace Server.Engines.Harvest
             lumber.BankWidth = 4;
             lumber.BankHeight = 3;
 
-            // Every bank holds from 20 to 45 logs
-            lumber.MinTotal = 20;
-            lumber.MaxTotal = 45;
+            // Every bank holds from 120 to 150 logs (supports 12-15 attempts at 10 logs each)
+            lumber.MinTotal = 120;
+            lumber.MaxTotal = 150;
 
             // A resource bank will respawn its content every 20 to 30 minutes
             lumber.MinRespawn = TimeSpan.FromMinutes(20.0);
