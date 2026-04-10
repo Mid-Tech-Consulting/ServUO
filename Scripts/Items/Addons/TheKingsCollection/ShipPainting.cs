@@ -18,7 +18,7 @@ namespace Server.Items
 
         [Constructable]
         public ShipPaintingAddon(DirectionType type)
-           : this(type, 0, DateTime.UtcNow + TimeSpan.FromDays(7))
+           : this(type, 0, DateTime.UtcNow)
         {
         }
 
@@ -31,10 +31,10 @@ namespace Server.Items
             switch (type)
             {
                 case DirectionType.East:
-                    AddComponent(new LocalizedAddonComponent(0x4C27, 1098378), 0, 0, 0);
+                    AddComponent(new ShipPaintingComponent(0x4C27), 0, 0, 0);
                     break;
                 case DirectionType.South:
-                    AddComponent(new LocalizedAddonComponent(0x4C26, 1098378), 0, 0, 0);
+                    AddComponent(new ShipPaintingComponent(0x4C26), 0, 0, 0);
                     break;
             }
         }
@@ -57,6 +57,10 @@ namespace Server.Items
 
                     from.AddToBackpack(item);
                     from.SendLocalizedMessage(1154174); // Powder charges have been placed in your backpack.
+                }
+                else
+                {
+                    from.SendLocalizedMessage(1154201); // There are no more resources available at this time.
                 }
             }
             else

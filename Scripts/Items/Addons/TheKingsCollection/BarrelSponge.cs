@@ -17,7 +17,7 @@ namespace Server.Items
         
         [Constructable]
         public BarrelSpongeAddon()
-           : this(0, DateTime.UtcNow + TimeSpan.FromDays(7))
+           : this(0, DateTime.UtcNow)
         {
         }
 
@@ -71,7 +71,11 @@ namespace Server.Items
                     ResourceCount--;
 
                     from.AddToBackpack(item);
-                    from.SendLocalizedMessage(1154176); // Potions have been placed in your backpack. 
+                    from.SendLocalizedMessage(1154176); // Potions have been placed in your backpack.
+                }
+                else
+                {
+                    from.SendLocalizedMessage(1154201); // There are no more resources available at this time.
                 }
             }
             else
