@@ -40,7 +40,7 @@ namespace Server.Spells.Seventh
             {
                 Caster.SendLocalizedMessage(500237); // Target can not be seen.
             }
-            else if (SpellHelper.CheckTown(p, Caster) && SpellHelper.CheckWater(new Point3D(p), Caster.Map) && CheckSequence())
+            else if (SpellHelper.CheckTown(p, Caster) && SpellHelper.CheckWater(new Point3D(p), Caster.Map) && SpellHelper.CheckFieldWard(new Point3D(p), Caster.Map, Caster) && CheckSequence())
             {
                 SpellHelper.Turn(Caster, p);
 
