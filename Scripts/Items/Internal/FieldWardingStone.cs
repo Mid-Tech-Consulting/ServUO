@@ -7,7 +7,7 @@ namespace Server.Items
         public override string DefaultName => "Field Warding Stone";
 
         [Constructable]
-        public FieldWardingStone() : base(0xED4)
+        public FieldWardingStone() : base(0xF21)
         {
             Movable = false;
         }
