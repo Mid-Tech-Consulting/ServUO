@@ -15,14 +15,10 @@ namespace Server.SkillHandlers
         public static TimeSpan OnUse(Mobile m)
         {
             if (PetTrainingHelper.Enabled && m.HasGump(typeof(NewAnimalLoreGump)))
-            {
-                m.SendLocalizedMessage(500118); // You must wait a few moments to use another skill.
-            }
-            else
-            {
-                m.Target = new InternalTarget();
-                m.SendLocalizedMessage(500328); // What animal should I look at?
-            }
+                m.CloseGump(typeof(NewAnimalLoreGump));
+
+            m.Target = new InternalTarget();
+            m.SendLocalizedMessage(500328); // What animal should I look at?
 
             return TimeSpan.FromSeconds(1.0);
         }
@@ -37,6 +33,7 @@ namespace Server.SkillHandlers
                 {
                     Timer.DelayCall(TimeSpan.FromSeconds(1), () =>
                         {
+                            from.CloseGump(typeof(NewAnimalLoreGump));
                             BaseGump.SendGump(new NewAnimalLoreGump((PlayerMobile)from, c));
                         });
                 }
