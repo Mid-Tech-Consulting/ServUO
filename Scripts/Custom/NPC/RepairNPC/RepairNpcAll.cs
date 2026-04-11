@@ -523,6 +523,7 @@ namespace Server.Gumps
             Hue = Utility.RandomSkinHue();
             CantWalk = true;
 
+            AddItem(new Server.Items.Bandana());
             AddItem(new Server.Items.ShortPants());
             AddItem(new Server.Items.Shirt());
             AddItem(new Server.Items.Shoes());
