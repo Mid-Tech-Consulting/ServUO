@@ -1,5 +1,6 @@
 using System;
 using Server;
+using Server.Accounting;
 using Server.Mobiles;
 using Server.Items;
 
@@ -23,7 +24,7 @@ namespace Server.Items
                 return;
 
             // Check if already claimed
-            if (player.HasTag("RewardStoneUsed"))
+            if (!(player.Account is Account acct) || acct.GetTag("RewardStoneUsed") != null)
             {
                 from.SendMessage("You have already claimed this reward.");
                 return;
@@ -34,7 +35,7 @@ namespace Server.Items
             from.SendMessage("You receive your reward!");
 
             // Mark as used
-            player.SetTag("RewardStoneUsed", "true");
+            acct.SetTag("RewardStoneUsed", "true");
         }
 
         public override void Serialize(GenericWriter writer)
