@@ -521,7 +521,7 @@ namespace Server.Gumps
             Name = "Equipment Repairman";
             Body = Utility.RandomList(400, 401); // random male/female human body
             Hue = Utility.RandomSkinHue();
-            CantWalk = true;
+            CanMove = false;
 
             AddItem(new Server.Items.Bandana());
             AddItem(new Server.Items.ShortPants());
