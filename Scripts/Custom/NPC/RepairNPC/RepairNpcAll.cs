@@ -60,7 +60,8 @@ namespace Server.Gumps
             Resizable = false;
 
             AddPage(0);
-            AddBackground(0, 0, 760, 600, 5054);
+            AddBackground(0, 0, 760, 600, 9270);
+            AddAlphaRegion(10, 10, 740, 580);
             AddLabel(270, 20, 37, @"Equipment Repair Service");
 
             CollectEquipmentInfo();
