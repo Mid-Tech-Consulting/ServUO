@@ -2284,7 +2284,8 @@ namespace System.CustomizableVendor
                 AddLabel(324, (PosY + 45), 2115, "Cost: " + r.Cost);
                 //odd numbers
                 AddImageTiledButton(227, (PosY + 26), 2328, 2329, ++m_ButtonNum, GumpButtonType.Reply, 1, b.ItemID,
-                    b.Hue, 15, 10, r.Display.Header);
+                    b.Hue, 15, 10, -1);
+                AddItemProperty(r.RewardInfo);
                 AddImageTiled(215, (PosY + 95), 359, 2, 96);
                 //odd numbers (same as above)
                 AddButton(470, (PosY + 45), 4011, 4012, m_ButtonNum, GumpButtonType.Reply, 1);
@@ -2653,9 +2654,7 @@ namespace System.CustomizableVendor
 
         protected static ImageTileButtonInfo CreateRewardButtonInfo(Reward r)
         {
-            ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
-            b.LocalizedTooltip = r.RewardInfo.LabelNumber;
-            return b;
+            return new ItemTileButtonInfo(r.RewardInfo);
         }
 
         protected virtual void AddEntryControl(Reward r)
@@ -2688,7 +2687,8 @@ namespace System.CustomizableVendor
                 AddLabel(227, m_PosY, 2123, r.Title);
                 AddLabel(324, (m_PosY + 45), 2115, "Cost: " + r.Cost);
                 AddImageTiledButton(227, (m_PosY + 26), 2328, 2329, (m_EntryNum), GumpButtonType.Reply, 1, b.ItemID,
-                    b.Hue, 15, 10, b.LocalizedTooltip);
+                    b.Hue, 15, 10, -1);
+                AddItemProperty(r.RewardInfo);
                 AddImageTiled(215, (m_PosY + 95), 359, 2, 96);
                 AddButton(470, (PosY + 45), 4011, 4012, (m_EntryNum), GumpButtonType.Reply, 1);
                 AddLabel(508, (PosY + 47), 745, @"View Item");
