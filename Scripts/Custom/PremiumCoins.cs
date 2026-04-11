@@ -83,7 +83,6 @@ namespace Server.Items
                         continue;
 
                     GiveCoins(m, 1);
-                    m.SendMessage(0x35, "You have received a Premium Coin for your time online!");
                 }
             }
         }
