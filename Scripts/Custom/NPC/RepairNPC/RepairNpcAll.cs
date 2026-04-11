@@ -502,11 +502,8 @@ namespace Server.Gumps
         }
     }
 
-    public class RepairNPCAll : BaseVendor
+    public class RepairNPCAll : BaseCreature
     {
-        private List<SBInfo> m_SBInfos = new List<SBInfo>();
-        protected override List<SBInfo> SBInfos { get { return m_SBInfos; } }
-
         private bool m_FreeRepairs;
 
         [CommandProperty(AccessLevel.GameMaster)]
@@ -517,15 +514,12 @@ namespace Server.Gumps
         }
 
         [Constructable]
-        public RepairNPCAll() : base("Equipment Repairman")
+        public RepairNPCAll() : base(AIType.AI_Vendor, FightMode.None, 10, 1, 0.2, 0.4)
         {
+            Name = "Equipment Repairman";
             Body = 689;
             Hue = 1153;
             CantWalk = true;
-        }
-
-        public override void InitSBInfo()
-        {
         }
 
         public RepairNPCAll(Serial serial) : base(serial)
