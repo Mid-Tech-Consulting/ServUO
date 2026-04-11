@@ -2248,7 +2248,7 @@ namespace System.CustomizableVendor
 
             if (entryPage == m_ServerPage)
             {
-                ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
+                ImageTileButtonInfo b = CreateRewardButtonInfo(r);
 
                 //begin time entries
                 if (r.Restock != null)
@@ -2651,13 +2651,20 @@ namespace System.CustomizableVendor
             AddPage(1);
         }
 
+        protected static ImageTileButtonInfo CreateRewardButtonInfo(Reward r)
+        {
+            ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
+            b.LocalizedTooltip = r.RewardInfo.LabelNumber;
+            return b;
+        }
+
         protected virtual void AddEntryControl(Reward r)
         {
             int entryPage = ((m_EntryNum - 1) / EntriesPerPage) + 1;
 
             if (entryPage == m_ServerPage)
             {
-                ImageTileButtonInfo b = new ItemTileButtonInfo(r.RewardInfo);
+                ImageTileButtonInfo b = CreateRewardButtonInfo(r);
 
                 //begin time entries
                 if (r.Restock != null)
@@ -3931,9 +3938,9 @@ namespace System.CustomizableVendor
         {
             try
             {
-                if (item is Server.Items.CommodityDeed deed)
+                if (item is CommodityDeed deed)
                 {
-                    var copy = new Server.Items.CommodityDeed();
+                    var copy = new CommodityDeed();
                     if (deed.Commodity != null)
                     {
                         Item commodityCopy = Clone(deed.Commodity);
