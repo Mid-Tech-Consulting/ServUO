@@ -519,9 +519,13 @@ namespace Server.Gumps
         public RepairNPCAll() : base(AIType.AI_Vendor, FightMode.None, 10, 1, 0.2, 0.4)
         {
             Name = "Equipment Repairman";
-            Body = 689;
-            Hue = 1153;
+            Body = Utility.RandomList(400, 401); // random male/female human body
+            Hue = Utility.RandomSkinHue();
             CantWalk = true;
+
+            AddItem(new Server.Items.FullApron());
+            AddItem(new Server.Items.Bascinet());
+            AddItem(new Server.Items.SmithHammer());
         }
 
         public RepairNPCAll(Serial serial) : base(serial)
