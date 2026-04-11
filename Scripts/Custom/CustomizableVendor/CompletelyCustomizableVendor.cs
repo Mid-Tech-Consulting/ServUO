@@ -3931,6 +3931,18 @@ namespace System.CustomizableVendor
         {
             try
             {
+                if (item is Server.Items.CommodityDeed deed)
+                {
+                    var copy = new Server.Items.CommodityDeed();
+                    if (deed.Commodity != null)
+                    {
+                        Item commodityCopy = Clone(deed.Commodity);
+                        if (commodityCopy != null)
+                            copy.SetCommodity(commodityCopy);
+                    }
+                    copy.Name = deed.Name;
+                    return copy;
+                }
                 if (item is Container)
                 {
                     return CloneBag(((Container)item).FindItemsByType(typeof(Item), false), (Container)item,
