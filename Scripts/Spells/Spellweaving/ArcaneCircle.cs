@@ -52,12 +52,6 @@ namespace Server.Spells.Spellweaving
                 return false;
             }
 
-            if (GetArcanists().Count < 2)
-            {
-                Caster.SendLocalizedMessage(1080452); //There are not enough spellweavers present to create an Arcane Focus.
-                return false;
-            }
-
             return base.CheckCast();
         }
 
