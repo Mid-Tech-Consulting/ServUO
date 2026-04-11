@@ -19,6 +19,30 @@ namespace Server.Gumps
         private Dictionary<Layer, int> m_RepairCosts;
         private int m_TotalCost;
 
+        private static readonly Layer[] RepairLayers = new Layer[]
+        {
+            Layer.Helm,
+            Layer.Neck,
+            Layer.Earrings,
+            Layer.Shirt,
+            Layer.Arms,
+            Layer.Gloves,
+            Layer.Ring,
+            Layer.Talisman,
+            Layer.InnerTorso,
+            Layer.Bracelet,
+            Layer.MiddleTorso,
+            Layer.OuterTorso,
+            Layer.Pants,
+            Layer.InnerLegs,
+            Layer.OuterLegs,
+            Layer.Shoes,
+            Layer.Waist,
+            Layer.Cloak,
+            Layer.FirstValid,
+            Layer.TwoHanded
+        };
+
         public RepairAllGump(Mobile owner, RepairNPCAll npc)
             : base(50, 50)
         {
@@ -49,11 +73,9 @@ namespace Server.Gumps
             if (from.Backpack == null)
                 return false;
 
-            // 先尝试从背包扣除
             if (from.Backpack.ConsumeTotal(typeof(Gold), amount))
                 return true;
 
-            // 如果背包钱不够，尝试从银行扣除剩余部分
             int backpackGold = from.Backpack.GetAmount(typeof(Gold));
             int remaining = amount - backpackGold;
 
@@ -81,31 +103,7 @@ namespace Server.Gumps
 
         private void CollectEquipmentInfo()
         {
-            Layer[] layers = new Layer[]
-            {
-                Layer.Helm,
-                Layer.Neck,
-                Layer.Earrings,
-                Layer.Shirt,
-                Layer.Arms,
-                Layer.Gloves,
-                Layer.Ring,
-                Layer.Talisman,
-                Layer.InnerTorso,
-                Layer.Bracelet,
-                Layer.MiddleTorso,
-                Layer.OuterTorso,
-                Layer.Pants,
-                Layer.InnerLegs,
-                Layer.OuterLegs,
-                Layer.Shoes,
-                Layer.Waist,
-                Layer.Cloak,
-                Layer.FirstValid,
-                Layer.TwoHanded
-            };
-
-            foreach (Layer layer in layers)
+            foreach (Layer layer in RepairLayers)
             {
                 Item item = m_Owner.FindItemOnLayer(layer);
                 m_Items[layer] = item;
@@ -116,7 +114,9 @@ namespace Server.Gumps
                     m_RepairCosts[layer] = cost;
                     if (cost > 0)
                     {
-                        m_TotalCost += cost;
+                        // Guard against integer overflow across all slots
+                        long newTotal = (long)m_TotalCost + cost;
+                        m_TotalCost = (int)Math.Min(newTotal, int.MaxValue);
                     }
                 }
                 else
@@ -153,9 +153,7 @@ namespace Server.Gumps
 
                 consumeFix = GetMaterialCost(bw.Resource);
                 if (bw.HitPoints < bw.MaxHitPoints)
-                {
                     toConsume = (bw.MaxHitPoints - bw.HitPoints) * 2 * consumeFix;
-                }
             }
             else if (item is BaseArmor)
             {
@@ -165,9 +163,7 @@ namespace Server.Gumps
 
                 consumeFix = GetMaterialCost(ba.Resource);
                 if (ba.HitPoints < ba.MaxHitPoints)
-                {
                     toConsume = (ba.MaxHitPoints - ba.HitPoints) * 2 * consumeFix;
-                }
             }
             else if (item is BaseJewel)
             {
@@ -177,9 +173,7 @@ namespace Server.Gumps
 
                 consumeFix = GetMaterialCost(bj.Resource);
                 if (bj.HitPoints < bj.MaxHitPoints)
-                {
                     toConsume = (bj.MaxHitPoints - bj.HitPoints) * 2 * consumeFix;
-                }
             }
             else if (item is BaseClothing)
             {
@@ -189,9 +183,7 @@ namespace Server.Gumps
 
                 consumeFix = GetMaterialCost(bjc.Resource);
                 if (bjc.HitPoints < bjc.MaxHitPoints)
-                {
                     toConsume = (bjc.MaxHitPoints - bjc.HitPoints) * 2 * consumeFix;
-                }
             }
 
             return toConsume;
@@ -250,15 +242,11 @@ namespace Server.Gumps
             }
 
             foreach (Layer layer in column1Layers)
-            {
                 DisplayEquipmentItem(column1X, ref y, layer, itemSpacing);
-            }
 
             y = 60;
             foreach (Layer layer in column2Layers)
-            {
                 DisplayEquipmentItem(column2X, ref y, layer, itemSpacing);
-            }
         }
 
         private void DisplayEquipmentItem(int x, ref int y, Layer layer, int itemSpacing)
@@ -266,13 +254,11 @@ namespace Server.Gumps
             Item item = m_Items[layer];
             int cost = m_RepairCosts[layer];
 
-            //AddLabel(x, y, 0x44, GetLayerName(layer) + ":");
-            
             if (item != null)
             {
                 AddItem(x + 50, y - 5, item.ItemID, item.Hue);
                 AddLabel(x + 130, y, GetTextHue(item), GetDurabilityString(item));
-                
+
                 if (cost > 0)
                 {
                     AddLabel(x + 200, y, 0x44, cost + " Gold");
@@ -293,34 +279,6 @@ namespace Server.Gumps
             }
 
             y += itemSpacing;
-        }
-
-        private string GetLayerName(Layer layer)
-        {
-            switch (layer)
-            {
-                case Layer.Helm: return "頭盔";
-                case Layer.Neck: return "項鍊";
-                case Layer.Earrings: return "耳環";
-                case Layer.Shirt: return "襯衫";
-                case Layer.Arms: return "護臂";
-                case Layer.Gloves: return "手套";
-                case Layer.Ring: return "戒指";
-                case Layer.Talisman: return "護身符";
-                case Layer.InnerTorso: return "內衣";
-                case Layer.Bracelet: return "手鐲";
-                case Layer.MiddleTorso: return "中衣";
-                case Layer.OuterTorso: return "外衣";
-                case Layer.Pants: return "褲子";
-                case Layer.InnerLegs: return "內褲";
-                case Layer.OuterLegs: return "護腿";
-                case Layer.Shoes: return "鞋子";
-                case Layer.Waist: return "腰帶";
-                case Layer.Cloak: return "披風";
-                case Layer.FirstValid: return "武器";
-                case Layer.TwoHanded: return "副手";
-                default: return layer.ToString();
-            }
         }
 
         private int GetTextHue(Item item)
@@ -363,9 +321,10 @@ namespace Server.Gumps
             return 100 + (int)layer;
         }
 
-        private Layer GetLayerFromButtonID(int buttonID)
+        private bool TryGetLayerFromButtonID(int buttonID, out Layer layer)
         {
-            return (Layer)(buttonID - 100);
+            layer = (Layer)(buttonID - 100);
+            return m_Items.ContainsKey(layer);
         }
 
         public override void OnResponse(NetState state, RelayInfo info)
@@ -374,22 +333,49 @@ namespace Server.Gumps
 
             if (info.ButtonID == 1)
             {
-                if (m_TotalCost > 0)
+                // Re-verify which items are still equipped and recalculate cost at response time
+                var toRepair = new List<KeyValuePair<Layer, Item>>();
+                long freshTotal = 0;
+
+                foreach (Layer layer in RepairLayers)
                 {
-                    if (HasEnoughGold(from, m_TotalCost))
+                    Item snapshotItem;
+                    if (!m_Items.TryGetValue(layer, out snapshotItem) || snapshotItem == null)
+                        continue;
+
+                    // Confirm item is still on this player at this layer
+                    Item currentItem = from.FindItemOnLayer(layer);
+                    if (currentItem == null || currentItem != snapshotItem)
+                        continue;
+
+                    int cost = CalculateRepairCost(currentItem);
+                    if (cost > 0)
                     {
-                        if (TryDeductGold(from, m_TotalCost))
+                        toRepair.Add(new KeyValuePair<Layer, Item>(layer, currentItem));
+                        freshTotal += cost;
+                    }
+                }
+
+                int totalCost = (int)Math.Min(freshTotal, int.MaxValue);
+
+                if (totalCost > 0)
+                {
+                    if (HasEnoughGold(from, totalCost))
+                    {
+                        if (TryDeductGold(from, totalCost))
                         {
-                            foreach (KeyValuePair<Layer, Item> kvp in m_Items)
-                            {
-                                if (kvp.Value != null && m_RepairCosts[kvp.Key] > 0)
-                                {
-                                    RepairItem(kvp.Value);
-                                }
-                            }
-                            from.SendMessage("You paid " + m_TotalCost + " gold coins to repair all equipment");
-                            m_NPC.SayTo(from, "You paid " + m_TotalCost + " gold coins to repair all equipment");
+                            foreach (var kvp in toRepair)
+                                RepairItem(kvp.Value);
+
+                            from.SendMessage("You paid " + totalCost + " gold coins to repair all equipment.");
+                            m_NPC.SayTo(from, "You paid " + totalCost + " gold coins to repair all equipment.");
                             Effects.PlaySound(from.Location, from.Map, 0x2A);
+                            from.SendGump(new RepairAllGump(from, m_NPC));
+                        }
+                        else
+                        {
+                            from.SendMessage("You don't have enough gold to pay for the repairs.");
+                            m_NPC.SayTo(from, "You don't have enough gold to pay for the repairs.");
                             from.SendGump(new RepairAllGump(from, m_NPC));
                         }
                     }
@@ -402,28 +388,45 @@ namespace Server.Gumps
                 }
                 else
                 {
-                    from.SendMessage(" No equipment requires repair requires repair.");
-                    m_NPC.SayTo(from, " No equipment requires repair requires repair..");
+                    from.SendMessage("No equipment requires repair.");
+                    m_NPC.SayTo(from, "No equipment requires repair.");
                 }
             }
             else if (info.ButtonID >= 100)
             {
-                Layer layer = GetLayerFromButtonID(info.ButtonID);
-                if (m_Items.ContainsKey(layer) && m_Items[layer] != null && m_RepairCosts[layer] > 0)
-                {
-                    Item item = m_Items[layer];
-                    int cost = m_RepairCosts[layer];
+                Layer layer;
+                if (!TryGetLayerFromButtonID(info.ButtonID, out layer))
+                    return;
 
-                    if (HasEnoughGold(from, cost))
+                Item snapshotItem;
+                if (!m_Items.TryGetValue(layer, out snapshotItem) || snapshotItem == null)
+                    return;
+
+                // Confirm item is still on this player at this layer
+                Item currentItem = from.FindItemOnLayer(layer);
+                if (currentItem == null || currentItem != snapshotItem)
+                {
+                    from.SendMessage("That item is no longer equipped.");
+                    from.SendGump(new RepairAllGump(from, m_NPC));
+                    return;
+                }
+
+                int cost = CalculateRepairCost(currentItem);
+                if (cost <= 0)
+                {
+                    from.SendGump(new RepairAllGump(from, m_NPC));
+                    return;
+                }
+
+                if (HasEnoughGold(from, cost))
+                {
+                    if (TryDeductGold(from, cost))
                     {
-                        if (TryDeductGold(from, cost))
-                        {
-                            RepairItem(item);
-                            from.SendMessage("You paid " + cost + " gold coins to repair " + item.Name +".");
-                            m_NPC.SayTo(from, "You paid " + cost + " gold coins to repair " + item.Name +".");
-                            Effects.PlaySound(from.Location, from.Map, 0x2A);
-                            from.SendGump(new RepairAllGump(from, m_NPC));
-                        }
+                        RepairItem(currentItem);
+                        from.SendMessage("You paid " + cost + " gold coins to repair " + currentItem.Name + ".");
+                        m_NPC.SayTo(from, "You paid " + cost + " gold coins to repair " + currentItem.Name + ".");
+                        Effects.PlaySound(from.Location, from.Map, 0x2A);
+                        from.SendGump(new RepairAllGump(from, m_NPC));
                     }
                     else
                     {
@@ -431,6 +434,12 @@ namespace Server.Gumps
                         m_NPC.SayTo(from, "You don't have enough gold to pay for the repairs.");
                         from.SendGump(new RepairAllGump(from, m_NPC));
                     }
+                }
+                else
+                {
+                    from.SendMessage("You don't have enough gold to pay for the repairs.");
+                    m_NPC.SayTo(from, "You don't have enough gold to pay for the repairs.");
+                    from.SendGump(new RepairAllGump(from, m_NPC));
                 }
             }
         }
@@ -499,6 +508,9 @@ namespace Server.Gumps
 
         public override void OnDoubleClick(Mobile from)
         {
+            if (!from.Alive)
+                return;
+
             if (from.InRange(this.Location, 3))
             {
                 from.SendGump(new RepairAllGump(from, this));
