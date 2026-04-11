@@ -18,6 +18,7 @@ namespace Server.Gumps
         private Dictionary<Layer, Item> m_Items;
         private Dictionary<Layer, int> m_RepairCosts;
         private int m_TotalCost;
+        private bool m_FreeRepairs;
 
         private static readonly Layer[] RepairLayers = new Layer[]
         {
@@ -48,6 +49,7 @@ namespace Server.Gumps
         {
             m_Owner = owner;
             m_NPC = npc;
+            m_FreeRepairs = npc.FreeRepairs;
             m_Items = new Dictionary<Layer, Item>();
             m_RepairCosts = new Dictionary<Layer, int>();
             m_TotalCost = 0;
@@ -65,7 +67,10 @@ namespace Server.Gumps
             DisplayEquipmentList();
 
             AddButton(220, 550, 4005, 4007, 1, GumpButtonType.Reply, 0);
-            AddLabel(270, 550, 0x44, "One-click repair all equipment (" + m_TotalCost + " Gold)");
+            string repairAllLabel = m_FreeRepairs
+                ? "One-click repair all equipment (Free)"
+                : "One-click repair all equipment (" + m_TotalCost + " Gold)";
+            AddLabel(270, 550, 0x44, repairAllLabel);
         }
 
         private bool TryDeductGold(Mobile from, int amount)
@@ -261,7 +266,7 @@ namespace Server.Gumps
 
                 if (cost > 0)
                 {
-                    AddLabel(x + 200, y, 0x44, cost + " Gold");
+                    AddLabel(x + 200, y, 0x44, m_FreeRepairs ? "Free" : cost + " Gold");
                     AddButton(x + 280, y - 5, 0x2a3a, 0x2a3a, GetButtonID(layer), GumpButtonType.Reply, 0);
                 }
                 else if (IsRepairable(item))
@@ -360,29 +365,32 @@ namespace Server.Gumps
 
                 if (totalCost > 0)
                 {
-                    if (HasEnoughGold(from, totalCost))
-                    {
-                        if (TryDeductGold(from, totalCost))
-                        {
-                            foreach (var kvp in toRepair)
-                                RepairItem(kvp.Value);
+                    bool doRepair = m_FreeRepairs;
 
-                            from.SendMessage("You paid " + totalCost + " gold coins to repair all equipment.");
-                            m_NPC.SayTo(from, "You paid " + totalCost + " gold coins to repair all equipment.");
-                            Effects.PlaySound(from.Location, from.Map, 0x2A);
-                            from.SendGump(new RepairAllGump(from, m_NPC));
-                        }
-                        else
+                    if (!doRepair)
+                    {
+                        if (HasEnoughGold(from, totalCost))
+                            doRepair = TryDeductGold(from, totalCost);
+
+                        if (!doRepair)
                         {
                             from.SendMessage("You don't have enough gold to pay for the repairs.");
                             m_NPC.SayTo(from, "You don't have enough gold to pay for the repairs.");
                             from.SendGump(new RepairAllGump(from, m_NPC));
                         }
                     }
-                    else
+
+                    if (doRepair)
                     {
-                        from.SendMessage("You don't have enough gold to pay for the repairs.");
-                        m_NPC.SayTo(from, "You don't have enough gold to pay for the repairs.");
+                        foreach (var kvp in toRepair)
+                            RepairItem(kvp.Value);
+
+                        string msg = m_FreeRepairs
+                            ? "All equipment has been repaired."
+                            : "You paid " + totalCost + " gold coins to repair all equipment.";
+                        from.SendMessage(msg);
+                        m_NPC.SayTo(from, msg);
+                        Effects.PlaySound(from.Location, from.Map, 0x2A);
                         from.SendGump(new RepairAllGump(from, m_NPC));
                     }
                 }
@@ -418,27 +426,30 @@ namespace Server.Gumps
                     return;
                 }
 
-                if (HasEnoughGold(from, cost))
+                bool doRepair = m_FreeRepairs;
+
+                if (!doRepair)
                 {
-                    if (TryDeductGold(from, cost))
-                    {
-                        RepairItem(currentItem);
-                        from.SendMessage("You paid " + cost + " gold coins to repair " + currentItem.Name + ".");
-                        m_NPC.SayTo(from, "You paid " + cost + " gold coins to repair " + currentItem.Name + ".");
-                        Effects.PlaySound(from.Location, from.Map, 0x2A);
-                        from.SendGump(new RepairAllGump(from, m_NPC));
-                    }
-                    else
+                    if (HasEnoughGold(from, cost))
+                        doRepair = TryDeductGold(from, cost);
+
+                    if (!doRepair)
                     {
                         from.SendMessage("You don't have enough gold to pay for the repairs.");
                         m_NPC.SayTo(from, "You don't have enough gold to pay for the repairs.");
                         from.SendGump(new RepairAllGump(from, m_NPC));
                     }
                 }
-                else
+
+                if (doRepair)
                 {
-                    from.SendMessage("You don't have enough gold to pay for the repairs.");
-                    m_NPC.SayTo(from, "You don't have enough gold to pay for the repairs.");
+                    RepairItem(currentItem);
+                    string msg = m_FreeRepairs
+                        ? currentItem.Name + " has been repaired."
+                        : "You paid " + cost + " gold coins to repair " + currentItem.Name + ".";
+                    from.SendMessage(msg);
+                    m_NPC.SayTo(from, msg);
+                    Effects.PlaySound(from.Location, from.Map, 0x2A);
                     from.SendGump(new RepairAllGump(from, m_NPC));
                 }
             }
@@ -490,6 +501,15 @@ namespace Server.Gumps
         private List<SBInfo> m_SBInfos = new List<SBInfo>();
         protected override List<SBInfo> SBInfos { get { return m_SBInfos; } }
 
+        private bool m_FreeRepairs;
+
+        [CommandProperty(AccessLevel.GameMaster)]
+        public bool FreeRepairs
+        {
+            get { return m_FreeRepairs; }
+            set { m_FreeRepairs = value; }
+        }
+
         [Constructable]
         public RepairNPCAll() : base("Equipment Repairman")
         {
@@ -524,13 +544,17 @@ namespace Server.Gumps
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write((int)0);
+            writer.Write((int)1); // version
+            writer.Write(m_FreeRepairs);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
             int version = reader.ReadInt();
+
+            if (version >= 1)
+                m_FreeRepairs = reader.ReadBool();
         }
     }
 }
