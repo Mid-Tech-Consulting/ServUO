@@ -14,12 +14,12 @@ namespace Server.Gumps
     public class RepairAllGump : Gump
     {
         private Mobile m_Owner;
-        private XiuLiNPC m_NPC;
+        private RepairNPCAll m_NPC;
         private Dictionary<Layer, Item> m_Items;
         private Dictionary<Layer, int> m_RepairCosts;
         private int m_TotalCost;
 
-        public RepairAllGump(Mobile owner, XiuLiNPC npc)
+        public RepairAllGump(Mobile owner, RepairNPCAll npc)
             : base(50, 50)
         {
             m_Owner = owner;
