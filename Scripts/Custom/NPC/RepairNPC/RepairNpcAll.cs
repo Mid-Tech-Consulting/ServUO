@@ -527,7 +527,7 @@ namespace Server.Gumps
             AddItem(new Server.Items.Shirt());
             AddItem(new Server.Items.Shoes());
             AddItem(new Server.Items.FullApron());
-            AddItem(new Server.Items.SmithHammer());
+            AddItem(new Server.Items.SmithHammer(50));
         }
 
         public RepairNPCAll(Serial serial) : base(serial)
