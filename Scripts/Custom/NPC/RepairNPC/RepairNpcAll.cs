@@ -305,9 +305,9 @@ namespace Server.Gumps
                 else if (hp < maxHP)
                     return 88;
                 else
-                    return 0;
+                    return 1153;
             }
-            return 0;
+            return 1153;
         }
 
         private string GetDurabilityString(Item item)
