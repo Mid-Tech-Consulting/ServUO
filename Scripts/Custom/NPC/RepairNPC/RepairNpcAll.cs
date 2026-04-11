@@ -336,6 +336,12 @@ namespace Server.Gumps
         {
             Mobile from = state.Mobile;
 
+            if (!from.InRange(m_NPC.Location, 3))
+            {
+                from.SendLocalizedMessage(500446); // That is too far away.
+                return;
+            }
+
             if (info.ButtonID == 1)
             {
                 // Re-verify which items are still equipped and recalculate cost at response time
