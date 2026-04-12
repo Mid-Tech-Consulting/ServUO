@@ -459,24 +459,7 @@ namespace Server.Misc
 			if (skill.Lock == SkillLock.Up &&
 				(!Siege.SiegeShard || !(from is PlayerMobile) || Siege.CanGainStat((PlayerMobile)from)))
 			{
-				var info = skill.Info;
-
-				// Old gain mechanic
-				if (!Core.ML)
-				{
-					var scalar = 1.0;
-
-					if (from.StrLock == StatLockType.Up && (info.StrGain / 33.3) * scalar > Utility.RandomDouble())
-						GainStat(from, Stat.Str);
-					else if (from.DexLock == StatLockType.Up && (info.DexGain / 33.3) * scalar > Utility.RandomDouble())
-						GainStat(from, Stat.Dex);
-					else if (from.IntLock == StatLockType.Up && (info.IntGain / 33.3) * scalar > Utility.RandomDouble())
-						GainStat(from, Stat.Int);
-				}
-				else
-				{
-					TryStatGain(info, from);
-				}
+				TryStatGain(skill.Info, from);
 			}
 		}
 
