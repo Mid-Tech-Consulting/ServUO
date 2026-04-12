@@ -11,7 +11,7 @@ namespace Server.Mobiles
     // =========================================================
     public abstract class BaseTrainingCreature : BaseCreature
     {
-        private static readonly TimeSpan InactivityTimeout = TimeSpan.FromMinutes(2);
+        private static readonly TimeSpan InactivityTimeout = TimeSpan.FromMinutes(1);
 
         private DateTime _lastAttackedTime;
         private InactivityTimer _inactivityTimer;
