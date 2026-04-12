@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Server.Gumps;
 using Server.Network;
 
@@ -341,12 +342,14 @@ namespace Server.Mobiles
     // =========================================================
     public class TrainingMaster : BaseCreature
     {
+        private static readonly TimeSpan GreetCooldown = TimeSpan.FromSeconds(60);
+        private readonly Dictionary<Mobile, DateTime> _greeted = [];
+
         [Constructable]
         public TrainingMaster()
             : base(AIType.AI_Vendor, FightMode.None, 10, 1, 0.2, 0.4)
         {
             Name = "Training Master";
-            Title = "the training master";
             Body = 400;
             CantWalk = true;
             CanMove = false;
@@ -359,6 +362,20 @@ namespace Server.Mobiles
 
         public override bool IsInvulnerable => true;
         public override bool ClickTitle => true;
+
+        public override void OnMovement(Mobile m, Point3D oldLocation)
+        {
+            base.OnMovement(m, oldLocation);
+
+            if (m is not PlayerMobile || !m.InRange(Location, 5) || m.InRange(oldLocation, 5))
+                return;
+
+            if (_greeted.TryGetValue(m, out DateTime last) && DateTime.UtcNow - last < GreetCooldown)
+                return;
+
+            _greeted[m] = DateTime.UtcNow;
+            Say("Hail warrior! Double click me to choose your sparring partner.");
+        }
 
         public override void OnDoubleClick(Mobile from)
         {
