@@ -337,7 +337,10 @@ namespace Server.Mobiles
             Title = "the training master";
             Body = 400;
             CantWalk = true;
+            Frozen = true;
             Blessed = true;
+
+            AddItem(new Server.Items.HoodedShroudOfShadows());
         }
 
         public TrainingMaster(Serial serial) : base(serial) { }
