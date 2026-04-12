@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Server.Gumps;
+using Server.Misc;
 using Server.Network;
 
 namespace Server.Mobiles
@@ -60,6 +61,29 @@ namespace Server.Mobiles
         {
             if (from is PlayerMobile || (from is BaseCreature bc && (bc.Controlled || bc.BardTarget == this)))
                 _lastAttackedTime = DateTime.UtcNow;
+        }
+
+        public override void OnGotMeleeAttack(Mobile attacker)
+        {
+            base.OnGotMeleeAttack(attacker);
+
+            if (!(attacker is PlayerMobile player))
+                return;
+
+            // 15% chance per hit to attempt a stat gain, bypassing the global stat timer
+            // so dedicated training actually produces results.
+            if (Utility.RandomDouble() >= 0.15)
+                return;
+
+            BaseWeapon weapon = player.Weapon as BaseWeapon;
+            if (weapon == null)
+                return;
+
+            SkillInfo info = player.Skills[weapon.Skill]?.Info;
+            if (info == null)
+                return;
+
+            SkillCheck.IncreaseStat(player, (SkillCheck.Stat)info.Primary);
         }
 
         public override void AlterMeleeDamageFrom(Mobile from, ref int damage)
