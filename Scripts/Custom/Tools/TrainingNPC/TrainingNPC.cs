@@ -22,7 +22,7 @@ namespace Server.Mobiles
         public Mobile Summoner { get; set; }
 
         protected BaseTrainingCreature(AIType ai, FightMode mode, int range, int irange, double passiveSpeed, double activeSpeed)
-            : base(ai, mode, range, irange, passiveSpeed, activeSpeed)
+            : base(ai, FightMode.Aggressor, range, irange, passiveSpeed, activeSpeed)
         {
             CantWalk = true;
             GuardImmune = true;
