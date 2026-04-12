@@ -22,7 +22,7 @@ namespace Server.Mobiles
             GuardImmune = true;
         }
 
-        protected BaseTrainingCreature(Serial serial) : base(serial) { }
+        public BaseTrainingCreature(Serial serial) : base(serial) { }
 
         public override bool AutoDispel => true;
         public override bool BleedImmune => true;
