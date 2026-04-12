@@ -144,7 +144,7 @@ namespace Server.Mobiles
 
             SetHits(136, 153);
 
-            SetDamage(1, 1);
+            SetDamage(0, 0);
 
             SetDamageType(ResistanceType.Physical, 100);
 
@@ -197,7 +197,7 @@ namespace Server.Mobiles
 
             SetHits(106, 120);
 
-            SetDamage(1, 1);
+            SetDamage(0, 0);
 
             SetDamageType(ResistanceType.Physical, 100);
 
@@ -250,7 +250,7 @@ namespace Server.Mobiles
 
             SetHits(118, 135);
 
-            SetDamage(1, 1);
+            SetDamage(0, 0);
 
             SetDamageType(ResistanceType.Physical, 100);
 
@@ -303,7 +303,7 @@ namespace Server.Mobiles
 
             SetHits(88, 105);
 
-            SetDamage(1, 1);
+            SetDamage(0, 0);
 
             SetDamageType(ResistanceType.Physical, 100);
 
