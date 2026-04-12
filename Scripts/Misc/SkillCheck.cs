@@ -480,23 +480,6 @@ namespace Server.Misc
 
 		public static void TryStatGain(SkillInfo info, Mobile from)
 		{
-			// Chance roll
-			double chance;
-
-            if (from is BaseCreature && ((BaseCreature)from).Controlled)
-            {
-                chance = _PetChanceToGainStats / 100.0;
-            }
-            else
-            {
-                chance = _PlayerChanceToGainStats / 100.0;
-            }
-
-			if (Utility.RandomDouble() >= chance)
-			{
-				return;
-			}
-
 			// Selection
 			var primaryLock = StatLockType.Locked;
 			var secondaryLock = StatLockType.Locked;
