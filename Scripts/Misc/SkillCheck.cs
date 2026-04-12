@@ -544,21 +544,22 @@ namespace Server.Misc
 					break;
 			}
 
-			// Gain
-			// Decision block of both are selected to gain
+			// Gain — use IncreaseStat directly to bypass the per-stat cooldown timer,
+			// so stats gain at the natural rate of skill usage rather than being
+			// bottlenecked to once every 15 minutes.
 			if (primaryLock == StatLockType.Up && secondaryLock == StatLockType.Up)
 			{
 				if (Utility.Random(4) == 0)
-					GainStat(from, (Stat)info.Secondary);
+					IncreaseStat(from, (Stat)info.Secondary);
 				else
-					GainStat(from, (Stat)info.Primary);
+					IncreaseStat(from, (Stat)info.Primary);
 			}
 			else // Will not do anything if neither are selected to gain
 			{
 				if (primaryLock == StatLockType.Up)
-					GainStat(from, (Stat)info.Primary);
+					IncreaseStat(from, (Stat)info.Primary);
 				else if (secondaryLock == StatLockType.Up)
-					GainStat(from, (Stat)info.Secondary);
+					IncreaseStat(from, (Stat)info.Secondary);
 			}
 		}
 

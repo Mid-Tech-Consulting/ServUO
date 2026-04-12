@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Server.Gumps;
 using Server.Items;
-using Server.Misc;
 using Server.Network;
 
 namespace Server.Mobiles
@@ -62,53 +61,6 @@ namespace Server.Mobiles
         {
             if (from is PlayerMobile || (from is BaseCreature bc && (bc.Controlled || bc.BardTarget == this)))
                 _lastAttackedTime = DateTime.UtcNow;
-        }
-
-        public override void OnGotMeleeAttack(Mobile attacker)
-        {
-            base.OnGotMeleeAttack(attacker);
-
-            if (!(attacker is PlayerMobile player))
-                return;
-
-            // 15% chance per hit to attempt a stat gain, bypassing the global stat timer
-            // so dedicated training actually produces results.
-            if (Utility.RandomDouble() >= 0.15)
-                return;
-
-            BaseWeapon weapon = player.Weapon as BaseWeapon;
-            if (weapon == null)
-                return;
-
-            SkillInfo info = player.Skills[weapon.Skill]?.Info;
-            if (info == null)
-                return;
-
-            bool primaryUp   = GetStatLock(player, (SkillCheck.Stat)info.Primary)   == StatLockType.Up;
-            bool secondaryUp = GetStatLock(player, (SkillCheck.Stat)info.Secondary) == StatLockType.Up;
-
-            if (primaryUp && secondaryUp)
-            {
-                // Mirror TryStatGain: 75% primary, 25% secondary
-                SkillCheck.IncreaseStat(player, Utility.Random(4) == 0
-                    ? (SkillCheck.Stat)info.Secondary
-                    : (SkillCheck.Stat)info.Primary);
-            }
-            else if (primaryUp)
-                SkillCheck.IncreaseStat(player, (SkillCheck.Stat)info.Primary);
-            else if (secondaryUp)
-                SkillCheck.IncreaseStat(player, (SkillCheck.Stat)info.Secondary);
-        }
-
-        private static StatLockType GetStatLock(Mobile m, SkillCheck.Stat stat)
-        {
-            switch (stat)
-            {
-                case SkillCheck.Stat.Str: return m.StrLock;
-                case SkillCheck.Stat.Dex: return m.DexLock;
-                case SkillCheck.Stat.Int: return m.IntLock;
-                default: return StatLockType.Locked;
-            }
         }
 
         public override void AlterMeleeDamageFrom(Mobile from, ref int damage)
