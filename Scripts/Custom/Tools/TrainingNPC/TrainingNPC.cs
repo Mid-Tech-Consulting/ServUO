@@ -355,6 +355,62 @@ namespace Server.Mobiles
     }
 
     // =========================================================
+    //  Training Golem
+    // =========================================================
+    [CorpseName("a training golem corpse")]
+    public class TrainingGolem : BaseTrainingCreature
+    {
+        [Constructable]
+        public TrainingGolem()
+            : base(AIType.AI_Melee, FightMode.Closest, 10, 1, 0.4, 0.8)
+        {
+            Name = "a training golem";
+            Body = 752;
+
+            SetStr(226, 255);
+            SetDex(76, 100);
+            SetInt(101, 125);
+
+            SetHits(136, 153);
+
+            SetDamage(0, 0);
+
+            SetDamageType(ResistanceType.Physical, 100);
+
+            SetResistance(ResistanceType.Physical, 40, 60);
+            SetResistance(ResistanceType.Fire, 100);
+            SetResistance(ResistanceType.Cold, 20, 30);
+            SetResistance(ResistanceType.Poison, 10, 25);
+            SetResistance(ResistanceType.Energy, 30, 45);
+
+            SetSkill(SkillName.MagicResist, 60.0, 100.0);
+            SetSkill(SkillName.Tactics, 60.0, 100.0);
+            SetSkill(SkillName.Wrestling, 60.1, 100.0);
+
+            Fame = 3500;
+            Karma = -3500;
+        }
+
+        public TrainingGolem(Serial serial) : base(serial) { }
+
+        public override int GetAngerSound() => 541;
+        public override int GetDeathSound() => 545;
+        public override int GetAttackSound() => 562;
+
+        public override void Serialize(GenericWriter writer)
+        {
+            base.Serialize(writer);
+            writer.Write(0);
+        }
+
+        public override void Deserialize(GenericReader reader)
+        {
+            base.Deserialize(reader);
+            reader.ReadInt();
+        }
+    }
+
+    // =========================================================
     //  Training Master NPC — double-click to open creature menu
     // =========================================================
     public class TrainingMaster : BaseCreature
@@ -438,6 +494,7 @@ namespace Server.Mobiles
                 case 1: creature = new TrainingHumanFighter(); break;
                 case 2: creature = new TrainingOrcWarrior(); break;
                 case 3: creature = new TrainingGargoyle(); break;
+                case 4: creature = new TrainingGolem(); break;
                 default: return;
             }
 
@@ -500,6 +557,9 @@ namespace Server.Mobiles
 
             AddButton(20, 115, 4005, 4007, 3, GumpButtonType.Reply, 0);
             AddLabel(58, 117, 0, "Gargoyle");
+
+            AddButton(20, 145, 4005, 4007, 4, GumpButtonType.Reply, 0);
+            AddLabel(58, 147, 0, "Golem");
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -520,6 +580,7 @@ namespace Server.Mobiles
                 case 1: _master.SpawnTrainingCreature(from, 0); break; // Elemental
                 case 2: _master.SpawnTrainingCreature(from, 2); break; // Orc Warrior
                 case 3: _master.SpawnTrainingCreature(from, 3); break; // Gargoyle
+                case 4: _master.SpawnTrainingCreature(from, 4); break; // Golem
             }
         }
     }
