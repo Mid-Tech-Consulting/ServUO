@@ -367,7 +367,7 @@ namespace Server.Mobiles
         {
             base.OnMovement(m, oldLocation);
 
-            if (!(m is PlayerMobile) || !m.InRange(Location, 5) || m.InRange(oldLocation, 5))
+            if (!(m is PlayerMobile) || !m.InRange(Location, 5) || oldLocation.InRange(Location, 5))
                 return;
 
             if (_greeted.TryGetValue(m, out DateTime last) && DateTime.UtcNow - last < GreetCooldown)
