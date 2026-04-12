@@ -82,6 +82,18 @@ namespace Server.Mobiles
                 damage = 0;
         }
 
+        public override void Serialize(GenericWriter writer)
+        {
+            base.Serialize(writer);
+            writer.Write(0);
+        }
+
+        public override void Deserialize(GenericReader reader)
+        {
+            base.Deserialize(reader);
+            reader.ReadInt();
+        }
+
         // ---- Inactivity timer ----
         private class InactivityTimer : Timer
         {
