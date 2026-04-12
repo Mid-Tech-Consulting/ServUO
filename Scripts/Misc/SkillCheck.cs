@@ -499,6 +499,9 @@ namespace Server.Misc
 
 		public static void TryStatGain(SkillInfo info, Mobile from)
 		{
+			// TEMP DEBUG: remove once stat gain is confirmed working
+			from.SendMessage(38, $"[TryStatGain] skill={info.Name} primary={info.Primary}({(info.Primary == StatCode.Str ? from.StrLock.ToString() : info.Primary == StatCode.Dex ? from.DexLock.ToString() : from.IntLock.ToString())}) secondary={info.Secondary}({(info.Secondary == StatCode.Str ? from.StrLock.ToString() : info.Secondary == StatCode.Dex ? from.DexLock.ToString() : from.IntLock.ToString())}) STR={from.RawStr}/{from.StrCap} DEX={from.RawDex}/{from.DexCap} INT={from.RawInt}/{from.IntCap} Total={from.RawStatTotal}/{from.StatCap}");
+
 			// Selection
 			var primaryLock = StatLockType.Locked;
 			var secondaryLock = StatLockType.Locked;
