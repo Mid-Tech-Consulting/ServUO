@@ -438,13 +438,10 @@ namespace Server.Mobiles
             AddLabel(58, 57, 0, "Elemental");
 
             AddButton(20, 85,  4005, 4007, 2, GumpButtonType.Reply, 0);
-            AddLabel(58, 87, 0, "Human Fighter");
+            AddLabel(58, 87, 0, "Orc Warrior");
 
             AddButton(20, 115, 4005, 4007, 3, GumpButtonType.Reply, 0);
-            AddLabel(58, 117, 0, "Orc Warrior");
-
-            AddButton(20, 145, 4005, 4007, 4, GumpButtonType.Reply, 0);
-            AddLabel(58, 147, 0, "Gargoyle");
+            AddLabel(58, 117, 0, "Gargoyle");
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -463,9 +460,8 @@ namespace Server.Mobiles
             switch (info.ButtonID)
             {
                 case 1: _master.SpawnTrainingCreature(from, 0); break; // Elemental
-                case 2: _master.SpawnTrainingCreature(from, 1); break; // Human Fighter
-                case 3: _master.SpawnTrainingCreature(from, 2); break; // Orc Warrior
-                case 4: _master.SpawnTrainingCreature(from, 3); break; // Gargoyle
+                case 2: _master.SpawnTrainingCreature(from, 2); break; // Orc Warrior
+                case 3: _master.SpawnTrainingCreature(from, 3); break; // Gargoyle
             }
         }
     }
