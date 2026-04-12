@@ -84,7 +84,31 @@ namespace Server.Mobiles
             if (info == null)
                 return;
 
-            SkillCheck.IncreaseStat(player, (SkillCheck.Stat)info.Primary);
+            bool primaryUp   = GetStatLock(player, (SkillCheck.Stat)info.Primary)   == StatLockType.Up;
+            bool secondaryUp = GetStatLock(player, (SkillCheck.Stat)info.Secondary) == StatLockType.Up;
+
+            if (primaryUp && secondaryUp)
+            {
+                // Mirror TryStatGain: 75% primary, 25% secondary
+                SkillCheck.IncreaseStat(player, Utility.Random(4) == 0
+                    ? (SkillCheck.Stat)info.Secondary
+                    : (SkillCheck.Stat)info.Primary);
+            }
+            else if (primaryUp)
+                SkillCheck.IncreaseStat(player, (SkillCheck.Stat)info.Primary);
+            else if (secondaryUp)
+                SkillCheck.IncreaseStat(player, (SkillCheck.Stat)info.Secondary);
+        }
+
+        private static StatLockType GetStatLock(Mobile m, SkillCheck.Stat stat)
+        {
+            switch (stat)
+            {
+                case SkillCheck.Stat.Str: return m.StrLock;
+                case SkillCheck.Stat.Dex: return m.DexLock;
+                case SkillCheck.Stat.Int: return m.IntLock;
+                default: return StatLockType.Locked;
+            }
         }
 
         public override void AlterMeleeDamageFrom(Mobile from, ref int damage)
