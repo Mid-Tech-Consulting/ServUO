@@ -179,11 +179,7 @@ namespace Server.Misc
 				return false; // Too difficult
 
 			if (chance >= 1.0)
-			{
-				// Still call CheckSkill so Gain/TryStatGain can fire for stat advancement
-				CheckSkill(from, skill, new Point2D(from.Location.X / LocationSize, from.Location.Y / LocationSize), 0.95);
-				return true;
-			}
+				return true; // No challenge
 
 			return CheckSkill(from, skill, new Point2D(from.Location.X / LocationSize, from.Location.Y / LocationSize), chance);
 		}
@@ -264,14 +260,6 @@ namespace Server.Misc
 				{
 					Gain(from, skill);
 				}
-				else if (from.Alive && from is PlayerMobile)
-				{
-					TryStatGain(skill.Info, from);
-				}
-			}
-			else if (from.Alive && from is PlayerMobile)
-			{
-				TryStatGain(skill.Info, from);
 			}
 
             EventSink.InvokeSkillCheck(new SkillCheckEventArgs(from, skill, success));
@@ -290,10 +278,6 @@ namespace Server.Misc
             gc /= 2;
 
             gc *= skill.Info.GainFactor;
-
-            // Boost gain chance - minimum 25% chance to gain
-            if (gc < 0.25)
-                gc = 0.25;
 
             // Pets get a 100% bonus
             if (from is BaseCreature && ((BaseCreature)from).Controlled)
@@ -354,11 +338,7 @@ namespace Server.Misc
 				return false; // Too difficult
 
 			if (chance >= 1.0)
-			{
-				// Still call CheckSkill so Gain/TryStatGain can fire for stat advancement
-				CheckSkill(from, skill, target, 0.95);
-				return true;
-			}
+				return true; // No challenge
 
 			return CheckSkill(from, skill, target, chance);
 		}
@@ -472,7 +452,11 @@ namespace Server.Misc
 				QuestHelper.CheckSkill((PlayerMobile)from, skill);
 			#endregion
 
-			TryStatGain(skill.Info, from);
+			if (skill.Lock == SkillLock.Up &&
+				(!Siege.SiegeShard || !(from is PlayerMobile) || Siege.CanGainStat((PlayerMobile)from)))
+			{
+				TryStatGain(skill.Info, from);
+			}
 		}
 
 		private static void CheckReduceSkill(Skills skills, int toGain, Skill gainSKill)
@@ -522,22 +506,24 @@ namespace Server.Misc
 					break;
 			}
 
-			// Gain — use IncreaseStat directly to bypass the per-stat cooldown timer,
-			// so stats gain at the natural rate of skill usage rather than being
-			// bottlenecked to once every 15 minutes.
-			if (primaryLock == StatLockType.Up && secondaryLock == StatLockType.Up)
+			double chance = _PlayerChanceToGainStats / 100.0;
+
+			if (Utility.RandomDouble() < chance)
 			{
-				if (Utility.Random(4) == 0)
-					IncreaseStat(from, (Stat)info.Secondary);
+				if (primaryLock == StatLockType.Up && secondaryLock == StatLockType.Up)
+				{
+					if (Utility.Random(2) == 0)
+						GainStat(from, (Stat)info.Secondary);
+					else
+						GainStat(from, (Stat)info.Primary);
+				}
 				else
-					IncreaseStat(from, (Stat)info.Primary);
-			}
-			else // Will not do anything if neither are selected to gain
-			{
-				if (primaryLock == StatLockType.Up)
-					IncreaseStat(from, (Stat)info.Primary);
-				else if (secondaryLock == StatLockType.Up)
-					IncreaseStat(from, (Stat)info.Secondary);
+				{
+					if (primaryLock == StatLockType.Up)
+						GainStat(from, (Stat)info.Primary);
+					else if (secondaryLock == StatLockType.Up)
+						GainStat(from, (Stat)info.Secondary);
+				}
 			}
 		}
 

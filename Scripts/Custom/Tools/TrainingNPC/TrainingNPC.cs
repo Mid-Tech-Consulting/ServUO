@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Server.Gumps;
 using Server.Items;
+using Server.Misc;
 using Server.Network;
 
 namespace Server.Mobiles
@@ -71,6 +72,31 @@ namespace Server.Mobiles
                 damage = 0;
             else if (from is PlayerMobile)
                 damage = 0;
+        }
+
+        // Grant the attacker a chance to gain stats on each hit
+        public override void OnGotMeleeAttack(Mobile attacker)
+        {
+            base.OnGotMeleeAttack(attacker);
+
+            if (!(attacker is PlayerMobile player))
+                return;
+
+            // 15% chance per hit to attempt a stat gain
+            if (Utility.Random(100) >= 15)
+                return;
+
+            // Pick which stat to try based on what the player has unlocked (set to Up)
+            var candidates = new List<SkillCheck.Stat>();
+
+            if (player.StrLock == StatLockType.Up) candidates.Add(SkillCheck.Stat.Str);
+            if (player.DexLock == StatLockType.Up) candidates.Add(SkillCheck.Stat.Dex);
+            if (player.IntLock == StatLockType.Up) candidates.Add(SkillCheck.Stat.Int);
+
+            if (candidates.Count == 0)
+                return;
+
+            SkillCheck.IncreaseStat(player, candidates[Utility.Random(candidates.Count)]);
         }
 
         public override void AlterDamageScalarFrom(Mobile caster, ref double scalar)
