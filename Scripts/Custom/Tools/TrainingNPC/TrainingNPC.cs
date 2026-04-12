@@ -16,6 +16,9 @@ namespace Server.Mobiles
         private DateTime _lastAttackedTime;
         private InactivityTimer _inactivityTimer;
 
+        public TrainingMaster Master { get; set; }
+        public Mobile Summoner { get; set; }
+
         protected BaseTrainingCreature(AIType ai, FightMode mode, int range, int irange, double passiveSpeed, double activeSpeed)
             : base(ai, mode, range, irange, passiveSpeed, activeSpeed)
         {
@@ -24,6 +27,12 @@ namespace Server.Mobiles
         }
 
         public BaseTrainingCreature(Serial serial) : base(serial) { }
+
+        public override void OnAfterDelete()
+        {
+            base.OnAfterDelete();
+            Master?.RemoveCreature(this);
+        }
 
         public override bool AutoDispel => true;
         public override bool BleedImmune => true;
@@ -86,13 +95,21 @@ namespace Server.Mobiles
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(0);
+            writer.Write(1);
+            writer.Write(Master);
+            writer.Write(Summoner);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
-            reader.ReadInt();
+            int version = reader.ReadInt();
+
+            if (version >= 1)
+            {
+                Master = reader.ReadMobile() as TrainingMaster;
+                Summoner = reader.ReadMobile();
+            }
         }
 
         // ---- Inactivity timer ----
@@ -342,8 +359,16 @@ namespace Server.Mobiles
     // =========================================================
     public class TrainingMaster : BaseCreature
     {
+        private const int VendorCreatureLimit = 6;
+
         private static readonly TimeSpan GreetCooldown = TimeSpan.FromSeconds(60);
         private readonly Dictionary<Mobile, DateTime> _greeted = new Dictionary<Mobile, DateTime>();
+        private readonly List<BaseTrainingCreature> _activeCreatures = new List<BaseTrainingCreature>();
+
+        public void RemoveCreature(BaseTrainingCreature creature)
+        {
+            _activeCreatures.Remove(creature);
+        }
 
         [Constructable]
         public TrainingMaster()
@@ -391,7 +416,21 @@ namespace Server.Mobiles
 
         public void SpawnTrainingCreature(Mobile from, int type)
         {
-            BaseCreature creature;
+            _activeCreatures.RemoveAll(c => c.Deleted);
+
+            if (_activeCreatures.Count >= VendorCreatureLimit)
+            {
+                from.SendMessage("The training area is at capacity. Please wait for a creature to become available.");
+                return;
+            }
+
+            if (_activeCreatures.Exists(c => c.Summoner == from))
+            {
+                from.SendMessage("You already have a training creature active. Defeat it before summoning another.");
+                return;
+            }
+
+            BaseTrainingCreature creature;
 
             switch (type)
             {
@@ -402,6 +441,10 @@ namespace Server.Mobiles
                 default: return;
             }
 
+            creature.Master = this;
+            creature.Summoner = from;
+            _activeCreatures.Add(creature);
+
             creature.MoveToWorld(from.Location, from.Map);
             from.SendMessage("A training creature has been summoned!");
         }
@@ -409,13 +452,28 @@ namespace Server.Mobiles
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(0);
+            writer.Write(1);
+
+            _activeCreatures.RemoveAll(c => c.Deleted);
+            writer.Write(_activeCreatures.Count);
+            foreach (BaseTrainingCreature c in _activeCreatures)
+                writer.Write(c);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
-            reader.ReadInt();
+            int version = reader.ReadInt();
+
+            if (version >= 1)
+            {
+                int count = reader.ReadInt();
+                for (int i = 0; i < count; i++)
+                {
+                    if (reader.ReadMobile() is BaseTrainingCreature c && !c.Deleted)
+                        _activeCreatures.Add(c);
+                }
+            }
         }
     }
 
