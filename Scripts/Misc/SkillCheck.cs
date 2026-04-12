@@ -262,23 +262,28 @@ namespace Server.Misc
             var success = Utility.Random(100) <= (int)(chance * 100);
             var gc = GetGainChance(from, skill, chance, success);
 
-			if (AllowGain(from, skill, obj))
+			bool allowGainResult = AllowGain(from, skill, obj);
+			if (from is PlayerMobile)
+				from.SendMessage(38, "[CS] allowGain=" + allowGainResult + " alive=" + from.Alive + " gc=" + gc.ToString("F2"));
+
+			if (allowGainResult)
 			{
 				if (from.Alive && (skill.Base < 10.0 || Utility.RandomDouble() <= gc || CheckGGS(from, skill)))
 				{
+					if (from is PlayerMobile) from.SendMessage(38, "[CS] calling Gain");
 					Gain(from, skill);
 				}
 				else if (from.Alive && from is PlayerMobile &&
 					(!Siege.SiegeShard || Siege.CanGainStat((PlayerMobile)from)))
 				{
-					// Skill didn't gain this tick but still try stat gain
+					from.SendMessage(38, "[CS] calling TryStatGain (no gain)");
 					TryStatGain(skill.Info, from);
 				}
 			}
 			else if (from.Alive && from is PlayerMobile &&
 				(!Siege.SiegeShard || Siege.CanGainStat((PlayerMobile)from)))
 			{
-				// Anti-macro blocked skill XP gain but stats can still advance
+				from.SendMessage(38, "[CS] calling TryStatGain (anti-macro)");
 				TryStatGain(skill.Info, from);
 			}
 
@@ -406,6 +411,8 @@ namespace Server.Misc
 
         public static void Gain(Mobile from, Skill skill, int toGain)
 		{
+			if (from is PlayerMobile) from.SendMessage(38, "[Gain] entered toGain=" + toGain);
+
 			if (from.Region.IsPartOf<Jail>())
 				return;
 
@@ -480,6 +487,8 @@ namespace Server.Misc
 				QuestHelper.CheckSkill((PlayerMobile)from, skill);
 			#endregion
 
+			if (from is PlayerMobile) from.SendMessage(38, "[Gain] about to call TryStatGain siege=" + Siege.SiegeShard);
+
 			if (!Siege.SiegeShard || !(from is PlayerMobile) || Siege.CanGainStat((PlayerMobile)from))
 			{
 				TryStatGain(skill.Info, from);
@@ -503,8 +512,8 @@ namespace Server.Misc
 
 		public static void TryStatGain(SkillInfo info, Mobile from)
 		{
-			// TEMP DEBUG: remove once stat gain is confirmed working
-			from.SendMessage(38, "[TryStatGain] " + info.Name + " Str=" + from.StrLock + " Dex=" + from.DexLock + " Int=" + from.IntLock + " Total=" + from.RawStatTotal + "/" + from.StatCap);
+			// TEMP DEBUG
+			from.SendMessage(38, "TRYSTATGAIN REACHED");
 
 			// Selection
 			var primaryLock = StatLockType.Locked;
