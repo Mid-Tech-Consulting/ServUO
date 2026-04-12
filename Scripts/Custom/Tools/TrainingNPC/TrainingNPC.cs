@@ -30,9 +30,9 @@ namespace Server.Mobiles
 
         // Called whenever the creature is placed on a real map —
         // covers both fresh spawns and server restarts after deserialization.
-        public override void OnMapChange()
+        public override void OnMapChange(Map oldMap)
         {
-            base.OnMapChange();
+            base.OnMapChange(oldMap);
 
             if (Map != null && Map != Map.Internal)
             {
@@ -116,7 +116,7 @@ namespace Server.Mobiles
     public class TrainingElemental : BaseTrainingCreature
     {
         [Constructable]
-        public TrainingNPC()
+        public TrainingElemental()
             : base(AIType.AI_Melee, FightMode.Closest, 10, 1, 0.2, 0.4)
         {
             Name = "a training elemental";
