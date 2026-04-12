@@ -349,7 +349,7 @@ namespace Server.Mobiles
             Title = "the training master";
             Body = 400;
             CantWalk = true;
-            Frozen = true;
+            CanMove = false;
             Blessed = true;
 
             AddItem(new Server.Items.HoodedShroudOfShadows());
