@@ -343,7 +343,7 @@ namespace Server.Mobiles
     public class TrainingMaster : BaseCreature
     {
         private static readonly TimeSpan GreetCooldown = TimeSpan.FromSeconds(60);
-        private readonly Dictionary<Mobile, DateTime> _greeted = [];
+        private readonly Dictionary<Mobile, DateTime> _greeted = new Dictionary<Mobile, DateTime>();
 
         [Constructable]
         public TrainingMaster()
@@ -367,7 +367,7 @@ namespace Server.Mobiles
         {
             base.OnMovement(m, oldLocation);
 
-            if (m is not PlayerMobile || !m.InRange(Location, 5) || m.InRange(oldLocation, 5))
+            if (!(m is PlayerMobile) || !m.InRange(Location, 5) || m.InRange(oldLocation, 5))
                 return;
 
             if (_greeted.TryGetValue(m, out DateTime last) && DateTime.UtcNow - last < GreetCooldown)
