@@ -460,7 +460,7 @@ namespace Server.Mobiles
 
         public override void OnDoubleClick(Mobile from)
         {
-            if (!from.InRange(Location, 4))
+            if (!from.InRange(Location, 8))
             {
                 from.SendLocalizedMessage(500446); // That is too far away.
                 return;
@@ -569,7 +569,7 @@ namespace Server.Mobiles
             if (from == null || from.Deleted || _master == null || _master.Deleted)
                 return;
 
-            if (!from.InRange(_master.Location, 4))
+            if (!from.InRange(_master.Location, 8))
             {
                 from.SendLocalizedMessage(500446);
                 return;
