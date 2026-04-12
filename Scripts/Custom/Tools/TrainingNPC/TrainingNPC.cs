@@ -30,7 +30,7 @@ namespace Server.Mobiles
 
         // Called whenever the creature is placed on a real map —
         // covers both fresh spawns and server restarts after deserialization.
-        public override void OnMapChange(Map oldMap)
+        protected override void OnMapChange(Map oldMap)
         {
             base.OnMapChange(oldMap);
 
