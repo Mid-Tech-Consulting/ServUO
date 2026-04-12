@@ -255,6 +255,10 @@ namespace Server.Misc
 			if (from.Skills.Cap == 0)
 				return false;
 
+			// TEMP DEBUG
+			if (from is PlayerMobile)
+				from.SendMessage(38, "[CheckSkill] " + skill.SkillName + " chance=" + chance.ToString("F2"));
+
             var success = Utility.Random(100) <= (int)(chance * 100);
             var gc = GetGainChance(from, skill, chance, success);
 
@@ -500,7 +504,7 @@ namespace Server.Misc
 		public static void TryStatGain(SkillInfo info, Mobile from)
 		{
 			// TEMP DEBUG: remove once stat gain is confirmed working
-			from.SendMessage(38, $"[TryStatGain] skill={info.Name} primary={info.Primary}({(info.Primary == StatCode.Str ? from.StrLock.ToString() : info.Primary == StatCode.Dex ? from.DexLock.ToString() : from.IntLock.ToString())}) secondary={info.Secondary}({(info.Secondary == StatCode.Str ? from.StrLock.ToString() : info.Secondary == StatCode.Dex ? from.DexLock.ToString() : from.IntLock.ToString())}) STR={from.RawStr}/{from.StrCap} DEX={from.RawDex}/{from.DexCap} INT={from.RawInt}/{from.IntCap} Total={from.RawStatTotal}/{from.StatCap}");
+			from.SendMessage(38, "[TryStatGain] " + info.Name + " Str=" + from.StrLock + " Dex=" + from.DexLock + " Int=" + from.IntLock + " Total=" + from.RawStatTotal + "/" + from.StatCap);
 
 			// Selection
 			var primaryLock = StatLockType.Locked;
