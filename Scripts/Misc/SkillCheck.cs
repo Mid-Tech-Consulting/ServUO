@@ -255,35 +255,22 @@ namespace Server.Misc
 			if (from.Skills.Cap == 0)
 				return false;
 
-			// TEMP DEBUG
-			if (from is PlayerMobile)
-				from.SendMessage(38, "[CheckSkill] " + skill.SkillName + " chance=" + chance.ToString("F2"));
-
             var success = Utility.Random(100) <= (int)(chance * 100);
             var gc = GetGainChance(from, skill, chance, success);
 
-			bool allowGainResult = AllowGain(from, skill, obj);
-			if (from is PlayerMobile)
-				from.SendMessage(38, "[CS] allowGain=" + allowGainResult + " alive=" + from.Alive + " gc=" + gc.ToString("F2"));
-
-			if (allowGainResult)
+			if (AllowGain(from, skill, obj))
 			{
 				if (from.Alive && (skill.Base < 10.0 || Utility.RandomDouble() <= gc || CheckGGS(from, skill)))
 				{
-					if (from is PlayerMobile) from.SendMessage(38, "[CS] calling Gain");
 					Gain(from, skill);
 				}
-				else if (from.Alive && from is PlayerMobile &&
-					(!Siege.SiegeShard || Siege.CanGainStat((PlayerMobile)from)))
+				else if (from.Alive && from is PlayerMobile)
 				{
-					from.SendMessage(38, "[CS] calling TryStatGain (no gain)");
 					TryStatGain(skill.Info, from);
 				}
 			}
-			else if (from.Alive && from is PlayerMobile &&
-				(!Siege.SiegeShard || Siege.CanGainStat((PlayerMobile)from)))
+			else if (from.Alive && from is PlayerMobile)
 			{
-				from.SendMessage(38, "[CS] calling TryStatGain (anti-macro)");
 				TryStatGain(skill.Info, from);
 			}
 
@@ -411,8 +398,6 @@ namespace Server.Misc
 
         public static void Gain(Mobile from, Skill skill, int toGain)
 		{
-			if (from is PlayerMobile) from.SendMessage(38, "[Gain] entered toGain=" + toGain);
-
 			if (from.Region.IsPartOf<Jail>())
 				return;
 
@@ -487,12 +472,7 @@ namespace Server.Misc
 				QuestHelper.CheckSkill((PlayerMobile)from, skill);
 			#endregion
 
-			if (from is PlayerMobile) from.SendMessage(38, "[Gain] about to call TryStatGain siege=" + Siege.SiegeShard);
-
-			if (!Siege.SiegeShard || !(from is PlayerMobile) || Siege.CanGainStat((PlayerMobile)from))
-			{
-				TryStatGain(skill.Info, from);
-			}
+			TryStatGain(skill.Info, from);
 		}
 
 		private static void CheckReduceSkill(Skills skills, int toGain, Skill gainSKill)
@@ -512,9 +492,6 @@ namespace Server.Misc
 
 		public static void TryStatGain(SkillInfo info, Mobile from)
 		{
-			// TEMP DEBUG
-			from.SendMessage(38, "TRYSTATGAIN REACHED");
-
 			// Selection
 			var primaryLock = StatLockType.Locked;
 			var secondaryLock = StatLockType.Locked;
