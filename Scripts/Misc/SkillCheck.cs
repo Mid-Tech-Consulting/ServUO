@@ -548,10 +548,24 @@ namespace Server.Misc
 			// Decision block of both are selected to gain
 			if (primaryLock == StatLockType.Up && secondaryLock == StatLockType.Up)
 			{
+				Stat first, second;
+
 				if (Utility.Random(4) == 0)
-					GainStat(from, (Stat)info.Secondary);
+				{
+					first = (Stat)info.Secondary;
+					second = (Stat)info.Primary;
+				}
 				else
-					GainStat(from, (Stat)info.Primary);
+				{
+					first = (Stat)info.Primary;
+					second = (Stat)info.Secondary;
+				}
+
+				// If the chosen stat is already at individual cap, fall back to the other
+				if (!CanRaise(from, first, false))
+					GainStat(from, second);
+				else
+					GainStat(from, first);
 			}
 			else // Will not do anything if neither are selected to gain
 			{
