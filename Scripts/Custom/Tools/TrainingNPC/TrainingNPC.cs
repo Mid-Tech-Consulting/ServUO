@@ -82,8 +82,8 @@ namespace Server.Mobiles
             if (!(attacker is PlayerMobile player))
                 return;
 
-            // 50% chance per hit to attempt a stat gain
-            if (Utility.Random(100) >= 50)
+            // 35% chance per hit to attempt a stat gain
+            if (Utility.Random(100) >= 35)
                 return;
 
             // Pick which stat to try based on what the player has unlocked (set to Up)
