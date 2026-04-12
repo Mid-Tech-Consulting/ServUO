@@ -373,7 +373,7 @@ namespace Server.Mobiles
                 default: return;
             }
 
-            creature.MoveToWorld(new Point3D(X + 2, Y, Z), Map);
+            creature.MoveToWorld(from.Location, from.Map);
             from.SendMessage("A training creature has been summoned!");
         }
 
