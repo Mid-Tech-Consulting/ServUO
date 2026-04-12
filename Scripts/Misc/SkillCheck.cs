@@ -179,7 +179,11 @@ namespace Server.Misc
 				return false; // Too difficult
 
 			if (chance >= 1.0)
-				return true; // No challenge
+			{
+				// Still call CheckSkill so Gain/TryStatGain can fire for stat advancement
+				CheckSkill(from, skill, new Point2D(from.Location.X / LocationSize, from.Location.Y / LocationSize), 0.95);
+				return true;
+			}
 
 			return CheckSkill(from, skill, new Point2D(from.Location.X / LocationSize, from.Location.Y / LocationSize), chance);
 		}
@@ -260,6 +264,18 @@ namespace Server.Misc
 				{
 					Gain(from, skill);
 				}
+				else if (from.Alive && from is PlayerMobile &&
+					(!Siege.SiegeShard || Siege.CanGainStat((PlayerMobile)from)))
+				{
+					// Skill didn't gain this tick but still try stat gain
+					TryStatGain(skill.Info, from);
+				}
+			}
+			else if (from.Alive && from is PlayerMobile &&
+				(!Siege.SiegeShard || Siege.CanGainStat((PlayerMobile)from)))
+			{
+				// Anti-macro blocked skill XP gain but stats can still advance
+				TryStatGain(skill.Info, from);
 			}
 
             EventSink.InvokeSkillCheck(new SkillCheckEventArgs(from, skill, success));
@@ -342,7 +358,11 @@ namespace Server.Misc
 				return false; // Too difficult
 
 			if (chance >= 1.0)
-				return true; // No challenge
+			{
+				// Still call CheckSkill so Gain/TryStatGain can fire for stat advancement
+				CheckSkill(from, skill, target, 0.95);
+				return true;
+			}
 
 			return CheckSkill(from, skill, target, chance);
 		}
@@ -456,8 +476,7 @@ namespace Server.Misc
 				QuestHelper.CheckSkill((PlayerMobile)from, skill);
 			#endregion
 
-			if (skill.Lock == SkillLock.Up &&
-				(!Siege.SiegeShard || !(from is PlayerMobile) || Siege.CanGainStat((PlayerMobile)from)))
+			if (!Siege.SiegeShard || !(from is PlayerMobile) || Siege.CanGainStat((PlayerMobile)from))
 			{
 				TryStatGain(skill.Info, from);
 			}
