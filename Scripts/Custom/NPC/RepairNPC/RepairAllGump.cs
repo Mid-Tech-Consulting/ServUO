@@ -280,7 +280,7 @@ namespace Server.Gumps
             }
             else
             {
-                AddLabel(x + 130, y, 0x44, "Null");
+                AddLabel(x + 130, y, 0x44, "Empty");
             }
 
             y += itemSpacing;
