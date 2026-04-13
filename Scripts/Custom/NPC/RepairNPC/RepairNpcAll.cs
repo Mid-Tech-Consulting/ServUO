@@ -36,6 +36,8 @@ namespace Server.Mobiles
         {
         }
 
+        public override bool IsInvulnerable => true;
+
         public override void OnDoubleClick(Mobile from)
         {
             if (!from.Alive)
