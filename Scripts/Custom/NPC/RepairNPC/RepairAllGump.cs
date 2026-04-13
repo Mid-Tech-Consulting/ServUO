@@ -40,7 +40,7 @@ namespace Server.Gumps
             Layer.Shoes,
             Layer.Waist,
             Layer.Cloak,
-            Layer.FirstValid,
+            Layer.OneHanded,
             Layer.TwoHanded
         };
 
