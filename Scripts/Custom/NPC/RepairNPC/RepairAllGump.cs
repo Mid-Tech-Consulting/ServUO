@@ -237,15 +237,13 @@ namespace Server.Gumps
             List<Layer> column1Layers = new List<Layer>();
             List<Layer> column2Layers = new List<Layer>();
 
-            int halfCount = m_Items.Count / 2;
-            int index = 0;
-            foreach (Layer layer in m_Items.Keys)
+            int halfCount = RepairLayers.Length / 2;
+            for (int index = 0; index < RepairLayers.Length; index++)
             {
                 if (index < halfCount)
-                    column1Layers.Add(layer);
+                    column1Layers.Add(RepairLayers[index]);
                 else
-                    column2Layers.Add(layer);
-                index++;
+                    column2Layers.Add(RepairLayers[index]);
             }
 
             foreach (Layer layer in column1Layers)
