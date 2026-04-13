@@ -42,7 +42,7 @@ namespace Server.Items
         {
             Name = " An Advance Interior Decorator";
             Weight = 1.0;
-            LootType = LootType.Regular;
+            LootType = LootType.Blessed;
         }
 
         public AdvancedInteriorDecorator(Serial serial)
