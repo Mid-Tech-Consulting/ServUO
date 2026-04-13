@@ -223,59 +223,6 @@ namespace Server.Mobiles
     }
 
     // =========================================================
-    //  Training Human Fighter
-    // =========================================================
-    [CorpseName("a training fighter corpse")]
-    public class TrainingHumanFighter : BaseTrainingCreature
-    {
-        [Constructable]
-        public TrainingHumanFighter()
-            : base(AIType.AI_Melee, FightMode.Closest, 10, 1, 0.2, 0.4)
-        {
-            Name = "a training fighter";
-            Body = 400;
-            BaseSoundID = 0x45A;
-
-            SetStr(176, 200);
-            SetDex(96, 115);
-            SetInt(36, 55);
-
-            SetHits(106, 120);
-
-            SetDamage(0, 0);
-
-            SetDamageType(ResistanceType.Physical, 100);
-
-            SetResistance(ResistanceType.Physical, 25, 35);
-            SetResistance(ResistanceType.Fire, 15, 25);
-            SetResistance(ResistanceType.Cold, 15, 25);
-            SetResistance(ResistanceType.Poison, 10, 20);
-            SetResistance(ResistanceType.Energy, 10, 20);
-
-            SetSkill(SkillName.MagicResist, 45.1, 75.0);
-            SetSkill(SkillName.Swords, 60.1, 100.0);
-            SetSkill(SkillName.Tactics, 60.1, 100.0);
-
-            Fame = 3000;
-            Karma = -3000;
-        }
-
-        public TrainingHumanFighter(Serial serial) : base(serial) { }
-
-        public override void Serialize(GenericWriter writer)
-        {
-            base.Serialize(writer);
-            writer.Write(0);
-        }
-
-        public override void Deserialize(GenericReader reader)
-        {
-            base.Deserialize(reader);
-            reader.ReadInt();
-        }
-    }
-
-    // =========================================================
     //  Training Orc Warrior
     // =========================================================
     [CorpseName("a training orc corpse")]
@@ -539,7 +486,6 @@ namespace Server.Mobiles
             switch (type)
             {
                 case 0: creature = new TrainingElemental(); break;
-                case 1: creature = new TrainingHumanFighter(); break;
                 case 2: creature = new TrainingOrcWarrior(); break;
                 case 3: creature = new TrainingGargoyle(); break;
                 case 4: creature = new TrainingGolem(); break;
