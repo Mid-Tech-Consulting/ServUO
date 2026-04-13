@@ -338,7 +338,8 @@ namespace Server.Gumps
         {
             Mobile from = state.Mobile;
 
-            if (!from.InRange(m_NPC.Location, 3))
+            if (m_NPC.Deleted || m_NPC.Map == null || m_NPC.Map == Map.Internal
+                || from.Map != m_NPC.Map || !from.InRange(m_NPC.Location, 3))
             {
                 from.SendLocalizedMessage(500446); // That is too far away.
                 return;
