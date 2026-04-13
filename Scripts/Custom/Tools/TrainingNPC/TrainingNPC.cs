@@ -9,7 +9,7 @@ namespace Server.Mobiles
 {
     // =========================================================
     //  Shared base — handles all player/pet damage immunity
-    //  and 2-minute inactivity auto-delete
+    //  and 1-minute inactivity auto-delete
     // =========================================================
     public abstract class BaseTrainingCreature : BaseCreature
     {
