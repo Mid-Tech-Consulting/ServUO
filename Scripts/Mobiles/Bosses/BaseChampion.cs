@@ -23,6 +23,7 @@ namespace Server.Mobiles
         {
         }
 		public override bool CanBeParagon { get { return false; } }
+        public override bool AllureImmune { get { return true; } }
         public abstract ChampionSkullType SkullType { get; }
         public abstract Type[] UniqueList { get; }
         public abstract Type[] SharedList { get; }
