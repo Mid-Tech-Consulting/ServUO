@@ -453,6 +453,27 @@ namespace Server.Mobiles
             _activeCreatures.Remove(creature);
         }
 
+        public bool HasActiveCreature(Mobile from)
+        {
+            _activeCreatures.RemoveAll(c => c.Deleted);
+            return _activeCreatures.Exists(c => c.Summoner == from);
+        }
+
+        public void DismissCreature(Mobile from)
+        {
+            _activeCreatures.RemoveAll(c => c.Deleted);
+            BaseTrainingCreature creature = _activeCreatures.Find(c => c.Summoner == from);
+
+            if (creature == null)
+            {
+                from.SendMessage("You have no active training creature to dismiss.");
+                return;
+            }
+
+            creature.Delete();
+            from.SendMessage("Your training creature has been dismissed.");
+        }
+
         [Constructable]
         public TrainingMaster()
             : base(AIType.AI_Vendor, FightMode.None, 10, 1, 0.2, 0.4)
@@ -494,7 +515,7 @@ namespace Server.Mobiles
             }
 
             from.CloseGump(typeof(TrainingGump));
-            from.SendGump(new TrainingGump(this));
+            from.SendGump(new TrainingGump(this, from));
         }
 
         public void SpawnTrainingCreature(Mobile from, int type)
@@ -509,7 +530,7 @@ namespace Server.Mobiles
 
             if (_activeCreatures.Exists(c => c.Summoner == from))
             {
-                from.SendMessage("You already have a training creature active. Defeat it before summoning another.");
+                from.SendMessage("You already have a training creature active. Speak with the Training Master to dismiss it.");
                 return;
             }
 
@@ -568,25 +589,38 @@ namespace Server.Mobiles
     {
         private readonly TrainingMaster _master;
 
-        public TrainingGump(TrainingMaster master) : base(150, 150)
+        public TrainingGump(TrainingMaster master, Mobile from) : base(150, 150)
         {
             _master = master;
 
             AddPage(0);
-            AddBackground(0, 0, 230, 210, 9200);
-            AddLabel(55, 15, 1153, "Choose Training Opponent");
 
-            AddButton(20, 55,  4005, 4007, 1, GumpButtonType.Reply, 0);
-            AddLabel(58, 57, 0, "Elemental");
+            if (master.HasActiveCreature(from))
+            {
+                AddBackground(0, 0, 270, 130, 9200);
+                AddLabel(80, 15, 1153, "Training Partner");
+                AddLabel(20, 45, 0, "You have an active training creature.");
+                AddLabel(20, 65, 0, "It leaves after 1 minute of inactivity.");
+                AddButton(20, 95, 4005, 4007, 10, GumpButtonType.Reply, 0);
+                AddLabel(58, 97, 0, "Dismiss");
+            }
+            else
+            {
+                AddBackground(0, 0, 230, 210, 9200);
+                AddLabel(55, 15, 1153, "Choose Training Opponent");
 
-            AddButton(20, 85,  4005, 4007, 2, GumpButtonType.Reply, 0);
-            AddLabel(58, 87, 0, "Orc Warrior");
+                AddButton(20, 55,  4005, 4007, 1, GumpButtonType.Reply, 0);
+                AddLabel(58, 57, 0, "Elemental");
 
-            AddButton(20, 115, 4005, 4007, 3, GumpButtonType.Reply, 0);
-            AddLabel(58, 117, 0, "Gargoyle");
+                AddButton(20, 85,  4005, 4007, 2, GumpButtonType.Reply, 0);
+                AddLabel(58, 87, 0, "Orc Warrior");
 
-            AddButton(20, 145, 4005, 4007, 4, GumpButtonType.Reply, 0);
-            AddLabel(58, 147, 0, "Golem");
+                AddButton(20, 115, 4005, 4007, 3, GumpButtonType.Reply, 0);
+                AddLabel(58, 117, 0, "Gargoyle");
+
+                AddButton(20, 145, 4005, 4007, 4, GumpButtonType.Reply, 0);
+                AddLabel(58, 147, 0, "Golem");
+            }
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -604,10 +638,11 @@ namespace Server.Mobiles
 
             switch (info.ButtonID)
             {
-                case 1: _master.SpawnTrainingCreature(from, 0); break; // Elemental
-                case 2: _master.SpawnTrainingCreature(from, 2); break; // Orc Warrior
-                case 3: _master.SpawnTrainingCreature(from, 3); break; // Gargoyle
-                case 4: _master.SpawnTrainingCreature(from, 4); break; // Golem
+                case 1:  _master.SpawnTrainingCreature(from, 0); break; // Elemental
+                case 2:  _master.SpawnTrainingCreature(from, 2); break; // Orc Warrior
+                case 3:  _master.SpawnTrainingCreature(from, 3); break; // Gargoyle
+                case 4:  _master.SpawnTrainingCreature(from, 4); break; // Golem
+                case 10: _master.DismissCreature(from);          break; // Dismiss
             }
         }
     }
