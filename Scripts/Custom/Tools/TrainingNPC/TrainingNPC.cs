@@ -548,7 +548,7 @@ namespace Server.Mobiles
                 AddLabel(20, 45, 0, "You have an active training creature.");
                 AddLabel(20, 65, 0, "It leaves after 1 minute of inactivity.");
                 AddButton(20, 95, 4005, 4007, 10, GumpButtonType.Reply, 0);
-                AddLabel(58, 97, 0, "Dismiss");
+                AddLabel(58, 97, 0, "Dismiss training creature");
             }
             else
             {
