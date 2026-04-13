@@ -23,6 +23,7 @@ namespace Server.Mobiles
         }
 
 		public override bool CanBeParagon { get { return false; } }
+        public override bool AllureImmune { get { return true; } }
         public virtual bool DropPrimer { get { return Core.TOL; } }
         public virtual bool GiveMLSpecial { get { return true; } }
 
