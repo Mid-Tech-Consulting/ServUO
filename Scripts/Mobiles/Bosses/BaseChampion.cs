@@ -249,9 +249,8 @@ namespace Server.Mobiles
         }
 
         #region Custom Artifact Drops
-        private static readonly Type[] m_CustomArtifacts = new Type[]
+        private static readonly Type[] m_CustomArmor = new Type[]
         {
-            // Armor
             typeof(GlovesOfTheHolyWarrior), typeof(GargishKiltOfTheHolyWarrior),
             typeof(SentinelsMempo), typeof(SentinelsNecklace),
             typeof(ShugenjasRaiment), typeof(GargishShugenjasRaiment),
@@ -260,9 +259,13 @@ namespace Server.Mobiles
             typeof(CorruptedPaladinVambraces), typeof(GargishCorruptedPaladinVambraces),
             typeof(GlovesOfTheArchlich), typeof(GargishKiltOfTheArchlich),
             typeof(BalronBoneArmor), typeof(GargishBalronBoneArmor),
-            // Khal Ankur
-            typeof(MaskOfKhalAnkur), typeof(PendantOfKhalAnkur),
-            // Clothing
+            typeof(MaskOfKhalAnkur),
+            typeof(DeathwardensGreaves), typeof(GargishDeathwardensGreaves),
+            typeof(AzaroksLegplates), typeof(GargishAzaroksLegplates),
+        };
+
+        private static readonly Type[] m_CustomClothing = new Type[]
+        {
             typeof(ScabbardOfJuonar), typeof(GargishScabbardOfJuonar),
             typeof(GeneralLethesEpaulettes), typeof(GargishGeneralLethesEpaulettes),
             typeof(LordMorphiusEpaulettes), typeof(GargishLordMorphiusEpaulettes),
@@ -273,66 +276,85 @@ namespace Server.Mobiles
             typeof(MushroomApron), typeof(GargishMushroomApron),
             typeof(SerpentSkinQuiver), typeof(GargishSerpentSkinWingArmor),
             typeof(RangersCloakOfAugmentation), typeof(WardensArmorOfAugmentation),
-            // Weapons - Unique
+            typeof(KaelvoksCincture), typeof(GargishKaelvoksCincture),
+        };
+
+        private static readonly Type[] m_CustomWeapons = new Type[]
+        {
+            // Unique
             typeof(ExporMalasFlamus), typeof(GargishExporMalasFlamus),
             typeof(ShugenjasWand),
-            // Slayer Weapons - Reptile
+            // Reptile
             typeof(ReptileLeafblade), typeof(ReptileWarAxe), typeof(ReptileBroadsword),
             typeof(ReptileDoubleAxe), typeof(ReptileWarHammer), typeof(ReptileMagicalShortbow),
             typeof(ReptileCompositeBow), typeof(ReptileSoulGlaive), typeof(ReptileBoomerang),
             typeof(ReptileGargishTalwar), typeof(ReptileGargishKatana), typeof(ReptileLajatang),
-            // Slayer Weapons - Repond
+            // Repond
             typeof(RepondLeafblade), typeof(RepondWarAxe), typeof(RepondBroadsword),
             typeof(RepondDoubleAxe), typeof(RepondWarHammer), typeof(RepondMagicalShortbow),
             typeof(RepondCompositeBow), typeof(RepondSoulGlaive), typeof(RepondBoomerang),
             typeof(RepondGargishTalwar), typeof(RepondGargishKatana), typeof(RepondLajatang),
-            // Slayer Weapons - Arachnid
+            // Arachnid
             typeof(ArachnidLeafblade), typeof(ArachnidWarAxe), typeof(ArachnidBroadsword),
             typeof(ArachnidDoubleAxe), typeof(ArachnidWarHammer), typeof(ArachnidMagicalShortbow),
             typeof(ArachnidCompositeBow), typeof(ArachnidSoulGlaive), typeof(ArachnidBoomerang),
             typeof(ArachnidGargishTalwar), typeof(ArachnidGargishKatana), typeof(ArachnidLajatang),
-            // Slayer Weapons - Undead
+            // Undead
             typeof(UndeadLeafblade), typeof(UndeadWarAxe), typeof(UndeadBroadsword),
             typeof(UndeadDoubleAxe), typeof(UndeadWarHammer), typeof(UndeadMagicalShortbow),
             typeof(UndeadCompositeBow), typeof(UndeadSoulGlaive), typeof(UndeadBoomerang),
             typeof(UndeadGargishTalwar), typeof(UndeadGargishKatana), typeof(UndeadLajatang),
-            // Slayer Weapons - Demon
+            // Demon
             typeof(DemonLeafblade), typeof(DemonWarAxe), typeof(DemonBroadsword),
             typeof(DemonDoubleAxe), typeof(DemonWarHammer), typeof(DemonMagicalShortbow),
             typeof(DemonCompositeBow), typeof(DemonSoulGlaive), typeof(DemonBoomerang),
             typeof(DemonGargishTalwar), typeof(DemonGargishKatana), typeof(DemonLajatang),
-            // Slayer Weapons - Fey
+            // Fey
             typeof(FeyLeafblade), typeof(FeyWarAxe), typeof(FeyBroadsword),
             typeof(FeyDoubleAxe), typeof(FeyWarHammer), typeof(FeyMagicalShortbow),
             typeof(FeyCompositeBow), typeof(FeySoulGlaive), typeof(FeyBoomerang),
             typeof(FeyGargishTalwar), typeof(FeyGargishKatana), typeof(FeyLajatang),
-            // Slayer Weapons - Elemental
+            // Elemental
             typeof(ElementalLeafblade), typeof(ElementalWarAxe), typeof(ElementalBroadsword),
             typeof(ElementalDoubleAxe), typeof(ElementalWarHammer), typeof(ElementalMagicalShortbow),
             typeof(ElementalCompositeBow), typeof(ElementalSoulGlaive), typeof(ElementalBoomerang),
             typeof(ElementalGargishTalwar), typeof(ElementalGargishKatana), typeof(ElementalLajatang),
-            // Spellbooks
+        };
+
+        private static readonly Type[] m_CustomSpellbooks = new Type[]
+        {
             typeof(ReptilianDeathSpellbook), typeof(RepondSpellbook),
             typeof(UndeadSpellbook), typeof(DemonSpellbook),
             typeof(FeySpellbook), typeof(ArachnidDoomSpellbook),
             typeof(ElementalBanSpellbook),
-            // Talisman
+        };
+
+        private static readonly Type[] m_CustomTalismans = new Type[]
+        {
             typeof(CarvedBoneRelicFromHolmes),
             typeof(ShadowMastersTalisman),
-            // Jewelry
+        };
+
+        private static readonly Type[] m_CustomJewelry = new Type[]
+        {
             typeof(SolariasSecretPoisons), typeof(GargishSolariasSecretPoisons),
-            // New Armor
-            typeof(DeathwardensGreaves), typeof(GargishDeathwardensGreaves),
-            typeof(AzaroksLegplates), typeof(GargishAzaroksLegplates),
-            // New Clothing
-            typeof(KaelvoksCincture), typeof(GargishKaelvoksCincture),
-            // Existing Updated
-            typeof(MarkOfTravesty),
+            typeof(PendantOfKhalAnkur),
+        };
+
+        private static readonly Type[][] m_CustomArtifactCategories = new Type[][]
+        {
+            m_CustomArmor,
+            m_CustomClothing,
+            m_CustomWeapons,
+            m_CustomSpellbooks,
+            m_CustomTalismans,
+            m_CustomJewelry,
         };
 
         public static void GiveCustomArtifact(Mobile m)
         {
-            Type type = m_CustomArtifacts[Utility.Random(m_CustomArtifacts.Length)];
+            Type[] category = m_CustomArtifactCategories[Utility.Random(m_CustomArtifactCategories.Length)];
+            Type type = category[Utility.Random(category.Length)];
             Item artifact = Loot.Construct(type);
 
             if (artifact != null)
@@ -370,10 +392,10 @@ namespace Server.Mobiles
                 if(Core.SA)
                     RefinementComponent.Roll(c, 3, 0.10);
 
-                // Custom artifact drops - 5% chance per eligible player
+                // Custom artifact drops - 25% chance per eligible player
                 foreach (Mobile m in toGive)
                 {
-                    if (m is PlayerMobile && 0.10 > Utility.RandomDouble())
+                    if (m is PlayerMobile && 0.25 > Utility.RandomDouble())
                     {
                         GiveCustomArtifact(m);
                     }
