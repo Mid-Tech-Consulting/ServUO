@@ -46,3 +46,4 @@ Config/Database.cfg
 !/Data/*
 !/bin/rosyln/*
 .claude/settings.json
+Config/Database.cfg

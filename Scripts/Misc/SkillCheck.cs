@@ -456,8 +456,8 @@ namespace Server.Misc
 				QuestHelper.CheckSkill((PlayerMobile)from, skill);
 			#endregion
 
-			if (skill.Lock == SkillLock.Up &&
-				(!Siege.SiegeShard || !(from is PlayerMobile) || Siege.CanGainStat((PlayerMobile)from)))
+			// Siege daily stat cap intentionally disabled — players gain until their normal stat cap.
+			if (skill.Lock == SkillLock.Up)
 			{
 				var info = skill.Info;
 

@@ -68,7 +68,9 @@ namespace Server.Spells.Spellweaving
 
                 duration += TimeSpan.FromHours(Math.Min(6, Arcanists.Count));
 
-                int strengthBonus = Math.Min(IsBonus(Caster.Location, Caster.Map) ? 6 : 5, Arcanists.Sum(m => GetStrength(m))); // Math.Min(Arcanists.Count, IsBonus(Caster.Location, Caster.Map) ? 6 : 5);	//The Sanctuary is a special, single location place
+                // TODO: temporary — always grants level 6 focus regardless of arcanist count/location. Restore scaled formula below when population supports it.
+                int strengthBonus = 6;
+                // int strengthBonus = Math.Min(IsBonus(Caster.Location, Caster.Map) ? 6 : 5, Arcanists.Sum(m => GetStrength(m)));
 
                 for (int i = 0; i < Arcanists.Count; i++)
                 {

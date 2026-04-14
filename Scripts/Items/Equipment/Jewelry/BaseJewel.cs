@@ -440,13 +440,7 @@ namespace Server.Items
 
         public override double DefaultWeight
         {
-            get
-            {
-                if (NegativeAttributes == null || NegativeAttributes.Unwieldly == 0)
-                    return base.DefaultWeight;
-
-                return 50;
-            }
+            get { return 1.0; }
         }
 
         public override void OnAfterDuped(Item newItem)
