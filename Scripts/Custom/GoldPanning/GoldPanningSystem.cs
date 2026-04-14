@@ -892,7 +892,4 @@ namespace Server
             return false;
         }
     }
-}/* Created by Hammerhand & Milva */
-
-using System;
-using Server;
+}
