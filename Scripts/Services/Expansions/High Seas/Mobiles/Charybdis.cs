@@ -207,6 +207,7 @@ namespace Server.Mobiles
                     double damage = Math.Max(40, Utility.RandomMinMax(50, 100) * ((double)Hits / (double)HitsMax));
 
                     mob.BoltEffect(0);
+                    DoHarmful(mob);
                     AOS.Damage((Mobile)mob, this, (int)damage, false, 0, 0, 0, 0, 0, 0, 100, false, false, false);
                     mob.FixedParticles(0x36BD, 20, 10, 5044, EffectLayer.Head);
                 }
