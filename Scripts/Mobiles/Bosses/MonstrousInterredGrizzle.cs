@@ -303,10 +303,12 @@ namespace Server.Mobiles
                 {
                     PlayerMobile pm = m as PlayerMobile;
                     dmg = (int)BalmOfProtection.HandleDamage(pm, dmg);
+                    m_Owner.DoHarmful(m);
                     AOS.Damage(m, m_Owner, dmg, 0, 0, 0, 100, 0);
                 }
                 else
                 {
+                    m_Owner.DoHarmful(m);
                     AOS.Damage(m, m_Owner, dmg, 0, 0, 0, 100, 0);
                 }
             }

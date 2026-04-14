@@ -381,7 +381,10 @@ namespace Server.Mobiles
             public void DealDamage(Mobile m)
             {
                 if (m != m_Owner && (m_Owner == null || CanTargetMob(m)))
+                {
+                    m_Owner.DoHarmful(m);
                     AOS.Damage(m, m_Owner, Utility.RandomMinMax(2, 4), 0, 100, 0, 0, 0);
+                }
             }
 
             public bool CanTargetMob(Mobile m)
