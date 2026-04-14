@@ -35,7 +35,7 @@ namespace Server.Engines.Harvest
             InitializeGoldPanning();
         }
 
-        public List<HarvestDefinition> Definitions
+        public new List<HarvestDefinition> Definitions
         {
             get
             {
@@ -139,7 +139,7 @@ namespace Server.Engines.Harvest
             #endregion
         }
 
-        public virtual bool CheckTool(Mobile from, Item tool)
+        public override bool CheckTool(Mobile from, Item tool)
         {
             bool wornOut = (tool == null || tool.Deleted || (tool is IUsesRemaining && ((IUsesRemaining)tool).UsesRemaining <= 0));
 
@@ -149,12 +149,12 @@ namespace Server.Engines.Harvest
             return !wornOut;
         }
 
-        public virtual bool CheckHarvest(Mobile from, Item tool)
+        public override bool CheckHarvest(Mobile from, Item tool)
         {
             return CheckTool(from, tool);
         }
 
-        public virtual bool CheckHarvest(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
+        public override bool CheckHarvest(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
         {
             if (!CheckTool(from, tool))
                 return false;
@@ -168,7 +168,7 @@ namespace Server.Engines.Harvest
             return true;
         }
 
-        public virtual bool CheckRange(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, bool timed)
+        public override bool CheckRange(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, bool timed)
         {
             bool inRange = (from.Map == map && from.InRange(loc, def.MaxRange));
 
@@ -178,7 +178,7 @@ namespace Server.Engines.Harvest
             return inRange;
         }
 
-        public virtual bool CheckResources(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, bool timed)
+        public override bool CheckResources(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, bool timed)
         {
             HarvestBank bank = def.GetBank(map, loc.X, loc.Y);
             bool available = (bank != null && bank.Current >= def.ConsumedPerHarvest);
@@ -189,16 +189,16 @@ namespace Server.Engines.Harvest
             return available;
         }
 
-        public virtual void OnBadHarvestTarget(Mobile from, Item tool, object toHarvest)
+        public override void OnBadHarvestTarget(Mobile from, Item tool, object toHarvest)
         {
         }
 
-        public virtual object GetLock(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
+        public override object GetLock(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
         {
             return this;
         }
 
-        public virtual void OnConcurrentHarvest(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
+        public override void OnConcurrentHarvest(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
         {
             from.SendMessage("You are already panning. Gold panning takes time."); // You are already panning.
         }
@@ -214,7 +214,7 @@ namespace Server.Engines.Harvest
             return true;
         }
 
-        public virtual void FinishHarvesting(Mobile from, Item tool, HarvestDefinition def, object toHarvest, object locked)
+        public override void FinishHarvesting(Mobile from, Item tool, HarvestDefinition def, object toHarvest, object locked)
         {
             from.EndAction(locked);
 
@@ -379,22 +379,22 @@ namespace Server.Engines.Harvest
             OnHarvestFinished(from, tool, def, vein, bank, resource, toHarvest);
         }
 
-        public virtual bool CheckHarvestSkill(Map map, Point3D loc, Mobile from, HarvestResource resource, HarvestDefinition def)
+        public override bool CheckHarvestSkill(Map map, Point3D loc, Mobile from, HarvestResource resource, HarvestDefinition def)
         {
             return from.Skills[def.Skill].Value >= resource.ReqSkill && from.CheckSkill(def.Skill, resource.MinSkill, resource.MaxSkill);
         }
 
-        public virtual void OnToolUsed(Mobile from, Item tool, bool caughtSomething)
+        public override void OnToolUsed(Mobile from, Item tool, bool caughtSomething)
         {
         }
 
-        public virtual void OnHarvestFinished(Mobile from, Item tool, HarvestDefinition def, HarvestVein vein, HarvestBank bank, HarvestResource resource, object harvested)
+        public override void OnHarvestFinished(Mobile from, Item tool, HarvestDefinition def, HarvestVein vein, HarvestBank bank, HarvestResource resource, object harvested)
         {
             if (Core.ML)
                 from.RevealingAction();
         }
 
-        public virtual Item Construct(Type type, Mobile from, Item tool)
+        public override Item Construct(Type type, Mobile from, Item tool)
         {
             try
             {
@@ -406,22 +406,22 @@ namespace Server.Engines.Harvest
             }
         }
 
-        public virtual HarvestVein MutateVein(Mobile from, Item tool, HarvestDefinition def, HarvestBank bank, object toHarvest, HarvestVein vein)
+        public override HarvestVein MutateVein(Mobile from, Item tool, HarvestDefinition def, HarvestBank bank, object toHarvest, HarvestVein vein)
         {
             return vein;
         }
 
-        public virtual void SendSuccessTo(Mobile from, Item item, HarvestResource resource)
+        public override void SendSuccessTo(Mobile from, Item item, HarvestResource resource)
         {
             resource.SendSuccessTo(from);
         }
 
-        public virtual void SendPackFullTo(Mobile from, Item item, HarvestDefinition def, HarvestResource resource)
+        public override void SendPackFullTo(Mobile from, Item item, HarvestDefinition def, HarvestResource resource)
         {
             def.SendMessageTo(from, def.PackFullMessage);
         }
 
-        public virtual bool Give(Mobile m, Item item, bool placeAtFeet)
+        public override bool Give(Mobile m, Item item, bool placeAtFeet)
         {
             if (m.PlaceInBackpack(item))
                 return true;
@@ -457,12 +457,12 @@ namespace Server.Engines.Harvest
             return true;
         }
 
-        public virtual Type MutateType(Type type, Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, HarvestResource resource)
+        public override Type MutateType(Type type, Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, HarvestResource resource)
         {
             return from.Region.GetResource(type);
         }
 
-        public virtual Type GetResourceType(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, HarvestResource resource)
+        public override Type GetResourceType(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, HarvestResource resource)
         {
             if (resource.Types.Length > 0)
                 return resource.Types[Utility.Random(resource.Types.Length)];
@@ -470,7 +470,7 @@ namespace Server.Engines.Harvest
             return null;
         }
 
-        public virtual HarvestResource MutateResource(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, HarvestVein vein, HarvestResource primary, HarvestResource fallback)
+        public override HarvestResource MutateResource(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc, HarvestVein vein, HarvestResource primary, HarvestResource fallback)
         {
             bool racialBonus = (def.RaceBonus && from.Race == Race.Elf);
 
@@ -485,7 +485,7 @@ namespace Server.Engines.Harvest
             return primary;
         }
 
-        public virtual bool OnHarvesting(Mobile from, Item tool, HarvestDefinition def, object toHarvest, object locked, bool last)
+        public override bool OnHarvesting(Mobile from, Item tool, HarvestDefinition def, object toHarvest, object locked, bool last)
         {
             if (!CheckHarvest(from, tool))
             {
@@ -532,13 +532,13 @@ namespace Server.Engines.Harvest
             return !last;
         }
 
-        public virtual void DoHarvestingSound(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
+        public override void DoHarvestingSound(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
         {
             if (def.EffectSounds.Length > 0)
                 from.PlaySound(Utility.RandomList(def.EffectSounds));
         }
 
-        public virtual void DoHarvestingEffect(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc)
+        public override void DoHarvestingEffect(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc)
         {
             from.Direction = from.GetDirectionTo(loc);
 
@@ -555,12 +555,12 @@ namespace Server.Engines.Harvest
             }
         }
 
-        public virtual HarvestDefinition GetDefinition(int tileID)
+        public override HarvestDefinition GetDefinition(int tileID)
         {
             return GetDefinition(tileID, null);
         }
 
-        public virtual HarvestDefinition GetDefinition(int tileID, Item tool)
+        public override HarvestDefinition GetDefinition(int tileID, Item tool)
         {
             HarvestDefinition def = null;
 
@@ -576,7 +576,7 @@ namespace Server.Engines.Harvest
         }
 
         #region High Seas
-        public virtual HarvestDefinition GetDefinitionFromSpecialTile(int tileID)
+        public override HarvestDefinition GetDefinitionFromSpecialTile(int tileID)
         {
             HarvestDefinition def = null;
 
@@ -592,7 +592,7 @@ namespace Server.Engines.Harvest
         }
         #endregion
 
-        public virtual void StartHarvesting(Mobile from, Item tool, object toHarvest)
+        public override void StartHarvesting(Mobile from, Item tool, object toHarvest)
         {
             if (!CheckHarvest(from, tool))
                 return;
@@ -634,7 +634,7 @@ namespace Server.Engines.Harvest
             OnHarvestStarted(from, tool, def, toHarvest);
         }
 
-        public virtual bool GetHarvestDetails(Mobile from, Item tool, object toHarvest, out int tileID, out Map map, out Point3D loc)
+        public override bool GetHarvestDetails(Mobile from, Item tool, object toHarvest, out int tileID, out Map map, out Point3D loc)
         {
             if (toHarvest is Static && !((Static)toHarvest).Movable)
             {
@@ -670,13 +670,12 @@ namespace Server.Engines.Harvest
         }
 
         #region Enhanced Client
-        public static void TargetByResource(TargetByResourceMacroEventArgs e)
+        public static new void TargetByResource(TargetByResourceMacroEventArgs e)
         {
             Mobile m = e.Mobile;
             Item tool = e.Tool;
 
             GoldPanningSystem system = null;
-            HarvestDefinition def = null;
             object toHarvest;
 
             if (tool is IHarvestTool)
@@ -739,7 +738,7 @@ namespace Server.Engines.Harvest
             return false;
         }
 
-        public static bool TryHarvestGrave(Mobile m)
+        public static new bool TryHarvestGrave(Mobile m)
         {
             Map map = m.Map;
 
@@ -781,7 +780,7 @@ namespace Server.Engines.Harvest
             return false;
         }
 
-        public static bool TryHarvestShrooms(Mobile m)
+        public static new bool TryHarvestShrooms(Mobile m)
         {
             Map map = m.Map;
 
