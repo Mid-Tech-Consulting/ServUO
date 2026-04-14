@@ -261,6 +261,8 @@ namespace Server.Mobiles
         public override void GenerateLoot()
         {
             AddLoot(LootPack.SuperBoss, 5);
+            if (Utility.RandomDouble() < 0.10)
+                PackItem(new PowerScroll(SkillName.Fishing, 120.0));
         }
 
         public Osiredon(Serial serial)
