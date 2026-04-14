@@ -217,6 +217,7 @@ namespace Server.Mobiles
                 mob.FixedParticles(0x36BD, 20, 10, 5044, EffectLayer.Head);
                 mob.PlaySound(0x307);
 
+                this.DoHarmful(mob);
                 int damage = Utility.RandomMinMax(50, 125);
                 AOS.Damage(mob, this, damage, 0, 100, 0, 0, 0);
             }
