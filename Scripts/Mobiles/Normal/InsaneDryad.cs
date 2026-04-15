@@ -115,7 +115,7 @@ namespace Server.Mobiles
             }
             eable.Free();
 
-            m_NextPeace = DateTime.UtcNow + TimeSpan.FromSeconds(10);
+            m_NextPeace = DateTime.UtcNow + duration + TimeSpan.FromSeconds(10);
             PlaySound(0x1D3);
         }
 

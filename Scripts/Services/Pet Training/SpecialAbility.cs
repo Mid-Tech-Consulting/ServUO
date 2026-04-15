@@ -46,7 +46,7 @@ namespace Server.Mobiles
                     SpecialAbility ability = null;
 
                     var abilties = profile.EnumerateSpecialAbilities().Where(m =>
-                        (type == DamageType.Melee && m.TriggerOnDoMeleeDamage) || (type >= DamageType.Spell && m.TriggerOnDoSpellDamage) &&
+                        ((type == DamageType.Melee && m.TriggerOnDoMeleeDamage) || (type >= DamageType.Spell && m.TriggerOnDoSpellDamage)) &&
                         !m.IsInCooldown(attacker)).ToArray();
 
                     if (abilties != null && abilties.Length > 0)
@@ -71,7 +71,7 @@ namespace Server.Mobiles
                     SpecialAbility ability = null;
 
                     var abilties = profile.EnumerateSpecialAbilities().Where(m =>
-                        (type == DamageType.Melee && m.TriggerOnGotMeleeDamage) || (type >= DamageType.Spell && m.TriggerOnGotSpellDamage) &&
+                        ((type == DamageType.Melee && m.TriggerOnGotMeleeDamage) || (type >= DamageType.Spell && m.TriggerOnGotSpellDamage)) &&
                         !m.IsInCooldown(defender)).ToArray();
 
                     if (abilties != null && abilties.Length > 0)
@@ -2566,29 +2566,29 @@ namespace Server.Mobiles
         {
             foreach (Mobile m in AreaEffect.FindValidTargets(creature, 2).OfType<Mobile>())
             {
-                if (!CanDrainLife(creature, defender))
+                if (!CanDrainLife(creature, m))
                 {
                     continue;
                 }
 
-                creature.DoHarmful(defender);
+                creature.DoHarmful(m);
 
-                defender.FixedParticles(0x374A, 10, 15, 5013, 0x496, 0, EffectLayer.Waist);
-                defender.PlaySound(0x231);
+                m.FixedParticles(0x374A, 10, 15, 5013, 0x496, 0, EffectLayer.Waist);
+                m.PlaySound(0x231);
 
-                defender.SendMessage("You feel the life drain out of you!");
+                m.SendMessage("You feel the life drain out of you!");
 
-                int toDrain = GetDrainAmount(creature, defender);
+                int toDrain = GetDrainAmount(creature, m);
 
-                if (defender is PlayerMobile)
+                if (m is PlayerMobile pm)
                 {
-                    toDrain = (int)LifeShieldLotion.HandleLifeDrain((PlayerMobile)defender, toDrain);
+                    toDrain = (int)LifeShieldLotion.HandleLifeDrain(pm, toDrain);
                 }
 
                 creature.Hits += toDrain;
                 AOS.Damage(m, creature, toDrain, 0, 0, 0, 0, 0, 0, 100);
 
-                creature.OnDrainLife(defender);
+                creature.OnDrainLife(m);
             }
         }
 
