@@ -1,3 +1,10 @@
+// Fixes author: Cork
+// Updated: 4/14/2026
+// Context menu → updates SecureInfo.Level in the house's Secures list
+// CheckAccessible → was reading this.Level (JewelryBox's own property, always CoOwners)
+// The fix reads the level from house.GetSecureInfoFor(item) (what the context menu actually changes),
+// falling back to this.Level only if no SecureInfo exists. It also delegates to house.HasSecureAccess
+// which handles combat-restricted checks the old switch statement missed.
 using System;
 using System.Collections.Generic;
 using Server.Multis;
@@ -43,7 +50,10 @@ namespace Server.Items
         public override void OnDoubleClick(Mobile from)
         {
             if (from.AccessLevel >= AccessLevel.GameMaster)
+            {
                 base.OnDoubleClick(from);
+                return;
+            }
 
             if (!from.InRange(GetWorldLocation(), 2))
             {
@@ -69,16 +79,10 @@ namespace Server.Items
             if (house == null)
                 return false;
 
-            switch (Level)
-            {
-                case SecureLevel.Owner: return house.IsOwner(from);
-                case SecureLevel.CoOwners: return house.IsCoOwner(from);
-                case SecureLevel.Friends: return house.IsFriend(from);
-                case SecureLevel.Anyone: return true;
-                case SecureLevel.Guild: return house.IsGuildMember(from);
-            }
+            SecureInfo info = house.GetSecureInfoFor(item);
+            SecureLevel level = info != null ? info.Level : Level;
 
-            return false;
+            return house.HasSecureAccess(from, level);
         }
 
         public override void GetContextMenuEntries(Mobile from, List<ContextMenuEntry> list)

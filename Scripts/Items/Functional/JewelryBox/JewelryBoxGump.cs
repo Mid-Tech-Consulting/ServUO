@@ -290,12 +290,6 @@ namespace Server.Items
 
         public override void OnResponse(NetState sender, RelayInfo info)
         {
-            if (!m_Box.CheckAccessible(m_From, m_Box))
-            {
-                m_From.SendLocalizedMessage(1061637); // You are not allowed to access this.
-                return;
-            }
-
             JewelryBoxFilter f = m_Box.Filter;
 
             int index = info.ButtonID;
@@ -331,6 +325,13 @@ namespace Server.Items
                     }
                 case 3: // ADD JEWELRY
                     {
+                        if (!m_Box.CheckAccessible(m_From, m_Box))
+                        {
+                            m_From.SendLocalizedMessage(1061637); // You are not allowed to access this.
+                            m_From.SendGump(new JewelryBoxGump(m_From, m_Box, m_Page));
+                            break;
+                        }
+
                         m_From.Target = new InternalTarget(m_From, m_Box, m_Page);
                         m_From.SendLocalizedMessage(1157725); // Target rings, bracelets, necklaces, earrings, or talisman in your backpack. You may also target a sub-container to add contents to the the jewelry box. When done, press ESC.
                         m_From.SendGump(new JewelryBoxGump(m_From, m_Box));
@@ -408,12 +409,19 @@ namespace Server.Items
                     }
                 default:
                     {
+                        if (!m_Box.CheckAccessible(m_From, m_Box))
+                        {
+                            m_From.SendLocalizedMessage(1061637); // You are not allowed to access this.
+                            m_From.SendGump(new JewelryBoxGump(m_From, m_Box, m_Page));
+                            break;
+                        }
+
                         Item item = m_Box.Items.Find(x => x.Serial == index);
                         m_From.AddToBackpack(item);
                         m_From.SendGump(new JewelryBoxGump(m_From, m_Box));
 
                         break;
-                    }                        
+                    }
             }
         }
     }
