@@ -75,7 +75,7 @@ namespace Server.Misc
                 Console.WriteLine("WARNING: Automatic backup FAILED:\n{0}", e);
             }
 
-            World.Save(true, permitBackgroundWrite);
+            World.Save(false, permitBackgroundWrite);
         }
 
         private static void Tick()
