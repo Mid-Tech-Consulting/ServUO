@@ -373,7 +373,7 @@ namespace Server.Multis
         {
             typeof(Engines.Plants.SeedBox), typeof(GardenShedAddon),
             typeof(GardenShedBarrel),       typeof(BaseSpecialScrollBook),
-            typeof(JewelryBox)
+            typeof(JewelryBox),             typeof(MasteryPrimerBook)
         };
 
         private Type[] _NoDecayItems = new Type[]
@@ -381,6 +381,7 @@ namespace Server.Multis
             typeof(BaseBoard),              typeof(Aquarium),
             typeof(FishBowl),               typeof(BaseSpecialScrollBook),
             typeof(Engines.Plants.SeedBox), typeof(JewelryBox),
+            typeof(MasteryPrimerBook),
         };
 
         // Not Included Storage
