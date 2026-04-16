@@ -32,6 +32,45 @@ namespace Server
         private static string _BaseDirectory;
         private static string _ExePath;
 
+        private static readonly object _ErrorLogLock = new object();
+
+        public static void LogException(Exception ex, string source = null)
+        {
+            if (ex == null)
+            {
+                return;
+            }
+
+            try
+            {
+                lock (_ErrorLogLock)
+                {
+                    if (!Directory.Exists("Logs"))
+                    {
+                        Directory.CreateDirectory("Logs");
+                    }
+
+                    if (!Directory.Exists("Logs/Errors"))
+                    {
+                        Directory.CreateDirectory("Logs/Errors");
+                    }
+
+                    string fileName = String.Format("Logs/Errors/{0:yyyy-MM-dd}.log", DateTime.UtcNow);
+
+                    using (StreamWriter op = new StreamWriter(fileName, true))
+                    {
+                        op.WriteLine("[{0:yyyy-MM-dd HH:mm:ss} UTC] Source: {1}", DateTime.UtcNow, source ?? "Unknown");
+                        op.WriteLine(ex.ToString());
+                        op.WriteLine(new String('-', 72));
+                    }
+                }
+            }
+            catch
+            {
+                // Never let the logger itself crash the server.
+            }
+        }
+
         private static bool _Cache = true;
 
         private static bool _Profiling;
@@ -184,6 +223,8 @@ namespace Server
         {
             Console.WriteLine(e.IsTerminating ? "Error:" : "Warning:");
             Console.WriteLine(e.ExceptionObject);
+
+            LogException(e.ExceptionObject as Exception, e.IsTerminating ? "UnhandledException (Terminating)" : "UnhandledException");
 
             if (e.IsTerminating)
             {
