@@ -32,4 +32,27 @@
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 		<PackageReference Include="Npgsql" Version="6.0.13" />
 	</ItemGroup>
+	<Target Name="CopyNuGetDepsToServUORoot" AfterTargets="Build">
+		<PropertyGroup>
+			<NuGetDepsSource>$(MSBuildProjectDirectory)\bin\$(Configuration)\</NuGetDepsSource>
+			<ServUORoot>$(MSBuildProjectDirectory)\..\</ServUORoot>
+		</PropertyGroup>
+		<ItemGroup>
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)Npgsql.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)Microsoft.Bcl.AsyncInterfaces.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)Microsoft.Bcl.HashCode.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Buffers.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Collections.Immutable.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Diagnostics.DiagnosticSource.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Memory.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Numerics.Vectors.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Runtime.CompilerServices.Unsafe.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Text.Encodings.Web.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Text.Json.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Threading.Channels.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.Threading.Tasks.Extensions.dll" />
+			<NuGetRuntimeDeps Include="$(NuGetDepsSource)System.ValueTuple.dll" />
+		</ItemGroup>
+		<Copy SourceFiles="@(NuGetRuntimeDeps)" DestinationFolder="$(ServUORoot)" SkipUnchangedFiles="true" Condition="Exists('%(NuGetRuntimeDeps.Identity)')" />
+	</Target>
 </Project>

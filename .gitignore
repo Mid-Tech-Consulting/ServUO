@@ -11,6 +11,21 @@
 /Scripts/obj
 /Scripts/Output
 
+/Npgsql.dll
+/Microsoft.Bcl.AsyncInterfaces.dll
+/Microsoft.Bcl.HashCode.dll
+/System.Buffers.dll
+/System.Collections.Immutable.dll
+/System.Diagnostics.DiagnosticSource.dll
+/System.Memory.dll
+/System.Numerics.Vectors.dll
+/System.Runtime.CompilerServices.Unsafe.dll
+/System.Text.Encodings.Web.dll
+/System.Text.Json.dll
+/System.Threading.Channels.dll
+/System.Threading.Tasks.Extensions.dll
+/System.ValueTuple.dll
+
 /Honesty
 /Logs
 /Backups
