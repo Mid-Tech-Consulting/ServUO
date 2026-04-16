@@ -399,6 +399,8 @@ namespace Server.Engines.VeteranRewards
                     new RewardEntry(miscellaneous,    1123603,  typeof(CoralTheOwl), Expansion.ML),
                     new RewardEntry(miscellaneous,    1151769,  typeof(GreaterBraceletOfBinding), Expansion.ML),
                     new RewardEntry(miscellaneous,    1156371,  typeof(Auction.AuctionSafeDeed), Expansion.TOL),
+
+                    new RewardEntry(miscellaneous,    "House Storage Increase Deed", typeof(HouseStorageIncreaseDeed)),
                 }),
                 new RewardList(RewardInterval, 2, new RewardEntry[]
                 {

@@ -406,7 +406,24 @@ namespace Server
 						prof.Start();
 					}
 
-					t.OnTick();
+					try
+					{
+						t.OnTick();
+					}
+					catch (Exception ex)
+					{
+						Core.LogException(ex, "Timer.OnTick: " + t.GetType().FullName);
+
+						try
+						{
+							Utility.PushColor(ConsoleColor.Red);
+							Console.WriteLine("Error in Timer.OnTick ({0}): {1}", t.GetType().FullName, ex.Message);
+							Utility.PopColor();
+						}
+						catch
+						{ }
+					}
+
 					t.m_Queued = false;
 					++index;
 

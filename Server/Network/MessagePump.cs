@@ -120,7 +120,23 @@ namespace Server.Network
             {
                 if (ns.Running)
                 {
-                    HandleReceive(ns);
+                    try
+                    {
+                        HandleReceive(ns);
+                    }
+                    catch (Exception ex)
+                    {
+                        Core.LogException(ex, String.Format("MessagePump.HandleReceive ({0})", ns));
+
+                        try
+                        {
+                            Utility.PushColor(ConsoleColor.Red);
+                            Console.WriteLine("Error in MessagePump.HandleReceive for {0}: {1}", ns, ex.Message);
+                            Utility.PopColor();
+                        }
+                        catch
+                        { }
+                    }
                 }
             }
 
@@ -342,9 +358,25 @@ namespace Server.Network
 					{
 						PacketReader r = new PacketReader(packetBuffer, packetLength, handler.Length != 0);
 
-						handler.OnReceive(ns, r);
+						try
+						{
+							handler.OnReceive(ns, r);
 
-                        ns.SetPacketTime((byte)packetID);
+							ns.SetPacketTime((byte)packetID);
+						}
+						catch (Exception ex)
+						{
+							Core.LogException(ex, String.Format("PacketHandler.OnReceive: 0x{0:X2} ({1})", packetID, ns));
+
+							try
+							{
+								Utility.PushColor(ConsoleColor.Red);
+								Console.WriteLine("Error in PacketHandler 0x{0:X2} for {1}: {2}", packetID, ns, ex.Message);
+								Utility.PopColor();
+							}
+							catch
+							{ }
+						}
 
 						if (BufferSize >= packetLength)
 						{

@@ -27,6 +27,8 @@ namespace Server.Commands
 
             Register("GetFollowers", AccessLevel.GameMaster, new CommandEventHandler(GetFollowers_OnCommand));
 
+            Register("ReStable", AccessLevel.GameMaster, new CommandEventHandler(ReStable_OnCommand));
+
             Register("ClearFacet", AccessLevel.Administrator, new CommandEventHandler(ClearFacet_OnCommand));
 
             Register("Where", AccessLevel.Counselor, new CommandEventHandler(Where_OnCommand));
@@ -302,6 +304,68 @@ namespace Server.Commands
                 from.BeginTarget(-1, false, TargetFlags.None, new TargetCallback(GetFollowers_OnTarget));
                 from.SendMessage("That is not a player. Try again.");
             }
+        }
+
+        [Usage("ReStable")]
+        [Description("Targets a controlled pet and returns it to its owner's stables.")]
+        public static void ReStable_OnCommand(CommandEventArgs e)
+        {
+            e.Mobile.BeginTarget(-1, false, TargetFlags.None, new TargetCallback(ReStable_OnTarget));
+            e.Mobile.SendMessage("Target a pet to return it to its owner's stables.");
+        }
+
+        public static void ReStable_OnTarget(Mobile from, object obj)
+        {
+            if (!(obj is BaseCreature pet))
+            {
+                from.SendMessage("That is not a creature.");
+                return;
+            }
+
+            if (pet.Summoned)
+            {
+                from.SendMessage("You cannot stable a summoned creature.");
+                return;
+            }
+
+            if (pet.IsStabled)
+            {
+                from.SendMessage("That pet is already stabled.");
+                return;
+            }
+
+            Mobile owner = pet.ControlMaster;
+
+            if (!pet.Controlled || owner == null)
+            {
+                from.SendMessage("That creature has no owner.");
+                return;
+            }
+
+            CommandLogging.WriteLine(from, "{0} {1} re-stabling {2} to {3}", from.AccessLevel, CommandLogging.Format(from), CommandLogging.Format(pet), CommandLogging.Format(owner));
+
+            if (pet is IMount mount)
+                mount.Rider = null;
+
+            pet.ControlTarget = null;
+            pet.ControlOrder = OrderType.Stay;
+            pet.Internalize();
+
+            pet.SetControlMaster(null);
+            pet.SummonMaster = null;
+
+            pet.IsStabled = true;
+            pet.StabledBy = owner;
+
+            if (Core.SE)
+                pet.Loyalty = BaseCreature.MaxLoyalty;
+
+            owner.Stabled.Add(pet);
+
+            from.SendMessage("{0} has been returned to {1}'s stables.", pet.Name, owner.Name);
+
+            from.BeginTarget(-1, false, TargetFlags.None, new TargetCallback(ReStable_OnTarget));
+            from.SendMessage("Target another pet, or ESC to stop.");
         }
 
         public static void ReplaceBankers_OnCommand(CommandEventArgs e)

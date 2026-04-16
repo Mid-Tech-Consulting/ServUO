@@ -21,7 +21,7 @@ namespace Server.Mobiles
             SetHits(15000);
             SetStam(203, 650);
 
-            SetDamage(28, 55);
+            SetDamage(28, 40);
 
             SetDamageType(ResistanceType.Physical, 25);
             SetDamageType(ResistanceType.Fire, 50);
@@ -127,12 +127,17 @@ namespace Server.Mobiles
             AddLoot(LootPack.UltraRich, 4);
         }
 
+        private DateTime m_NextEarthquake;
+
         public override void OnGaveMeleeAttack(Mobile defender)
         {
             base.OnGaveMeleeAttack(defender);
 
-            if (0.2 >= Utility.RandomDouble())
+            if (DateTime.UtcNow >= m_NextEarthquake && 0.1 >= Utility.RandomDouble())
+            {
                 this.Earthquake();
+                m_NextEarthquake = DateTime.UtcNow + TimeSpan.FromSeconds(15);
+            }
         }
 
         public void Earthquake()
@@ -165,12 +170,12 @@ namespace Server.Mobiles
             {
                 Mobile m = (Mobile)targets[i];
 
-                double damage = m.Hits * 0.6;
+                double damage = m.Hits * 0.4;
 
                 if (damage < 10.0)
                     damage = 10.0;
-                else if (damage > 75.0)
-                    damage = 75.0;
+                else if (damage > 50.0)
+                    damage = 50.0;
 
                 this.DoHarmful(m);
 

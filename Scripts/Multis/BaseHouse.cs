@@ -327,8 +327,17 @@ namespace Server.Multis
         {
             get
             {
-                return GlobalBonusStorageScalar;
+                return GlobalBonusStorageScalar + (m_HasHouseStorageIncrease ? 0.4 : 0.0);
             }
+        }
+
+        private bool m_HasHouseStorageIncrease;
+
+        [CommandProperty(AccessLevel.GameMaster)]
+        public bool HasHouseStorageIncrease
+        {
+            get { return m_HasHouseStorageIncrease; }
+            set { m_HasHouseStorageIncrease = value; }
         }
 
         private bool m_Public;
@@ -3045,7 +3054,9 @@ namespace Server.Multis
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write((int)22); // version
+            writer.Write((int)23); // version
+
+            writer.Write(m_HasHouseStorageIncrease);
 
             writer.Write((int)_CurrentDecay);
 
@@ -3176,6 +3187,11 @@ namespace Server.Multis
 
             switch (version)
             {
+                case 23:
+                    {
+                        m_HasHouseStorageIncrease = reader.ReadBool();
+                        goto case 22;
+                    }
                 case 22:
                     {
                         _CurrentDecay = (DecayType)reader.ReadInt();
