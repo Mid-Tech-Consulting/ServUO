@@ -1,15 +1,28 @@
+using System.Collections.Generic;
+using Server.ContextMenus;
+using Server.Gumps;
 using Server.Multis;
 
 namespace Server.Items
 {
-    public class BankStone : Item
+    public class BankStone : Item, ISecurable
     {
+        [CommandProperty(AccessLevel.GameMaster)]
+        public SecureLevel Level { get; set; }
+
         [Constructable]
         public BankStone() : base(3796)
         {
             Movable = true;
             Hue = 0x485;
             Name = "Bank Stone";
+            Level = SecureLevel.Friends;
+        }
+
+        public override void GetContextMenuEntries(Mobile from, List<ContextMenuEntry> list)
+        {
+            base.GetContextMenuEntries(from, list);
+            SetSecureLevelEntry.AddTo(from, this, list);
         }
 
         public override void OnDoubleClick(Mobile from)
@@ -28,9 +41,9 @@ namespace Server.Items
                 return;
             }
 
-            if (!house.IsOwner(from) && !house.IsCoOwner(from) && !house.IsFriend(from))
+            if (!house.HasSecureAccess(from, Level))
             {
-                from.SendMessage("You must be a friend, co-owner, or owner of the house to use this bank stone.");
+                from.SendLocalizedMessage(1061637); // You are not allowed to access this.
                 return;
             }
 
@@ -45,14 +58,21 @@ namespace Server.Items
         {
             base.Serialize(writer);
 
-            writer.Write((int)0); // version
+            writer.Write((int)1); // version
+
+            writer.Write((int)Level);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
 
-            reader.ReadInt();
+            int version = reader.ReadInt();
+
+            if (version >= 1)
+                Level = (SecureLevel)reader.ReadInt();
+            else
+                Level = SecureLevel.CoOwners;
         }
     }
 }
