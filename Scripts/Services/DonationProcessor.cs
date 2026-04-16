@@ -1,4 +1,3 @@
-/*
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -153,12 +152,7 @@ namespace Server.Services
         {
             Account acct = Accounts.GetAccount(accountName) as Account;
 
-            if (acct == null)
-                return false;
-
-            acct.DepositCurrency(sovereigns);
-            return true;
+            return acct != null && acct.DepositSovereigns(sovereigns);
         }
     }
 }
-*/

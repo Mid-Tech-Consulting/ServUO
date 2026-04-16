@@ -85,7 +85,8 @@ namespace Server.Engines.UOStore
             //Register<DeluxeStarterPackToken>(1158368, 1158369, 0, 0x9CCB, 0, 2000, cat);
             Register<GreenGoblinStatuette>(1125133, 1158015, 0xA095, 0, 0, 600, cat);
             //Register<TotemOfChromaticFortune>(1157606, 1157604, 0, 0x9CC9, 0, 300, cat);
-            Register<MythicCharacterToken>(new TextDefinition[] { 1156614, 1156615 }, 1156679, 0x2AAA, 0, 0, 2500, cat);
+            Register<MythicCharacterToken>(new TextDefinition[] { 1156614, 1156615 }, 1156679, 0x2AAA, 0, 0, 1500, cat);
+            Register<BankStone>("Bank Stone", 0, 3796, 0, 0x485, 1000, cat);
 
             // Character
             cat = StoreCategory.Character;
@@ -96,7 +97,7 @@ namespace Server.Engines.UOStore
             Register<GreenGoblinStatuette>(1125133, 1158015, 0xA095, 0, 0, 600, cat);
             Register<GreyGoblinStatuette>(1125135, 1158015, 0xA097, 0, 0, 600, cat);
             Register<StableSlotIncreaseToken>(1157608, 1157609, 0x2AAA, 0, 0, 500, cat);
-            Register<MythicCharacterToken>(new TextDefinition[] { 1156614, 1156615 }, 1156679, 0x2AAA, 0, 0, 2500, cat);
+            Register<MythicCharacterToken>(new TextDefinition[] { 1156614, 1156615 }, 1156679, 0x2AAA, 0, 0, 1500, cat);
             Register<CharacterReincarnationToken>(new TextDefinition[] { 1156612, 1156615 }, 1156677, 0x2AAA, 0, 0, 2000, cat);
 
             Register<AbyssalHairDye>(1149822, 1156676, 0, 0x9C7A, 0, 400, cat);
