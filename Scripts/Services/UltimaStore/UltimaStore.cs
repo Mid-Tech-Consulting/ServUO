@@ -39,6 +39,11 @@ namespace Server.Engines.UOStore
     {
         public static readonly string FilePath = Path.Combine("Saves/Misc", "UltimaStore.bin");
 
+        // Rotate this each month to recolor all monthly-themed store items
+        // (mount statues and the monthly hair dye). 0 = no tint.
+        // Current: 0x0ABB Sapphire Blue.
+        public const int ColorOfTheMonthHue = 0x0ABB;
+
         public static bool Enabled { get { return Configuration.Enabled; } set { Configuration.Enabled = value; } }
 
         public static List<StoreEntry> Entries { get; private set; }
@@ -80,13 +85,18 @@ namespace Server.Engines.UOStore
         {
             // Featured
             StoreCategory cat = StoreCategory.Featured;
-            Register<VirtueShield>(1109616, 1158384, 0x7818, 0, 0, 1500, cat);
+            Register<VirtueShield>(1109616, 1158384, 0x7818, 0, 0, 1000, cat);
             Register<SoulstoneToken>(1158404, 1158405, 0x2A93, 0, 2598, 1000, cat, ConstructSoulstone);
             //Register<DeluxeStarterPackToken>(1158368, 1158369, 0, 0x9CCB, 0, 2000, cat);
             Register<GreenGoblinStatuette>(1125133, 1158015, 0xA095, 0, 0, 600, cat);
             //Register<TotemOfChromaticFortune>(1157606, 1157604, 0, 0x9CC9, 0, 300, cat);
             Register<MythicCharacterToken>(new TextDefinition[] { 1156614, 1156615 }, 1156679, 0x2AAA, 0, 0, 1500, cat);
             Register<BankStone>("Bank Stone", 0, 3796, 0, 0x485, 1000, cat);
+            Register<PublicSoulstone>("Public Soulstone", 1158405, 0x2A93, 0, 88, 1500, cat);
+            Register<MonthlyHairDye>("Monthly Hair Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyHairDye);
+            Register<MonthlyBeardDye>("Monthly Beard Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyBeardDye);
+            Register<CursedRemovalDeed>("Cursed Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
+            Register<NegativeAttributeRemovalDeed>("Negative Attribute Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
 
             // Character
             cat = StoreCategory.Character;
@@ -292,12 +302,14 @@ namespace Server.Engines.UOStore
 
             // mounts
             cat = StoreCategory.Mounts;
-            Register<CoconutCrabStatue>(1159165, 1159166, 0xA335, 0, 0, 1000, cat);
-            Register<SkeletalCatStatue>(1158462, 1158738, 0xA138, 0, 0, 1000, cat);
-            Register<EowmuStatue>(1158082, 1158433, 0xA0C0, 0, 0, 1000, cat);
-            Register<WindrunnerStatue>(1124685, 1157373, 0x9ED5, 0, 0, 1000, cat);
-            Register<LasherStatue>(1157214, 1157305, 0x9E35, 0, 0, 1000, cat);
-            Register<ChargerOfTheFallen>(1075187, 1156646, 0x2D9C, 0, 0, 1000, cat);
+            Register<CoconutCrabStatue>(1159165, 1159166, 0xA335, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
+            Register<SkeletalCatStatue>(1158462, 1158738, 0xA138, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
+            Register<EowmuStatue>(1158082, 1158433, 0xA0C0, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
+            Register<WindrunnerStatue>(1124685, 1157373, 0x9ED5, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
+            Register<LasherStatue>(1157214, 1157305, 0x9E35, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
+            Register<ChargerOfTheFallen>(1075187, 1156646, 0x2D9C, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
+            Register<EtherealDragonHildebrandt>("Ethereal Dragon Hildebrandt", 0, 0xB162, 0, ColorOfTheMonthHue, 1500, cat, ConstructHuedMount);
+            Register<EtherealHellfireSteed>("Ethereal Hellfire Steed", 0, 0xB165, 0, ColorOfTheMonthHue, 1500, cat, ConstructHuedMount);
 
             // misc
             cat = StoreCategory.Misc;
@@ -559,6 +571,35 @@ namespace Server.Engines.UOStore
         public static Item ConstructHitchingPost(Mobile m, StoreEntry entry)
         {
             return new HitchingPost(false);
+        }
+
+        public static Item ConstructMonthlyHairDye(Mobile m, StoreEntry entry)
+        {
+            return new MonthlyHairDye(entry.Hue);
+        }
+
+        public static Item ConstructMonthlyBeardDye(Mobile m, StoreEntry entry)
+        {
+            return new MonthlyBeardDye(entry.Hue);
+        }
+
+        public static Item ConstructHuedMount(Mobile m, StoreEntry entry)
+        {
+            Item item = Activator.CreateInstance(entry.ItemType) as Item;
+
+            if (item != null && entry.Hue != 0)
+            {
+                item.Hue = entry.Hue;
+
+                if (item is EtherealMount eth)
+                {
+                    eth.StatueHue = entry.Hue;
+                    eth.TransparentMountedHue = entry.Hue;
+                    eth.NonTransparentMountedHue = entry.Hue;
+                }
+            }
+
+            return item;
         }
         #endregion
 

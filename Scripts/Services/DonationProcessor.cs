@@ -19,6 +19,10 @@ namespace Server.Services
         // How often to poll for pending donations (in seconds)
         private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(30);
 
+        // Per-command DB timeout. Anything that takes longer is treated as failure
+        // so a hung Postgres can never wedge the polling loop forever.
+        private const int CommandTimeoutSeconds = 5;
+
         public static void Initialize()
         {
             _pollTimer = Timer.DelayCall(PollInterval, PollInterval, OnTick);
@@ -34,15 +38,25 @@ namespace Server.Services
 
             Task.Run(async () =>
             {
-                var pending = await FetchPendingDonationsAsync();
+                try
+                {
+                    var pending = await FetchPendingDonationsAsync().ConfigureAwait(false);
 
-                // GrantSovereigns touches game state, so it must run on the game thread
-                if (pending.Count > 0)
-                {
-                    Timer.DelayCall(TimeSpan.Zero, () => ProcessOnGameThread(pending));
+                    if (pending.Count > 0)
+                    {
+                        // GrantSovereigns touches game state, so it must run on the game thread.
+                        // _processing is reset at the end of the game-thread work or after the
+                        // background mark-complete task finishes.
+                        Timer.DelayCall(TimeSpan.Zero, () => ProcessOnGameThread(pending));
+                    }
+                    else
+                    {
+                        _processing = false;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
+                    Console.WriteLine("[DonationProcessor] Poll task failed: {0}", ex);
                     _processing = false;
                 }
             });
@@ -56,21 +70,25 @@ namespace Server.Services
             {
                 using (var conn = new NpgsqlConnection(ConnectionString))
                 {
-                    await conn.OpenAsync();
+                    await conn.OpenAsync().ConfigureAwait(false);
 
                     using (var cmd = new NpgsqlCommand(
                         "SELECT id, account_name, sovereigns FROM donations " +
                         "WHERE is_completed = false AND transaction_id IS NOT NULL",
                         conn))
-                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        while (await reader.ReadAsync())
+                        cmd.CommandTimeout = CommandTimeoutSeconds;
+
+                        using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                         {
-                            results.Add((
-                                reader.GetInt64(0),
-                                reader.GetString(1),
-                                reader.GetInt32(2)
-                            ));
+                            while (await reader.ReadAsync().ConfigureAwait(false))
+                            {
+                                results.Add((
+                                    reader.GetInt64(0),
+                                    reader.GetString(1),
+                                    reader.GetInt32(2)
+                                ));
+                            }
                         }
                     }
                 }
@@ -87,26 +105,32 @@ namespace Server.Services
         {
             var completed = new List<long>();
 
-            foreach (var donation in pending)
+            try
             {
-                if (GrantSovereigns(donation.accountName, donation.sovereigns))
+                foreach (var donation in pending)
                 {
-                    completed.Add(donation.id);
-                    Console.WriteLine(
-                        "[DonationProcessor] Granted {0} sovereigns to account '{1}' (donation #{2})",
-                        donation.sovereigns, donation.accountName, donation.id
-                    );
-                }
-                else
-                {
-                    Console.WriteLine(
-                        "[DonationProcessor] Account '{0}' not found, skipping donation #{1}",
-                        donation.accountName, donation.id
-                    );
+                    if (GrantSovereigns(donation.accountName, donation.sovereigns))
+                    {
+                        completed.Add(donation.id);
+                        Console.WriteLine(
+                            "[DonationProcessor] Granted {0} sovereigns to account '{1}' (donation #{2})",
+                            donation.sovereigns, donation.accountName, donation.id
+                        );
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            "[DonationProcessor] Account '{0}' not found, skipping donation #{1}",
+                            donation.accountName, donation.id
+                        );
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[DonationProcessor] Error granting sovereigns: {0}", ex);
+            }
 
-            // Mark completed donations on a background thread
             if (completed.Count > 0)
             {
                 Task.Run(() => MarkCompletedAsync(completed));
@@ -123,18 +147,17 @@ namespace Server.Services
             {
                 using (var conn = new NpgsqlConnection(ConnectionString))
                 {
-                    await conn.OpenAsync();
+                    await conn.OpenAsync().ConfigureAwait(false);
 
-                    foreach (long id in ids)
+                    using (var cmd = new NpgsqlCommand(
+                        "UPDATE donations SET is_completed = true, updated_at = @now WHERE id = ANY(@ids)",
+                        conn))
                     {
-                        using (var cmd = new NpgsqlCommand(
-                            "UPDATE donations SET is_completed = true, updated_at = @now WHERE id = @id",
-                            conn))
-                        {
-                            cmd.Parameters.AddWithValue("id", id);
-                            cmd.Parameters.AddWithValue("now", DateTime.UtcNow);
-                            await cmd.ExecuteNonQueryAsync();
-                        }
+                        cmd.CommandTimeout = CommandTimeoutSeconds;
+                        cmd.Parameters.AddWithValue("now", DateTime.UtcNow);
+                        cmd.Parameters.AddWithValue("ids", ids.ToArray());
+
+                        await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                 }
             }

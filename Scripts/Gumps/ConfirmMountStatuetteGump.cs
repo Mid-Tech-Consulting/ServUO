@@ -26,6 +26,9 @@ namespace Server.Gumps
             if (m_Item is ICreatureStatuette)
             {
                 m = Activator.CreateInstance(((ICreatureStatuette)m_Item).CreatureType) as BaseCreature;
+
+                if (m != null && m_Item.Hue != 0)
+                    m.Hue = m_Item.Hue;
             }
 
             if (m != null)
