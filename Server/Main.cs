@@ -431,18 +431,18 @@ namespace Server
 
             try
             {
+                if (!Directory.Exists("Logs"))
+                {
+                    Directory.CreateDirectory("Logs");
+                }
+
                 if (Service)
                 {
-                    if (!Directory.Exists("Logs"))
-                    {
-                        Directory.CreateDirectory("Logs");
-                    }
-
                     Console.SetOut(MultiConsoleOut = new MultiTextWriter(new FileLogger("Logs/Console.log")));
                 }
                 else
                 {
-                    Console.SetOut(MultiConsoleOut = new MultiTextWriter(Console.Out));
+                    Console.SetOut(MultiConsoleOut = new MultiTextWriter(Console.Out, new FileLogger("Logs/Console.log")));
                 }
             }
             catch
