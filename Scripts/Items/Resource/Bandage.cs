@@ -322,25 +322,7 @@ namespace Server.Items
         {
             StopHeal();
 
-            if (m_Patient is PlayerMobile || m_Healer is PlayerMobile)
-            {
-                string poisonInfo = m_Patient.Poisoned
-                    ? String.Format("Poisoned=true (Name={0} RealLevel={1})", m_Patient.Poison.Name, m_Patient.Poison.RealLevel)
-                    : "Poisoned=false";
-
-                Console.WriteLine(
-                    "[BandageDebug] Healer={0} ({1} Healing/{2} Anatomy) Patient={3} Hits={4}/{5} {6} Bleeding={7}",
-                    m_Healer.Name,
-                    (int)m_Healer.Skills[SkillName.Healing].Value,
-                    (int)m_Healer.Skills[SkillName.Anatomy].Value,
-                    m_Patient.Name,
-                    m_Patient.Hits,
-                    m_Patient.HitsMax,
-                    poisonInfo,
-                    BleedAttack.IsBleeding(m_Patient));
-            }
-
-            int healerNumber = -1, patientNumber = -1;
+int healerNumber = -1, patientNumber = -1;
             bool playSound = true;
             bool checkSkills = false;
 
