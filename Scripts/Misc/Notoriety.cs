@@ -274,7 +274,7 @@ namespace Server.Misc
 				if (target.Murderer)
 					return Notoriety.Murderer;
 
-				if (target.Criminal && target.Map != null && ((target.Map.Rules & MapRules.HarmfulRestrictions) == 0))
+				if (target.Criminal)
 					return Notoriety.Criminal;
 
 				var sourceGuild = GetGuildFor(source.Guild as Guild, source);
