@@ -406,10 +406,10 @@ namespace Server.Misc
 
 			if (sourceGuild != null && targetGuild != null)
 			{
-				if (sourceGuild == targetGuild)
+				if (sourceGuild == targetGuild && !target.Criminal)
 					return Notoriety.Ally;
 
-				if (sourceGuild.IsAlly(targetGuild))
+				if (sourceGuild.IsAlly(targetGuild) && !target.Criminal)
 					return Notoriety.Ally;
 
 				if (sourceGuild.IsEnemy(targetGuild))
