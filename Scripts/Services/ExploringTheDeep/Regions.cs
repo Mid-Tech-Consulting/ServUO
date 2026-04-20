@@ -102,8 +102,6 @@ namespace Server.Regions
 
             if (m is PlayerMobile)
             {
-                int equipment = m.Items.Where(i => (i is CanvassRobe || i is BootsOfBallast || i is NictitatingLens || i is AquaPendant || i is GargishNictitatingLens) && (i.Parent is Mobile && ((Mobile)i.Parent).FindItemOnLayer(i.Layer) == i)).Count();
-                
                 PlayerMobile pm = m as PlayerMobile;
 
                 if (m.AccessLevel == AccessLevel.Player)
@@ -120,16 +118,6 @@ namespace Server.Regions
                             pm.SendLocalizedMessage(1154412); // You cannot proceed while pets are under your control!
                             return false;
                         }
-                    }
-                    else if (pm.ExploringTheDeepQuest != ExploringTheDeepQuestChain.CollectTheComponentComplete)
-                    {
-                        m.SendLocalizedMessage(1154325); // You feel as though by doing this you are missing out on an important part of your journey...
-                        return false;
-                    }
-                    else if (equipment < 4)
-                    {
-                        m.SendLocalizedMessage(1154413); // You couldn't hope to survive proceeding without the proper equipment...
-                        return false;
                     }
                 }
             }
