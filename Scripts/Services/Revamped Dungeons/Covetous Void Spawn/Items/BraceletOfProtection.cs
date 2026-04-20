@@ -22,7 +22,9 @@ namespace Server.Items
             Hue = 1157;
             Attributes.BonusHits = 5;
             Attributes.RegenHits = 10;
-            Attributes.DefendChance = 5;
+            Attributes.DefendChance = 15;
+            Attributes.CastRecovery = 3;
+            Attributes.EnhancePotions = 15;
 
             switch (Utility.Random(6))
             {

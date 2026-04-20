@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Server;
 using Server.Engines.Craft;
 using Server.Mobiles;
@@ -1120,6 +1121,11 @@ namespace Server.Items
 
     public class UnstableTimeRift : Item
     {
+        public const int LuckBonusAmount = 1000;
+        public static readonly TimeSpan BuffDuration = TimeSpan.FromHours(24.0);
+
+        private static readonly Dictionary<Mobile, DateTime> m_BuffExpires = new Dictionary<Mobile, DateTime>();
+
         public override int LabelNumber { get { return 1156320; } } // An Unstable Time Rift
 
         [Constructable]
@@ -1130,8 +1136,39 @@ namespace Server.Items
 
         public override void OnDoubleClick(Mobile m)
         {
-            if(m.InRange(GetWorldLocation(), 3))
-                this.LabelTo(m, 1156321); // *You peer into the Time Rift and see back to the very beginning of Time...*
+            if (!m.InRange(GetWorldLocation(), 3))
+                return;
+
+            LabelTo(m, 1156321); // *You peer into the Time Rift and see back to the very beginning of Time...*
+
+            if (m_BuffExpires.TryGetValue(m, out DateTime expires) && expires > DateTime.UtcNow)
+            {
+                TimeSpan remaining = expires - DateTime.UtcNow;
+                m.SendMessage("The rift's energy still lingers within you. Try again in {0}h {1}m.",
+                    (int)remaining.TotalHours, remaining.Minutes);
+                return;
+            }
+
+            m_BuffExpires[m] = DateTime.UtcNow + BuffDuration;
+            m.SendLocalizedMessage(1079551); // Your luck just improved!
+            m.FixedParticles(0x373A, 10, 15, 5018, EffectLayer.Waist);
+            m.PlaySound(0x22);
+        }
+
+        public static int GetLuckBonus(Mobile m)
+        {
+            if (m_BuffExpires.TryGetValue(m, out DateTime expires))
+            {
+                if (expires > DateTime.UtcNow)
+                    return LuckBonusAmount;
+
+                m_BuffExpires.Remove(m);
+
+                if (m.NetState != null)
+                    m.SendLocalizedMessage(1079552); // Your luck just ran out.
+            }
+
+            return 0;
         }
 
         public UnstableTimeRift(Serial serial)

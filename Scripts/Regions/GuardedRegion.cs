@@ -97,12 +97,7 @@ namespace Server.Regions
 
 		public virtual bool CheckVendorAccess(BaseVendor vendor, Mobile from)
 		{
-			if (from.AccessLevel >= AccessLevel.GameMaster || IsDisabled())
-			{
-				return true;
-			}
-
-            return !from.Murderer;
+			return true;
 		}
 
 		public override bool OnBeginSpellCast(Mobile m, ISpell s)

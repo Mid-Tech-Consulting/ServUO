@@ -96,7 +96,8 @@ namespace Server.Engines.UOStore
             Register<MonthlyHairDye>("Monthly Hair Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyHairDye);
             Register<MonthlyBeardDye>("Monthly Beard Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyBeardDye);
             Register<CursedRemovalDeed>("Cursed Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
-            Register<NegativeAttributeRemovalDeed>("Negative Attribute Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
+            Register<NegativeAttributeRemovalDeed>("Attribute Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
+            Register<TransmogrificationPotion>("Transmogrification Potion", 0, 0xF0E, 0, 1161, 500, cat);
 
             // Character
             cat = StoreCategory.Character;

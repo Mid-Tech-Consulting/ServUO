@@ -1899,7 +1899,7 @@ namespace Server
 			}
 		}
 
-		private static bool m_GlobalRegenThroughPoison = true;
+		private static bool m_GlobalRegenThroughPoison = false;
 
 		public static bool GlobalRegenThroughPoison { get { return m_GlobalRegenThroughPoison; } set { m_GlobalRegenThroughPoison = value; } }
 

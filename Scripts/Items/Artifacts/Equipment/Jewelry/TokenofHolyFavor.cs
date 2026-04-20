@@ -12,11 +12,14 @@ namespace Server.Items
         {
             Hue = 96;
             Attributes.BonusHits = 5;
-            Attributes.CastRecovery = 2;
+            Attributes.BonusInt = 10;
+            Attributes.CastRecovery = 3;
             Attributes.CastSpeed = 1;
             Attributes.DefendChance = 10;
             Attributes.AttackChance = 10;
-            Attributes.SpellDamage = 4;
+            Attributes.SpellDamage = 20;
+            Attributes.EnhancePotions = 25;
+            Attributes.RegenMana = 2;
             Resistances.Cold = 5;
             Resistances.Poison = 5;
         }

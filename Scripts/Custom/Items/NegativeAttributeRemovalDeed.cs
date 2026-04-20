@@ -8,7 +8,7 @@ namespace Server.Items
         public NegativeAttributeRemovalDeed() : base(0x14F0)
         {
             Weight = 1.0;
-            Name = "Negative Attribute Removal Deed";
+            Name = "Attribute Removal Deed";
             LootType = LootType.Blessed;
             Hue = 1175;
         }

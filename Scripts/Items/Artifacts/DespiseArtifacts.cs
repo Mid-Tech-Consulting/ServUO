@@ -19,6 +19,8 @@ namespace Server.Items
 			Attributes.Luck = 250;
 			Attributes.SpellDamage = 20;
 			Attributes.LowerRegCost = 20;
+			Attributes.CastSpeed = 1;
+			Attributes.CastRecovery = 3;
 		}
 		
 		public CompassionsEye(Serial serial) : base(serial)

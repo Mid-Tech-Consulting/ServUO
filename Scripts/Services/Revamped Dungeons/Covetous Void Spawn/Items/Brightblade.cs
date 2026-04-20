@@ -14,7 +14,9 @@ namespace Server.Items
         public Brightblade()
         {
             WeaponAttributes.HitLeechStam = 100;
-            WeaponAttributes.SplinteringWeapon = 20;
+            WeaponAttributes.SplinteringWeapon = 30;
+            WeaponAttributes.HitLowerDefend = 50;
+            WeaponAttributes.HitFireball = 50;
             Attributes.RegenStam = 3;
             Attributes.AttackChance = 10;
             Attributes.CastSpeed = 1;
@@ -54,7 +56,9 @@ namespace Server.Items
         public GargishBrightblade()
         {
             WeaponAttributes.HitLeechStam = 100;
-            WeaponAttributes.SplinteringWeapon = 20;
+            WeaponAttributes.SplinteringWeapon = 30;
+            WeaponAttributes.HitLowerDefend = 50;
+            WeaponAttributes.HitFireball = 50;
             Attributes.RegenStam = 3;
             Attributes.AttackChance = 10;
             Attributes.CastSpeed = 1;

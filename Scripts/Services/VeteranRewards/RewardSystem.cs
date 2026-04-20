@@ -355,6 +355,7 @@ namespace Server.Engines.VeteranRewards
                     new RewardEntry(specialDyeTubs, 1006008, typeof(RewardBlackDyeTub)),
                     new RewardEntry(specialDyeTubs, 1006013, typeof(FurnitureDyeTub)),
                     new RewardEntry(specialDyeTubs, 1006047, typeof(SpecialDyeTub)),
+                    new RewardEntry(specialDyeTubs, "Sigil Dye Tub", typeof(SigilDyeTub)),
 
                     new RewardEntry(cloaksAndRobes, 1006009, typeof(RewardCloak), Bronze, 1041286),
                     new RewardEntry(cloaksAndRobes, 1006010, typeof(RewardRobe), Bronze, 1041287),

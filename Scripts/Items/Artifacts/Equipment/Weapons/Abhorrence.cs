@@ -11,9 +11,10 @@ namespace Server.Items
         public Abhorrence()
         {
             Attributes.SpellChanneling = 1;
-            WeaponAttributes.HitLightning = 35;
+            WeaponAttributes.HitLightning = 70;
             WeaponAttributes.HitLeechMana = 40;
-            WeaponAttributes.HitLowerDefend = 20;
+            WeaponAttributes.HitLowerDefend = 50;
+            Attributes.BalancedWeapon = 1;
             Attributes.WeaponSpeed = 35;
             Attributes.WeaponDamage = 50;
             ExtendedWeaponAttributes.Bane = 1;

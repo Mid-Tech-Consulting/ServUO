@@ -99,6 +99,11 @@ namespace Server.Network
 
 		public bool IsEmpty { get { return (_pending.Count == 0 && _buffered == null); } }
 
+		public int PendingBytes
+		{
+			get { return (_pending.Count * m_CoalesceBufferSize) + (_buffered?.Length ?? 0); }
+		}
+
 		public Gram CheckFlushReady()
 		{
 			Gram gram = Interlocked.Exchange(ref _buffered, null);

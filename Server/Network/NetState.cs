@@ -639,6 +639,12 @@ namespace Server.Network
 
 		private readonly object _SendLock = new object();
 
+        // Telemetry: warn when a client's SendQueue backlog passes this threshold.
+        // Helps diagnose movement freezes in item-dense areas.
+        private const int SendQueueWarnBytes = 256 * 1024;
+        private const int SendQueueWarnCooldownMs = 30000;
+        private long _LastSendQueueWarnTick;
+
         public virtual void Send(Packet p)
         {
             if (p == null)
@@ -708,10 +714,28 @@ namespace Server.Network
                             lock (_SendLock)
                             {
                                 SendQueue.Gram gram;
+                                int pendingBytes;
 
                                 lock (m_SendQueue)
                                 {
                                     gram = m_SendQueue.Enqueue(buffer, length);
+                                    pendingBytes = m_SendQueue.PendingBytes;
+                                }
+
+                                if (pendingBytes >= SendQueueWarnBytes)
+                                {
+                                    long now = Core.TickCount;
+
+                                    if (now - _LastSendQueueWarnTick >= SendQueueWarnCooldownMs)
+                                    {
+                                        _LastSendQueueWarnTick = now;
+
+                                        Utility.PushColor(ConsoleColor.Yellow);
+                                        Console.WriteLine(
+                                            "[SendQueueWarn] Client: {0}: backlog {1} KB (packet {2:X2})",
+                                            this, pendingBytes / 1024, p.PacketID);
+                                        Utility.PopColor();
+                                    }
                                 }
 
                                 if (buffered && m_SendBufferPool.Count < SendBufferCapacity)
