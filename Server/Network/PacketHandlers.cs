@@ -630,11 +630,16 @@ namespace Server.Network
         public static void AttackReq(NetState state, PacketReader pvSrc)
         {
             Mobile from = state.Mobile;
-            Mobile m = World.FindMobile(pvSrc.ReadInt32());
+            Serial serial = pvSrc.ReadInt32();
+            Mobile m = World.FindMobile(serial);
 
             if (m != null)
             {
                 from.Attack(m);
+            }
+            else if (World.FindItem(serial) is IDamageable d)
+            {
+                from.Attack(d);
             }
         }
 
