@@ -180,8 +180,9 @@ namespace Server.Mobiles
 
         public override void GenerateLoot()
         {
-            AddLoot(LootPack.SuperBoss, 4);
-            AddLoot(LootPack.FilthyRich);
+            AddLoot(LootPack.SuperBoss, 6);
+            AddLoot(LootPack.UltraRich, 2);
+            AddLoot(LootPack.HighScrolls, 2);
         }
 
         public override void CheckReflect(Mobile caster, ref bool reflect)
@@ -225,21 +226,18 @@ namespace Server.Mobiles
 
             eable.Free();
 
-            foreach (Mobile m in list)
+            if (count < 4 && list.Count > 0)
             {
                 (new DarkWisp()).MoveToWorld(new Point3D(Location), Map);
+            }
+
+            foreach (Mobile m in list)
+            {
                 double teleportchance = (double)Hits / HitsMax;
 
                 if (teleportchance < Utility.RandomDouble() && m.Alive)
                 {
-                    switch (Utility.Random(6))
-                    {
-                        case 0: m.MoveToWorld(new Point3D(6431, 1664, 0), Map); break;
-                        case 1: m.MoveToWorld(new Point3D(6432, 1634, 0), Map); break;
-                        case 2: m.MoveToWorld(new Point3D(6401, 1657, 0), Map); break;
-                        case 3: m.MoveToWorld(new Point3D(6401, 1637, 0), Map); break;
-                        default: m.MoveToWorld(new Point3D(Location), Map); break;
-                    }
+                    m.MoveToWorld(new Point3D(Location), Map);
                 }
             }
         }

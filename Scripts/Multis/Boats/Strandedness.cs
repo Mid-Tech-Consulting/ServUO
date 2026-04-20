@@ -108,6 +108,9 @@ namespace Server.Misc
             if(boat != null && !boat.Deleted)
                 return false;
 
+			if ( from.Region != null && from.Region.IsPartOf( "Underwater World" ) )
+				return false;
+
 			object surface = map.GetTopSurface( from.Location );
 
 			if ( surface is LandTile )
