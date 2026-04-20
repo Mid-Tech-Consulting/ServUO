@@ -274,7 +274,7 @@ namespace Server.Misc
 				if (target.Murderer)
 					return Notoriety.Murderer;
 
-				if (target.Criminal && target.Map != null && ((target.Map.Rules & MapRules.HarmfulRestrictions) == 0))
+				if (target.Criminal)
 					return Notoriety.Criminal;
 
 				var sourceGuild = GetGuildFor(source.Guild as Guild, source);
@@ -406,10 +406,10 @@ namespace Server.Misc
 
 			if (sourceGuild != null && targetGuild != null)
 			{
-				if (sourceGuild == targetGuild)
+				if (sourceGuild == targetGuild && !target.Criminal)
 					return Notoriety.Ally;
 
-				if (sourceGuild.IsAlly(targetGuild))
+				if (sourceGuild.IsAlly(targetGuild) && !target.Criminal)
 					return Notoriety.Ally;
 
 				if (sourceGuild.IsEnemy(targetGuild))
