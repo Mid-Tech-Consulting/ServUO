@@ -4400,15 +4400,24 @@ namespace Server.Mobiles
 
 		public List<Mobile> PermaFlags { get { return m_PermaFlags; } }
 
-        public override int Luck { get { return AosAttributes.GetValue(this, AosAttribute.Luck) + TenthAnniversarySculpture.GetLuckBonus(this); } }
+        public override int Luck
+        {
+            get
+            {
+                return AosAttributes.GetValue(this, AosAttribute.Luck)
+                    + TenthAnniversarySculpture.GetLuckBonus(this)
+                    + FountainOfFortune.GetLuckBonus(this)
+                    + UnstableTimeRift.GetLuckBonus(this);
+            }
+        }
 
         public int RealLuck
-		{ 
+		{
             get
             {
                 int facetBonus = !Siege.SiegeShard && this.Map == Map.Felucca ? RandomItemGenerator.FeluccaLuckBonus : 0;
 
-                return Luck + FountainOfFortune.GetLuckBonus(this) + UnstableTimeRift.GetLuckBonus(this) + facetBonus;
+                return Luck + facetBonus;
             }
         }
 

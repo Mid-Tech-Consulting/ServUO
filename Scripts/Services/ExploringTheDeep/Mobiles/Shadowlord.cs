@@ -1,11 +1,29 @@
 using System;
 using Server.Items;
+using Server.Spells;
+using Server.Spells.Necromancy;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Server.Mobiles
 {
+    public class ShadowlordNecroAI : NecroMageAI
+    {
+        public ShadowlordNecroAI(BaseCreature m) : base(m) { }
+
+        public override Spell GetRandomCurseSpell()
+        {
+            Spell spell = base.GetRandomCurseSpell();
+
+            if (spell is BloodOathSpell)
+                return new EvilOmenSpell(m_Mobile, null);
+
+            return spell;
+        }
+    }
+
+
     public enum ShadowlordType
     {
         Astaroth,
@@ -63,7 +81,7 @@ namespace Server.Mobiles
             SetHits(50000, 55000);
             SetStam(1003, 1114);
 
-            SetDamage(35, 41);
+            SetDamage(25, 30);
 
             SetDamageType(ResistanceType.Physical, 20);
             SetDamageType(ResistanceType.Fire, 20);
@@ -77,7 +95,7 @@ namespace Server.Mobiles
             SetResistance(ResistanceType.Poison, 70, 80);
             SetResistance(ResistanceType.Energy, 70, 80);
 
-            SetSkill(SkillName.EvalInt, 140.0);
+            SetSkill(SkillName.EvalInt, 100.0);
             SetSkill(SkillName.Magery, 120.0);
             SetSkill(SkillName.Meditation, 140.0);
             SetSkill(SkillName.MagicResist, 110.2, 120.0);
@@ -119,6 +137,8 @@ namespace Server.Mobiles
         }
 
         public override bool AlwaysMurderer { get { return true; } }
+
+        protected override BaseAI ForcedAI { get { return new ShadowlordNecroAI(this); } }
 
         public override int GetAngerSound() { return 1550; }
         public override int GetHurtSound() { return 1552; }
@@ -208,7 +228,7 @@ namespace Server.Mobiles
             foreach (Mobile m in list)
             {
                 (new DarkWisp()).MoveToWorld(new Point3D(Location), Map);
-                int teleportchance = Hits / HitsMax;
+                double teleportchance = (double)Hits / HitsMax;
 
                 if (teleportchance < Utility.RandomDouble() && m.Alive)
                 {
