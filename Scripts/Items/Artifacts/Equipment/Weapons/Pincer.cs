@@ -12,6 +12,9 @@ namespace Server.Items
         {
             Hue = 2500;
             Attributes.BalancedWeapon = 1;
+            WeaponAttributes.HitFireball = 70;
+            Attributes.WeaponSpeed = 20;
+            WeaponAttributes.HitLowerDefend = 50; 
             Slayer2 = BaseRunicTool.GetRandomSlayer();
             SetSkillBonuses.SetValues(0, SkillName.Lumberjacking, 10);
             WeaponAttributes.HitLeechHits = 87;
@@ -22,7 +25,7 @@ namespace Server.Items
 
         public override void GetDamageTypes(Mobile wielder, out int phys, out int fire, out int cold, out int pois, out int nrgy, out int chaos, out int direct)
         {
-            phys = 30; fire = 70;
+            phys = 0; fire = 100;
             cold = nrgy = chaos = direct = pois = 0;
         }
 
@@ -66,7 +69,7 @@ namespace Server.Items
 
         public override void GetDamageTypes(Mobile wielder, out int phys, out int fire, out int cold, out int pois, out int nrgy, out int chaos, out int direct)
         {
-            phys = 30; fire = 70;
+            phys = 0; fire = 100;
             cold = nrgy = chaos = direct = pois = 0;
         }
 

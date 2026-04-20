@@ -13,7 +13,9 @@
       "Bash(cp \"C:/code/Scripts/Custom/Premium Members/WhiteCourage.cs\" \"c:/code/ServUO/Scripts/Custom/WhiteCourage.cs\")",
       "Bash(find C:/code/Scripts/ -iname *premium*stone* -o -iname *reward*stone* -o -iname *vendor*stone*)",
       "Bash(grep -i \"\\\\.cs$\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(./ServUO.exe)",
+      "Bash(tasklist //FI \"IMAGENAME eq ServUO.exe\")"
     ],
     "additionalDirectories": [
       "C:\\code\\Scripts\\Custom Arth\\Test\\Reward Tickets"

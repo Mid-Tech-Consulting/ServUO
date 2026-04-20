@@ -12,6 +12,9 @@ namespace Server.Items
         {
             Slayer2 = BaseRunicTool.GetRandomSlayer();
             WeaponAttributes.HitLowerAttack = 40;
+            WeaponAttributes.SplinteringWeapon = 30;
+            WeaponAttributes.HitLightning = 50;
+            WeaponAttributes.HitLowerDefend = 50;
             Attributes.WeaponSpeed = 26;
             Attributes.WeaponDamage = 35;
             Attributes.LowerManaCost = 8;

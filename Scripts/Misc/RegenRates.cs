@@ -24,6 +24,8 @@ namespace Server.Misc
             Mobile.DefaultStamRate = TimeSpan.FromSeconds(7.0);
             Mobile.DefaultManaRate = TimeSpan.FromSeconds(7.0);
 
+            Mobile.GlobalRegenThroughPoison = Config.Get("RegenThroughPoison", false);
+
             Mobile.ManaRegenRateHandler = new RegenRateHandler(Mobile_ManaRegenRate);
 
             if (Core.AOS)

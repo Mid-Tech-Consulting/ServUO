@@ -27,6 +27,9 @@ namespace Server.Items
             Slayer = BaseRunicTool.GetRandomSlayer();
 
             WeaponAttributes.ResistColdBonus = 15;
+            WeaponAttributes.HitLeechMana = 80;
+            WeaponAttributes.HitLeechHits = 80;
+            WeaponAttributes.HitColdArea = 80;
             AosElementDamages.Fire = 100;
             Hue = 1165;
 
@@ -81,6 +84,9 @@ namespace Server.Items
             Slayer = BaseRunicTool.GetRandomSlayer();
 
             WeaponAttributes.ResistColdBonus = 15;
+            WeaponAttributes.HitLeechMana = 80;
+            WeaponAttributes.HitLeechHits = 80;
+            WeaponAttributes.HitColdArea = 80;
             AosElementDamages.Fire = 100;
             Hue = 1165;
 

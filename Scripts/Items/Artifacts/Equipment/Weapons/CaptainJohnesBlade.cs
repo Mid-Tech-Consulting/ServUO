@@ -15,6 +15,9 @@ namespace Server.Items
             Attributes.DefendChance = 15;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 60;
+            WeaponAttributes.HitLeechMana = 80;
+            WeaponAttributes.HitHarm = 70;
+            WeaponAttributes.HitColdArea = 80;
             ExtendedWeaponAttributes.Bane = 1;
 
             Hue = 2124;
@@ -60,6 +63,9 @@ namespace Server.Items
             Attributes.DefendChance = 15;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 60;
+            WeaponAttributes.HitLeechMana = 80;
+            WeaponAttributes.HitHarm = 70;
+            WeaponAttributes.HitColdArea = 80;
             ExtendedWeaponAttributes.Bane = 1;
 
             Hue = 2124;

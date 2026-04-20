@@ -26,7 +26,8 @@ namespace Server.Mobiles
         {
             typeof(Abhorrence),         typeof(CaptainJohnesBlade),             typeof(Craven),
             typeof(Equivocation),       typeof(GargishCaptainJohnesBlade),      typeof(GargishEquivocation),
-            typeof(GargishPincer),      typeof(Pincer)
+            typeof(GargishPincer),      typeof(Pincer),                         typeof(Hellspire),
+            typeof(GargishHellspire)
         };
 
         [CommandProperty(AccessLevel.GameMaster)]

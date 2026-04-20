@@ -55,16 +55,6 @@ namespace Server.Multis
             if (map == Map.Ilshenar || SpellHelper.IsFeluccaT2A(map, center) || SpellHelper.IsEodon(map, center))
                 return HousePlacementResult.BadRegion; // No houses in Ilshenar/T2A/Eodon
 
-            if (map == Map.Malas && (multiID == 0x007C || multiID == 0x007E))
-                return HousePlacementResult.InvalidCastleKeep;
-
-            #region SA
-            if (map == Map.TerMur && !Server.Engines.Points.PointsSystem.QueensLoyalty.IsNoble(from))
-            {
-                return HousePlacementResult.NoQueenLoyalty;
-            }
-            #endregion
-
             var noHousingRegion = (NoHousingRegion)Region.Find(center, map).GetRegion(typeof(NoHousingRegion));
 
             if (noHousingRegion != null)

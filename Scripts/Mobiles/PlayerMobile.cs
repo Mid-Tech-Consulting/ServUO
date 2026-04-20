@@ -4408,7 +4408,7 @@ namespace Server.Mobiles
             {
                 int facetBonus = !Siege.SiegeShard && this.Map == Map.Felucca ? RandomItemGenerator.FeluccaLuckBonus : 0;
 
-                return Luck + FountainOfFortune.GetLuckBonus(this) + facetBonus;
+                return Luck + FountainOfFortune.GetLuckBonus(this) + UnstableTimeRift.GetLuckBonus(this) + facetBonus;
             }
         }
 

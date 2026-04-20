@@ -18,6 +18,8 @@ namespace Server.Items
             Attributes.WeaponSpeed = 35;
             Attributes.WeaponDamage = 50;
             WeaponAttributes.HitCurse = 15;
+            WeaponAttributes.HitFireball = 70;
+            WeaponAttributes.HitLowerDefend = 50;
             Hue = 1365;
         }
 
@@ -64,6 +66,8 @@ namespace Server.Items
             Attributes.WeaponSpeed = 35;
             Attributes.WeaponDamage = 50;
             WeaponAttributes.HitCurse = 15;
+            WeaponAttributes.HitFireball = 70;
+            WeaponAttributes.HitLowerDefend = 50;
             Hue = 1365;
         }
 
