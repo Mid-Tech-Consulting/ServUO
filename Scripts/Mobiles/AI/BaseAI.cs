@@ -1654,17 +1654,6 @@ namespace Server.Mobiles
                 }
             }
 
-            foreach (var aggressed in controlMaster.Aggressed.Select(x => x.Defender).Where(m => ValidGuardTarget(m)))
-            {
-                var dist = aggressed.GetDistanceToSqrt(controlMaster);
-
-                if (closestMob == null || dist < closestDist)
-                {
-                    closestMob = aggressed;
-                    closestDist = dist;
-                }
-            }
-
             if (closestMob != null)
             {
                 if (m_Mobile.Debug && closestMob != null && combatant != closestMob)
