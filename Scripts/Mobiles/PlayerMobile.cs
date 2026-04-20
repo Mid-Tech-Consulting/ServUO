@@ -2193,6 +2193,8 @@ namespace Server.Mobiles
 
             if (Core.SA && amount > 0 && from != null && from != this)
             {
+                bool patientIsCriminal = Criminal || Murderer;
+
                 for (int i = Aggressed.Count - 1; i >= 0; i--)
                 {
                     var info = Aggressed[i];
@@ -2202,7 +2204,7 @@ namespace Server.Mobiles
                         info.Defender.RegisterDamage(amount, from);
                     }
 
-                    if (info.Defender.Player && from.CanBeHarmful(info.Defender, false))
+                    if (!patientIsCriminal && info.Defender.Player && from.CanBeHarmful(info.Defender, false))
                     {
                         from.DoHarmful(info.Defender, true);
                     }
@@ -2217,7 +2219,7 @@ namespace Server.Mobiles
                         info.Attacker.RegisterDamage(amount, from);
                     }
 
-                    if (info.Attacker.Player && from.CanBeHarmful(info.Attacker, false))
+                    if (!patientIsCriminal && info.Attacker.Player && from.CanBeHarmful(info.Attacker, false))
                     {
                         from.DoHarmful(info.Attacker, true);
                     }
