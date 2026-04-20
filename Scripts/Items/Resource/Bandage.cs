@@ -291,20 +291,27 @@ namespace Server.Items
 
                 if (chance >= Utility.Random(100))
                 {
-                    m_HealedPoisonOrBleed = poisoned ? m_Patient.Poison.RealLevel : 3;
+                    if (poisoned)
+                    {
+                        int poisonLevel = m_Patient.Poison.RealLevel;
 
-                    if (poisoned && m_Patient.CurePoison(m_Healer))
-                    {
-                        m_Patient.SendLocalizedMessage(1010059); // You have been cured of all poisons.
-                    }
-                    else
-                    {
-                        if (BleedAttack.IsBleeding(m_Patient))
+                        if (m_Patient.CurePoison(m_Healer))
                         {
-                            BleedAttack.EndBleed(m_Patient, false);
-                        }
+                            m_HealedPoisonOrBleed = poisonLevel;
 
-                        m_Patient.SendLocalizedMessage(1060088); // You bind the wound and stop the bleeding
+                            if (m_Healer != m_Patient)
+                                m_Healer.SendLocalizedMessage(1010058); // You have cured the target of all poisons.
+
+                            m_Patient.SendLocalizedMessage(1010059); // You have been cured of all poisons.
+                        }
+                    }
+                    else if (BleedAttack.IsBleeding(m_Patient))
+                    {
+                        m_HealedPoisonOrBleed = 3;
+
+                        BleedAttack.EndBleed(m_Patient, false);
+
+                        m_Healer.SendLocalizedMessage(1060088); // You bind the wound and stop the bleeding
                         m_Patient.SendLocalizedMessage(1060167); // The bleeding wounds have healed, you are no longer bleeding!
                     }
                 }
@@ -315,7 +322,7 @@ namespace Server.Items
         {
             StopHeal();
 
-            int healerNumber = -1, patientNumber = -1;
+int healerNumber = -1, patientNumber = -1;
             bool playSound = true;
             bool checkSkills = false;
 
