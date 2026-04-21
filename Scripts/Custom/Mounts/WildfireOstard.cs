@@ -14,7 +14,7 @@ namespace Server.Mobiles
             : base(name, 0xDA, 0x3EA4, AIType.AI_Melee, FightMode.Closest, 10, 1, 0.2, 0.4)
         {
             BaseSoundID = 0x275;
-            Hue = 1175;
+            Hue = 0x0AC6;
 
             SetStr(540);
             SetDex(100);
@@ -50,12 +50,17 @@ namespace Server.Mobiles
             ControlSlots = 3;
             MinTameSkill = 96.0;
 
-            // Rare color rolls — independent chances for special hues.
-            if (Utility.Random(250) == 0) Hue = 2048;
-            if (Utility.Random(500) == 0) Hue = 2206;
-            if (Utility.Random(100) == 0) Hue = 2216;
-            if (Utility.Random(1000) == 0) Hue = 2210;
-            if (Utility.Random(1000) == 0) Hue = 2228;
+            // Color roll: rare overrides only. 86% stays the default 0x0AC6.
+            int roll = Utility.Random(10000);
+            if (roll < 100) Hue = 0x07B7;                         // 1% Red (ultra rare)
+            else if (roll < 250) Hue = 1153;                       // 1.5% Luna White
+            else if (roll < 400) Hue = 2406;                       // 1.5% Black
+            else if (roll < 600) Hue = 2048;                       // 2% existing
+            else if (roll < 800) Hue = 2206;                       // 2% existing
+            else if (roll < 1000) Hue = 2216;                      // 2% existing
+            else if (roll < 1200) Hue = 2210;                      // 2% existing
+            else if (roll < 1400) Hue = 2228;                      // 2% existing
+            // else: default 0x0AC6 unchanged (86%)
         }
 
         public WildfireOstard(Serial serial)

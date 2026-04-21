@@ -9,7 +9,7 @@ namespace Server.Items
     [Flipable(0xED4, 0xED5)]
     public class DragonEggRedemptionStone : Item
     {
-        public const int EggCost = 1000;
+        public const int EggCost = 500;
 
         public Dictionary<Mobile, int> Deposits { get; private set; }
 

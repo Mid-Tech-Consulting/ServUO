@@ -50,7 +50,7 @@ namespace Server.Mobiles
             VirtualArmor = 80;
 
             Tamable = true;
-            ControlSlots = 3;
+            ControlSlots = 2;
             MinTameSkill = 100.1;
 
             switch (Utility.Random(12))
@@ -116,7 +116,7 @@ namespace Server.Mobiles
             base.Deserialize(reader);
             int version = reader.ReadInt();
             if (version < 1)
-                ControlSlots = 3;
+                ControlSlots = 2;
         }
     }
 }

@@ -50,15 +50,21 @@ namespace Server.Mobiles
             VirtualArmor = 90;
 
             Tamable = true;
-            ControlSlots = 4;
+            ControlSlots = 3;
             MinTameSkill = 104.1;
 
-            // Rare color rolls — each independent chance. 1653 is the rare body variant.
-            if (Utility.Random(250) == 0) { BodyValue = 1653; Hue = 2048; }
-            if (Utility.Random(500) == 0) { BodyValue = 1653; Hue = 2206; }
-            if (Utility.Random(100) == 0) { BodyValue = 1653; Hue = 2216; }
-            if (Utility.Random(1000) == 0) { BodyValue = 1653; Hue = 2210; }
-            if (Utility.Random(1000) == 0) { BodyValue = 1653; Hue = 2228; }
+            // Color roll: rare overrides only. 86% stays the natural body color.
+            // 1653 is the rare body variant used for all special hues.
+            int roll = Utility.Random(10000);
+            if (roll < 100) { BodyValue = 1653; Hue = 0x07B7; }           // 1% Red (ultra rare)
+            else if (roll < 250) { BodyValue = 1653; Hue = 1153; }         // 1.5% Luna White
+            else if (roll < 400) { BodyValue = 1653; Hue = 2406; }         // 1.5% Black
+            else if (roll < 600) { BodyValue = 1653; Hue = 2048; }         // 2% existing
+            else if (roll < 800) { BodyValue = 1653; Hue = 2206; }         // 2% existing
+            else if (roll < 1000) { BodyValue = 1653; Hue = 2216; }        // 2% existing
+            else if (roll < 1200) { BodyValue = 1653; Hue = 2210; }        // 2% existing
+            else if (roll < 1400) { BodyValue = 1653; Hue = 2228; }        // 2% existing
+            // else: natural body color unchanged (86%)
 
             switch (Utility.Random(12))
             {
@@ -142,7 +148,7 @@ namespace Server.Mobiles
             int version = reader.ReadInt();
 
             if (version < 1)
-                ControlSlots = 4;
+                ControlSlots = 3;
         }
     }
 }

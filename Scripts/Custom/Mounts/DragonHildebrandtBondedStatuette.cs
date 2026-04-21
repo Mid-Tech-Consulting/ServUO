@@ -2,7 +2,7 @@ using Server.Mobiles;
 
 namespace Server.Items
 {
-    public class DragonHildebrandtBondedStatuette : BaseImprisonedMobile
+    public class DragonHildebrandtBondedStatuette : BaseDragonEggStatuette
     {
         [Constructable]
         public DragonHildebrandtBondedStatuette()
