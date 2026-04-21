@@ -1643,6 +1643,18 @@ namespace Server.Mobiles
             Mobile closestMob = combatant;
             var closestDist = combatant == null ? m_Mobile.RangePerception : combatant.GetDistanceToSqrt(controlMaster);
 
+            // Include owner's current target so pet attacks what owner is attacking
+            var masterCombatant = controlMaster.Combatant as Mobile;
+            if (masterCombatant != null && ValidGuardTarget(masterCombatant))
+            {
+                var dist = masterCombatant.GetDistanceToSqrt(controlMaster);
+                if (closestMob == null || dist < closestDist)
+                {
+                    closestMob = masterCombatant;
+                    closestDist = dist;
+                }
+            }
+
             foreach (var aggressor in controlMaster.Aggressors.Select(x => x.Attacker).Where(m => ValidGuardTarget(m)))
             {
                 var dist = aggressor.GetDistanceToSqrt(controlMaster);
