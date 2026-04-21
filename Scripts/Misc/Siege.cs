@@ -134,6 +134,9 @@ namespace Server
 
 			if (pm != null && pm.Map == Map.Trammel && pm.AccessLevel == AccessLevel.Player)
 			{
+				if (pm.Region != null && pm.Region.IsPartOf("Underwater World"))
+					return;
+
 				pm.MoveToWorld(new Point3D(989, 519, -50), Map.Malas);
 				pm.SendMessage("You have been removed from Trammel.");
 			}

@@ -31,6 +31,7 @@ namespace Server.Engines.Shadowguard
     public class ShadowguardController : Item
     {
         public static readonly TimeSpan ReadyDuration = TimeSpan.FromSeconds(Config.Get("Shadowguard.ReadyDuration", 30));
+        public static readonly TimeSpan RoofAccessDuration = TimeSpan.FromHours(Config.Get("Shadowguard.RoofAccessHours", 4));
         public static bool RandomInstances = Config.Get("Shadowguard.RandomizeInstances", false);
 
         public static ShadowguardController Instance { get; set; }
@@ -42,6 +43,7 @@ namespace Server.Engines.Shadowguard
         public Rectangle2D Lobby { get; set; }
 
         public Dictionary<Mobile, EncounterType> Table { get; set; }
+        public Dictionary<Mobile, DateTime> RoofAccessExpiry { get; set; }
         public List<ShadowguardEncounter> Encounters { get; set; }
         public Dictionary<Mobile, EncounterType> Queue { get; set; }
         public List<BaseAddon> Addons { get; set; }
@@ -171,16 +173,30 @@ namespace Server.Engines.Shadowguard
 
         public void CompleteRoof(Mobile m)
         {
-            if(Table == null)
+            // Player keeps their room progress until their RoofAccessExpiry window passes.
+            // Expiry is checked lazily in CanTryEncounter / HasCompletedEncounter.
+        }
+
+        private void ExpireRoofAccessIfStale(Mobile m)
+        {
+            if (RoofAccessExpiry == null || !RoofAccessExpiry.ContainsKey(m))
                 return;
 
-            if (Table.ContainsKey(m))
+            if (RoofAccessExpiry[m] > DateTime.UtcNow)
+                return;
+
+            RoofAccessExpiry.Remove(m);
+
+            if (Table != null && Table.ContainsKey(m))
             {
                 Table.Remove(m);
+
+                if (Table.Count == 0)
+                    Table = null;
             }
 
-            if (Table.Count == 0)
-                Table = null;
+            if (RoofAccessExpiry.Count == 0)
+                RoofAccessExpiry = null;
         }
 
         public void OnEncounterComplete(ShadowguardEncounter encounter, bool expired)
@@ -214,6 +230,16 @@ namespace Server.Engines.Shadowguard
 
                 Table[m] = encounter;
             }
+
+            // If this completion brings the player to all 5 rooms, start their Roof access window.
+            if ((Table[m] & EncounterType.Required) == EncounterType.Required)
+            {
+                if (RoofAccessExpiry == null)
+                    RoofAccessExpiry = new Dictionary<Mobile, DateTime>();
+
+                if (!RoofAccessExpiry.ContainsKey(m))
+                    RoofAccessExpiry[m] = DateTime.UtcNow + RoofAccessDuration;
+            }
         }
 
         public void AddEncounter(ShadowguardEncounter encounter)
@@ -223,6 +249,7 @@ namespace Server.Engines.Shadowguard
 
         public bool HasCompletedEncounter(Mobile m, EncounterType encounter)
         {
+            ExpireRoofAccessIfStale(m);
             return Table != null && Table.ContainsKey(m) && (Table[m] & encounter) != 0;
         }
 
@@ -242,17 +269,24 @@ namespace Server.Engines.Shadowguard
                 {
                     foreach (PartyMemberInfo info in p.Members)
                     {
+                        ExpireRoofAccessIfStale(info.Mobile);
+
                         if (Table == null || !Table.ContainsKey(info.Mobile) || (Table[info.Mobile] & EncounterType.Required) != EncounterType.Required)
                         {
-                            m.SendLocalizedMessage(1156249); // All members of your party must complete each of the Shadowguard Towers before attempting the finale. 
+                            m.SendLocalizedMessage(1156249); // All members of your party must complete each of the Shadowguard Towers before attempting the finale.
                             return false;
                         }
                     }
                 }
-                else if (Table == null || !Table.ContainsKey(m) || (Table[m] & EncounterType.Required) != EncounterType.Required)
+                else
                 {
-                    m.SendLocalizedMessage(1156196); // You must complete each level of Shadowguard before attempting the Roof.
-                    return false;
+                    ExpireRoofAccessIfStale(m);
+
+                    if (Table == null || !Table.ContainsKey(m) || (Table[m] & EncounterType.Required) != EncounterType.Required)
+                    {
+                        m.SendLocalizedMessage(1156196); // You must complete each level of Shadowguard before attempting the Roof.
+                        return false;
+                    }
                 }
             }
 
@@ -583,6 +617,12 @@ namespace Server.Engines.Shadowguard
                 Table = null;
             }
 
+            if (RoofAccessExpiry != null)
+            {
+                RoofAccessExpiry.Clear();
+                RoofAccessExpiry = null;
+            }
+
             Instance = null;
         }
 
@@ -594,7 +634,7 @@ namespace Server.Engines.Shadowguard
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(0);
+            writer.Write(1); // version
 
             writer.Write(KickLocation);
             writer.Write(Lobby);
@@ -619,6 +659,18 @@ namespace Server.Engines.Shadowguard
 
             writer.Write(Addons.Count);
             Addons.ForEach(addon => writer.Write(addon));
+
+            // version 1+
+            writer.Write(RoofAccessExpiry == null ? 0 : RoofAccessExpiry.Count);
+
+            if (RoofAccessExpiry != null)
+            {
+                ColUtility.ForEach(RoofAccessExpiry, (m, expiry) =>
+                {
+                    writer.Write(m);
+                    writer.Write(expiry);
+                });
+            }
         }
 
         public override void Deserialize(GenericReader reader)
@@ -664,6 +716,22 @@ namespace Server.Engines.Shadowguard
 
                 if (addon != null)
                     Addons.Add(addon);
+            }
+
+            if (version >= 1)
+            {
+                count = reader.ReadInt();
+                for (int i = 0; i < count; i++)
+                {
+                    if (RoofAccessExpiry == null)
+                        RoofAccessExpiry = new Dictionary<Mobile, DateTime>();
+
+                    Mobile m = reader.ReadMobile();
+                    DateTime expiry = reader.ReadDateTime();
+
+                    if (m != null)
+                        RoofAccessExpiry[m] = expiry;
+                }
             }
 
             StartTimer();

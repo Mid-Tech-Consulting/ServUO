@@ -1131,7 +1131,7 @@ namespace Server.Mobiles
         }
 
         #region Flee!!!
-        public virtual bool CanFlee { get { return !m_Paragon && !GivesMLMinorArtifact; } }
+        public virtual bool CanFlee { get { return false; } }
 
         private DateTime m_EndFlee;
 

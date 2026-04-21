@@ -185,22 +185,6 @@ namespace Server.Mobiles
             AddLoot(LootPack.HighScrolls, 2);
         }
 
-        public override void CheckReflect(Mobile caster, ref bool reflect)
-        {
-            int c = 0;
-            IPooledEnumerable eable = GetMobilesInRange(20);
-
-            foreach (Mobile m in eable)
-            {
-                if (m != null && m is DarkWisp)
-                    c++;
-                continue;
-            }
-            eable.Free();
-            if (c > 0)
-                reflect = true; // Reflect spells if ShadowLord having wisps around
-        }
-
         public override void OnDrainLife(Mobile victim)
         {
             if (Map == null)
@@ -212,11 +196,14 @@ namespace Server.Mobiles
 
             foreach (Mobile m in eable)
             {
-                if (m == this || !CanBeHarmful(m))
+                if (m is DarkWisp)
                 {
-                    if (m is DarkWisp) { count++; }
+                    count++;
                     continue;
                 }
+
+                if (m == this || !CanBeHarmful(m))
+                    continue;
 
                 if (m is BaseCreature && (((BaseCreature)m).Controlled || ((BaseCreature)m).Summoned || ((BaseCreature)m).Team != Team))
                     list.Add(m);
@@ -249,9 +236,13 @@ namespace Server.Mobiles
             foreach (DamageStore ds in rights.Where(s => s.m_HasRight))
             {
                 int luck = ds.m_Mobile is PlayerMobile ? ((PlayerMobile)ds.m_Mobile).RealLuck : ds.m_Mobile.Luck;
-                int chance = 75 + (luck / 15);
+                double chance =
+                    luck <= 500 ? 0.05 :
+                    luck <= 1000 ? 0.10 :
+                    luck <= 2000 ? 0.15 :
+                    luck <= 3000 ? 0.20 : 0.25;
 
-                if (chance > Utility.Random(5000))
+                if (Utility.RandomDouble() < chance)
                 {
                     Mobile m = ds.m_Mobile;
                     Item artifact = Loot.Construct(ArtifactDrops[Utility.Random(ArtifactDrops.Length)]);

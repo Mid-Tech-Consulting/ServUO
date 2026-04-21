@@ -15,6 +15,11 @@ namespace Server.Items
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
             Attributes.LowerManaCost = 8;
+            Attributes.LowerRegCost = 20;
+            Attributes.SpellDamage = 15;
+            Attributes.Luck = 150;
+            Attributes.BonusInt = 5;
+            Attributes.BonusDex = 5;
         }
 
         public ShadowbaneEpaulettes(Serial serial)
@@ -48,6 +53,11 @@ namespace Server.Items
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
             Attributes.LowerManaCost = 8;
+            Attributes.LowerRegCost = 20;
+            Attributes.SpellDamage = 15;
+            Attributes.Luck = 150;
+            Attributes.BonusInt = 5;
+            Attributes.BonusDex = 5;
         }
 
         public GargishShadowbaneEpaulettes(Serial serial)

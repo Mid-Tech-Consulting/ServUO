@@ -95,7 +95,7 @@ namespace Server.Items
                 }
 
                 if (item is BaseWeapon || item is BaseArmor || item is BaseClothing
-                    || item is BaseJewel || item is BaseShield)
+                    || item is BaseJewel || item is BaseShield || item is BaseTalisman)
                 {
                     item.Hue = m_Tub.DyedHue;
                     from.PlaySound(0x23E);

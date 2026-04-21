@@ -15,7 +15,11 @@
       "Bash(grep -i \"\\\\.cs$\")",
       "Bash(git push:*)",
       "Bash(./ServUO.exe)",
-      "Bash(tasklist //FI \"IMAGENAME eq ServUO.exe\")"
+      "Bash(tasklist //FI \"IMAGENAME eq ServUO.exe\")",
+      "Bash(git fetch *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git checkout *)"
     ],
     "additionalDirectories": [
       "C:\\code\\Scripts\\Custom Arth\\Test\\Reward Tickets"
