@@ -341,7 +341,7 @@ namespace Server.Engines.Shadowguard
 		
 		public override void OnDoubleClick(Mobile from)
 		{
-			if(from.Backpack != null && from.InRange(this.Location, 3))
+			if(Encounter != null && from.Backpack != null && from.InRange(this.Location, 3))
 			{
                 if (Encounter.Apple == null || Encounter.Apple.Deleted)
                 {

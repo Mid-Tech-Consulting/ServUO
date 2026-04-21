@@ -397,7 +397,10 @@ namespace Server.Engines.Shadowguard
                 ShadowguardCypress tree = reader.ReadItem() as ShadowguardCypress;
 
                 if (tree != null)
+                {
+                    tree.Encounter = this;
                     Trees.Add(tree);
+                }
             }
 
             count = reader.ReadInt();
@@ -1020,9 +1023,12 @@ namespace Server.Engines.Shadowguard
                                 if (_Checked == null)
                                     _Checked = new List<ShadowguardCanal>();
 
-                                _Checked.Add((ShadowguardCanal)next);
-
-                                RecursiveCheck(next, item);
+                                ShadowguardCanal nextCanal = (ShadowguardCanal)next;
+                                if (!_Checked.Contains(nextCanal))
+                                {
+                                    _Checked.Add(nextCanal);
+                                    RecursiveCheck(next, item);
+                                }
                             }
 						}
 					}
