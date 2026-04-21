@@ -1,6 +1,7 @@
 using Server.Gumps;
 using Server.Mobiles;
 using Server.Network;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Server.Items
@@ -10,18 +11,30 @@ namespace Server.Items
     {
         public const int EggCost = 1000;
 
+        public Dictionary<Mobile, int> Deposits { get; private set; }
+
         [Constructable]
         public DragonEggRedemptionStone()
             : base(0xED4)
         {
             Name = "a Dragon Egg Redemption Stone";
-            Hue = 1175;
+            Hue = 1152;
             Movable = false;
+
+            Deposits = new Dictionary<Mobile, int>();
         }
 
         public DragonEggRedemptionStone(Serial serial)
             : base(serial)
         {
+            Deposits = new Dictionary<Mobile, int>();
+        }
+
+        public int GetDeposit(Mobile m)
+        {
+            int count;
+            Deposits.TryGetValue(m, out count);
+            return count;
         }
 
         public override void OnDoubleClick(Mobile from)
@@ -39,42 +52,36 @@ namespace Server.Items
             }
         }
 
-        public static int CountEggs(Mobile m)
+        public int DepositAll(Mobile m)
         {
             if (m.Backpack == null)
                 return 0;
 
-            return m.Backpack.FindItemsByType<DragonEgg>(true).Sum(e => e.Amount);
-        }
-
-        public static bool ConsumeEggs(Mobile m, int amount)
-        {
-            if (m.Backpack == null)
-                return false;
-
-            int remaining = amount;
             var eggs = m.Backpack.FindItemsByType<DragonEgg>(true);
+            int total = eggs.Sum(e => e.Amount);
 
-            if (eggs.Sum(e => e.Amount) < amount)
-                return false;
+            if (total <= 0)
+                return 0;
 
             foreach (var egg in eggs)
-            {
-                if (remaining <= 0)
-                    break;
+                egg.Delete();
 
-                if (egg.Amount <= remaining)
-                {
-                    remaining -= egg.Amount;
-                    egg.Delete();
-                }
-                else
-                {
-                    egg.Amount -= remaining;
-                    remaining = 0;
-                }
-            }
+            int current;
+            Deposits.TryGetValue(m, out current);
+            Deposits[m] = current + total;
 
+            return total;
+        }
+
+        public bool Redeem(Mobile m, int amount)
+        {
+            int current;
+            Deposits.TryGetValue(m, out current);
+
+            if (current < amount)
+                return false;
+
+            Deposits[m] = current - amount;
             return true;
         }
 
@@ -82,12 +89,29 @@ namespace Server.Items
         {
             base.Serialize(writer);
             writer.Write((int)0);
+
+            writer.Write(Deposits.Count);
+            foreach (var kvp in Deposits)
+            {
+                writer.Write(kvp.Key);
+                writer.Write(kvp.Value);
+            }
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
             reader.ReadInt();
+
+            int count = reader.ReadInt();
+            for (int i = 0; i < count; i++)
+            {
+                Mobile m = reader.ReadMobile();
+                int amt = reader.ReadInt();
+
+                if (m != null)
+                    Deposits[m] = amt;
+            }
         }
     }
 
@@ -100,37 +124,52 @@ namespace Server.Items
         {
             m_Stone = stone;
 
-            int eggs = DragonEggRedemptionStone.CountEggs(pm);
+            int banked = stone.GetDeposit(pm);
+            int inPack = pm.Backpack == null ? 0
+                : pm.Backpack.FindItemsByType<DragonEgg>(true).Sum(e => e.Amount);
 
             Closable = true;
             Disposable = true;
             Dragable = true;
 
-            AddBackground(0, 0, 420, 340, 5054);
-            AddBackground(10, 10, 400, 320, 3500);
+            AddBackground(0, 0, 440, 400, 5054);
+            AddBackground(10, 10, 420, 380, 3500);
 
             AddLabel(120, 22, 53, "Dragon Egg Redemption");
-            AddLabel(25, 60, 0, string.Format("You have {0} dragon eggs. Each reward costs {1}.", eggs, DragonEggRedemptionStone.EggCost));
 
-            AddLabel(25, 95, 53, "Choose a statuette:");
+            AddLabel(25, 60, 0, string.Format("Banked on stone: {0}", banked));
+            AddLabel(25, 80, 0, string.Format("In your backpack: {0}", inPack));
+            AddLabel(25, 100, 0x22, string.Format("Cost per statuette: {0} eggs.", DragonEggRedemptionStone.EggCost));
 
-            AddButton(30, 125, 4005, 4007, 1, GumpButtonType.Reply, 0);
-            AddLabel(65, 125, 0, "Hellfire Steed");
+            AddButton(25, 130, 4005, 4007, 100, GumpButtonType.Reply, 0);
+            AddLabel(60, 130, inPack > 0 ? (ushort)68 : (ushort)0x22,
+                inPack > 0
+                    ? string.Format("Deposit {0} eggs from your pack.", inPack)
+                    : "Deposit (no eggs in pack).");
 
-            AddButton(30, 155, 4005, 4007, 2, GumpButtonType.Reply, 0);
-            AddLabel(65, 155, 0, "Bane Dragon");
+            AddLabel(25, 170, 53, "Redeem a statuette:");
 
-            AddButton(30, 185, 4005, 4007, 3, GumpButtonType.Reply, 0);
-            AddLabel(65, 185, 0, "Wildfire Ostard");
+            AddButton(30, 200, 4005, 4007, 1, GumpButtonType.Reply, 0);
+            AddLabel(65, 200, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
+                "Hellfire Steed");
 
-            AddButton(30, 215, 4005, 4007, 4, GumpButtonType.Reply, 0);
-            AddLabel(65, 215, 0, "Dragon Hildebrandt");
+            AddButton(30, 225, 4005, 4007, 2, GumpButtonType.Reply, 0);
+            AddLabel(65, 225, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
+                "Bane Dragon");
 
-            AddLabel(25, 260, 0x22, "Double-click a statuette to summon.");
-            AddLabel(25, 280, 0x22, "Summoned pets have a small chance for a rare color.");
+            AddButton(30, 250, 4005, 4007, 3, GumpButtonType.Reply, 0);
+            AddLabel(65, 250, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
+                "Wildfire Ostard");
 
-            AddButton(340, 295, 4020, 4022, 0, GumpButtonType.Reply, 0);
-            AddLabel(300, 295, 0, "Cancel");
+            AddButton(30, 275, 4005, 4007, 4, GumpButtonType.Reply, 0);
+            AddLabel(65, 275, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
+                "Dragon Hildebrandt");
+
+            AddLabel(25, 320, 0x22, "Statuettes pop a pet when double-clicked.");
+            AddLabel(25, 340, 0x22, "Summoned pets have a small chance for a rare color.");
+
+            AddButton(360, 355, 4020, 4022, 0, GumpButtonType.Reply, 0);
+            AddLabel(320, 355, 0, "Close");
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -146,14 +185,21 @@ namespace Server.Items
                 return;
             }
 
-            if (DragonEggRedemptionStone.CountEggs(from) < DragonEggRedemptionStone.EggCost)
+            if (info.ButtonID == 100)
             {
-                from.SendMessage(string.Format("You need {0} dragon eggs to redeem a reward.", DragonEggRedemptionStone.EggCost));
+                int deposited = m_Stone.DepositAll(from);
+
+                if (deposited > 0)
+                    from.SendMessage(string.Format("You deposit {0} dragon eggs. Total banked: {1}.",
+                        deposited, m_Stone.GetDeposit(from)));
+                else
+                    from.SendMessage("You have no dragon eggs in your backpack to deposit.");
+
+                pm.SendGump(new DragonEggRedemptionGump(pm, m_Stone));
                 return;
             }
 
             Item reward = null;
-
             switch (info.ButtonID)
             {
                 case 1: reward = new HellfireSteedBondedStatuette(); break;
@@ -165,6 +211,15 @@ namespace Server.Items
             if (reward == null)
                 return;
 
+            if (m_Stone.GetDeposit(from) < DragonEggRedemptionStone.EggCost)
+            {
+                from.SendMessage(string.Format("You need {0} banked eggs to redeem. You have {1}.",
+                    DragonEggRedemptionStone.EggCost, m_Stone.GetDeposit(from)));
+                reward.Delete();
+                pm.SendGump(new DragonEggRedemptionGump(pm, m_Stone));
+                return;
+            }
+
             if (from.Backpack == null || !from.Backpack.TryDropItem(from, reward, false))
             {
                 from.SendMessage("Your backpack cannot hold the statuette. Make room and try again.");
@@ -172,10 +227,13 @@ namespace Server.Items
                 return;
             }
 
-            DragonEggRedemptionStone.ConsumeEggs(from, DragonEggRedemptionStone.EggCost);
+            m_Stone.Redeem(from, DragonEggRedemptionStone.EggCost);
 
-            from.SendMessage("You redeem your dragon eggs for a bonded statuette.");
+            from.SendMessage(string.Format("You redeem 1000 dragon eggs for a statuette. Remaining: {0}.",
+                m_Stone.GetDeposit(from)));
             from.PlaySound(0x1EA);
+
+            pm.SendGump(new DragonEggRedemptionGump(pm, m_Stone));
         }
     }
 }

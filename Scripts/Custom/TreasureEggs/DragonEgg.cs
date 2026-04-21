@@ -13,7 +13,7 @@ namespace Server.Items
         public DragonEgg(int amount) : base(0x41BD)
         {
             Name = "a dragon egg";
-            Hue = 1175;
+            Hue = 1152;
             Stackable = true;
             Amount = amount;
         }
