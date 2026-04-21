@@ -645,6 +645,28 @@ namespace Server.Network
         private const int SendQueueWarnCooldownMs = 30000;
         private long _LastSendQueueWarnTick;
 
+        private static readonly string SendQueueWarnLogPath = "Logs/SendQueueWarn.log";
+        private static readonly object _SendQueueWarnFileLock = new object();
+
+        private static void WriteSendQueueWarn(string line)
+        {
+            try
+            {
+                lock (_SendQueueWarnFileLock)
+                {
+                    var dir = System.IO.Path.GetDirectoryName(SendQueueWarnLogPath);
+                    if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
+                        System.IO.Directory.CreateDirectory(dir);
+
+                    System.IO.File.AppendAllText(SendQueueWarnLogPath, line + Environment.NewLine);
+                }
+            }
+            catch
+            {
+                // Swallow — telemetry failure should never break the send path.
+            }
+        }
+
         public virtual void Send(Packet p)
         {
             if (p == null)
@@ -730,11 +752,9 @@ namespace Server.Network
                                     {
                                         _LastSendQueueWarnTick = now;
 
-                                        Utility.PushColor(ConsoleColor.Yellow);
-                                        Console.WriteLine(
-                                            "[SendQueueWarn] Client: {0}: backlog {1} KB (packet {2:X2})",
-                                            this, pendingBytes / 1024, p.PacketID);
-                                        Utility.PopColor();
+                                        WriteSendQueueWarn(string.Format(
+                                            "{0:yyyy-MM-dd HH:mm:ss} [SendQueueWarn] Client: {1}: backlog {2} KB (packet {3:X2})",
+                                            DateTime.UtcNow, this, pendingBytes / 1024, p.PacketID));
                                     }
                                 }
 

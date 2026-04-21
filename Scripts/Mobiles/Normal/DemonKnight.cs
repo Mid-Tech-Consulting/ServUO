@@ -136,6 +136,25 @@ namespace Server.Mobiles
                 }
             }
 
+            // Drop 2 guaranteed Legendary items into the corpse regardless of luck.
+            if (Core.HS && RandomItemGenerator.Enabled)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    Item legendary = Core.AOS
+                        ? Loot.RandomArmorOrShieldOrWeaponOrJewelry()
+                        : Loot.RandomArmorOrShieldOrWeapon();
+
+                    if (legendary == null)
+                        continue;
+
+                    if (RunicReforging.GenerateRandomArtifactItem(legendary, 0, Utility.RandomMinMax(1250, 1300)))
+                        c.DropItem(legendary);
+                    else
+                        legendary.Delete();
+                }
+            }
+
             base.OnDeath(c);
         }
 

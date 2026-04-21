@@ -496,18 +496,18 @@ namespace Server.Items
             int eggCount;
             if (isSos)
             {
-                eggCount = level >= 4 ? 6 : 2; // ancient vs regular
+                eggCount = level >= 4 ? 10 : 3; // ancient vs regular
             }
             else
             {
                 switch (level)
                 {
-                    case 1: case 2: eggCount = 1; break;
-                    case 3: eggCount = 2; break;
-                    case 4: eggCount = 3; break;
-                    case 5: eggCount = 4; break;
-                    case 6: eggCount = 5; break;
-                    case 7: eggCount = 6; break;
+                    case 1: case 2: eggCount = 2; break;
+                    case 3: eggCount = 4; break;
+                    case 4: eggCount = 5; break;
+                    case 5: eggCount = 6; break;
+                    case 6: eggCount = 8; break;
+                    case 7: eggCount = 10; break;
                     default: eggCount = 0; break;
                 }
             }
@@ -516,49 +516,22 @@ namespace Server.Items
                 cont.DropItem(new DragonEgg(eggCount));
             #endregion
 
-            // Top-tier chests and ancient SOS guarantee 2 legendary items on top of normal loot.
+            // Top-tier chests and ancient SOS guarantee 2 Legendary items regardless of luck.
             if (topTierLoot && Core.HS && RandomItemGenerator.Enabled)
             {
-                int placed = 0;
-
-                for (int pass = 0; pass < 2 && placed < 2; pass++)
+                for (int i = 0; i < 2; i++)
                 {
-                    for (int attempt = 0; attempt < 10 && placed < 2; attempt++)
-                    {
-                        Item item = Core.AOS
-                            ? Loot.RandomArmorOrShieldOrWeaponOrJewelry()
-                            : Loot.RandomArmorOrShieldOrWeapon();
+                    Item item = Core.AOS
+                        ? Loot.RandomArmorOrShieldOrWeaponOrJewelry()
+                        : Loot.RandomArmorOrShieldOrWeapon();
 
-                        if (item == null)
-                            continue;
+                    if (item == null)
+                        continue;
 
-                        RunicReforging.GenerateRandomItem(item, luck, 1200, 1300, map);
-
-                        if (item is ICombatEquipment eq && eq.ItemPower == ItemPower.LegendaryArtifact)
-                        {
-                            cont.DropItem(item);
-                            placed++;
-                        }
-                        else
-                        {
-                            item.Delete();
-                        }
-                    }
-
-                    // Fallback on the last pass: accept the roll even if it didn't reach Legendary.
-                    if (placed < 2 && pass == 1)
-                    {
-                        Item item = Core.AOS
-                            ? Loot.RandomArmorOrShieldOrWeaponOrJewelry()
-                            : Loot.RandomArmorOrShieldOrWeapon();
-
-                        if (item != null)
-                        {
-                            RunicReforging.GenerateRandomItem(item, luck, 1250, 1300, map);
-                            cont.DropItem(item);
-                            placed++;
-                        }
-                    }
+                    if (RunicReforging.GenerateRandomArtifactItem(item, luck, Utility.RandomMinMax(1250, 1300)))
+                        cont.DropItem(item);
+                    else
+                        item.Delete();
                 }
             }
         }

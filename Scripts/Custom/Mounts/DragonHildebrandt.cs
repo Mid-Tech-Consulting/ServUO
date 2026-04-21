@@ -17,9 +17,11 @@ namespace Server.Mobiles
             : base(name, 0x581, 0x3EDD, AIType.AI_Mage, FightMode.Closest, 10, 1, 0.2, 0.2)
         {
             BaseSoundID = 362;
+            Hue = 1450;
 
-            // Every Hildebrandt spawns with a unique hue in this range.
-            Hue = Utility.RandomMinMax(1400, 1500);
+            // 10% chance to pop a rare Hildebrandt color from the original 1400-1500 range.
+            if (Utility.RandomDouble() < 0.10)
+                Hue = Utility.RandomMinMax(1400, 1500);
 
             SetStr(396, 525);
             SetDex(286, 505);

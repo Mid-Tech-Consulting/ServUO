@@ -50,17 +50,17 @@ namespace Server.Mobiles
             ControlSlots = 3;
             MinTameSkill = 96.0;
 
-            // Color roll: rare overrides only. 86% stays the default 0x0AC6.
+            // Color roll: rare overrides only. 56% stays the default 0x0AC6.
             int roll = Utility.Random(10000);
             if (roll < 100) Hue = 0x07B7;                         // 1% Red (ultra rare)
             else if (roll < 250) Hue = 1153;                       // 1.5% Luna White
             else if (roll < 400) Hue = 2406;                       // 1.5% Black
-            else if (roll < 600) Hue = 2048;                       // 2% existing
-            else if (roll < 800) Hue = 2206;                       // 2% existing
-            else if (roll < 1000) Hue = 2216;                      // 2% existing
-            else if (roll < 1200) Hue = 2210;                      // 2% existing
-            else if (roll < 1400) Hue = 2228;                      // 2% existing
-            // else: default 0x0AC6 unchanged (86%)
+            else if (roll < 1200) Hue = 2048;                      // 8% existing
+            else if (roll < 2000) Hue = 2206;                      // 8% existing
+            else if (roll < 2800) Hue = 2216;                      // 8% existing
+            else if (roll < 3600) Hue = 2210;                      // 8% existing
+            else if (roll < 4400) Hue = 2228;                      // 8% existing
+            // else: default 0x0AC6 unchanged (56%)
         }
 
         public WildfireOstard(Serial serial)

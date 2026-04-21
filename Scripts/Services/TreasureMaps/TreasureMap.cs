@@ -977,7 +977,7 @@ namespace Server.Items
                 ClearPins();
                 LootType = LootType.Regular;
                 m_Decoder = null;
-                GetRandomLocation(Facet, TreasureMapInfo.NewSystem ? TreasureFacet == TreasureFacet.Eodon : false);
+                ChestLocation = GetRandomLocation(Facet, TreasureMapInfo.NewSystem ? TreasureFacet == TreasureFacet.Eodon : false);
                 InvalidateProperties();
                 NextReset = DateTime.UtcNow + ResetTime;
             }
@@ -1002,6 +1002,10 @@ namespace Server.Items
             else
             {
                 SendLocalizedMessageTo(from, 503017); // The treasure is marked by the red pin. Grab a shovel and go dig it up!
+
+                // Custom: surface the actual chest coords so players don't have to use [props.
+                from.SendMessage(0x35, "Treasure location: {0}, {1} ({2}).",
+                    ChestLocation.X, ChestLocation.Y, Facet == null ? "unknown" : Facet.Name);
             }
 
             if (Pins.Count == 0)

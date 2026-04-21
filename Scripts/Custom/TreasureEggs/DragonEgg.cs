@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Server.Items
 {
     public class DragonEgg : Item
@@ -20,6 +22,25 @@ namespace Server.Items
 
         public DragonEgg(Serial serial) : base(serial)
         {
+        }
+
+        public override void OnAdded(object parent)
+        {
+            base.OnAdded(parent);
+
+            if (Deleted || !(parent is Container container))
+                return;
+
+            // Auto-merge with an existing dragon egg stack in the same container.
+            DragonEgg existing = container.Items
+                .OfType<DragonEgg>()
+                .FirstOrDefault(e => e != this && e.Amount + Amount <= 60000);
+
+            if (existing != null)
+            {
+                existing.Amount += Amount;
+                Delete();
+            }
         }
 
         public override void GetProperties(ObjectPropertyList list)
