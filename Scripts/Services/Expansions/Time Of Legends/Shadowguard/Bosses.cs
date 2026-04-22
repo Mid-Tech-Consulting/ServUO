@@ -912,7 +912,7 @@ namespace Server.Engines.Shadowguard
 					else
 						mount.Rider = null;
 				}
-				else if (m.Flying)
+				else if (m.Flying && m is PlayerMobile)
 				{
 					((PlayerMobile)m).SetMountBlock(BlockMountType.Dazed, TimeSpan.FromSeconds(10), true);
 				}

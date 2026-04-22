@@ -178,8 +178,10 @@ namespace Server.Engines.Shadowguard
                         AddPlayer(pm);
                     }
 				}
-				
-				AddPlayer(m);
+                else
+                {
+                    AddPlayer(m);
+                }
 			}
 		}
 
