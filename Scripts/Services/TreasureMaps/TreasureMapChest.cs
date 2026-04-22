@@ -201,12 +201,22 @@ namespace Server.Items
                 cont.LockLevel = cont.RequiredSkill - 10;
                 cont.MaxLockLevel = cont.RequiredSkill + 40;
 
+                // Ancient SOS (level >= 4) and L7 treasure maps share the top-tier loot table.
+                bool topTier = (level == 7 && !isSos) || (isSos && level >= 4);
+
                 #region Gold
-                cont.DropItem(new Gold(isSos ? level * 10000 : level * 5000));
+                if (topTier)
+                    cont.DropItem(new Gold(60000));
+                else
+                    cont.DropItem(new Gold(isSos ? level * 10000 : level * 5000));
                 #endregion
 
                 #region Scrolls
-                if (isSos)
+                if (topTier)
+                {
+                    count = 35; // L7 map equivalent
+                }
+                else if (isSos)
                 {
                     switch(level)
                     {
@@ -228,7 +238,11 @@ namespace Server.Items
                 #region Magical Items
                 double propsScale = 1.0;
 
-                if (Core.SE)
+                if (topTier)
+                {
+                    count = 80; // L7 map equivalent
+                }
+                else if (Core.SE)
                 {
                     switch (level)
                     {
@@ -357,7 +371,13 @@ namespace Server.Items
             #endregion
 
             #region Reagents
-            if (isSos)
+            bool topTierLoot = (level == 7 && !isSos) || (isSos && level >= 4);
+
+            if (topTierLoot)
+            {
+                count = Utility.RandomMinMax(40, 60) * 8; // L7 map equivalent
+            }
+            else if (isSos)
             {
                 switch (level)
                 {
@@ -379,7 +399,9 @@ namespace Server.Items
             #endregion
 
             #region Gems
-            if (level == 0)
+            if (topTierLoot)
+                count = 22; // L7 map equivalent
+            else if (level == 0)
                 count = 2;
             else
                 count = (level * 3) + 1;
@@ -468,6 +490,49 @@ namespace Server.Items
                     rolls += level - 2;
 
                 RefinementComponent.Roll(cont, rolls, 0.10);
+            }
+
+            #region Dragon Eggs
+            int eggCount;
+            if (isSos)
+            {
+                eggCount = level >= 4 ? 10 : 3; // ancient vs regular
+            }
+            else
+            {
+                switch (level)
+                {
+                    case 1: case 2: eggCount = 2; break;
+                    case 3: eggCount = 4; break;
+                    case 4: eggCount = 5; break;
+                    case 5: eggCount = 6; break;
+                    case 6: eggCount = 8; break;
+                    case 7: eggCount = 10; break;
+                    default: eggCount = 0; break;
+                }
+            }
+
+            if (eggCount > 0)
+                cont.DropItem(new DragonEgg(eggCount));
+            #endregion
+
+            // Top-tier chests and ancient SOS guarantee 2 Legendary items regardless of luck.
+            if (topTierLoot && Core.HS && RandomItemGenerator.Enabled)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    Item item = Core.AOS
+                        ? Loot.RandomArmorOrShieldOrWeaponOrJewelry()
+                        : Loot.RandomArmorOrShieldOrWeapon();
+
+                    if (item == null)
+                        continue;
+
+                    if (RunicReforging.GenerateRandomArtifactItem(item, luck, Utility.RandomMinMax(1250, 1300)))
+                        cont.DropItem(item);
+                    else
+                        item.Delete();
+                }
             }
         }
 

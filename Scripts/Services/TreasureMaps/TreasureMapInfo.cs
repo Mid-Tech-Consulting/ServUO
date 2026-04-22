@@ -972,6 +972,44 @@ namespace Server.Items
 
             list = null;
             #endregion
+
+            #region Dragon Eggs
+            int eggCount;
+            switch (level)
+            {
+                case TreasureLevel.Stash: eggCount = 4; break;
+                case TreasureLevel.Supply: eggCount = 5; break;
+                case TreasureLevel.Cache: eggCount = 6; break;
+                case TreasureLevel.Hoard: eggCount = 8; break;
+                case TreasureLevel.Trove: eggCount = 10; break;
+                default: eggCount = 0; break;
+            }
+
+            if (eggCount > 0)
+                chest.DropItem(new DragonEgg(eggCount));
+            #endregion
+
+            #region Guaranteed Legendaries (Trove only)
+            if (level == TreasureLevel.Trove && Core.HS && RandomItemGenerator.Enabled)
+            {
+                int luck = from is PlayerMobile ? ((PlayerMobile)from).RealLuck : from.Luck;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    Item legendary = Core.AOS
+                        ? Loot.RandomArmorOrShieldOrWeaponOrJewelry()
+                        : Loot.RandomArmorOrShieldOrWeapon();
+
+                    if (legendary == null)
+                        continue;
+
+                    if (RunicReforging.GenerateRandomArtifactItem(legendary, luck, Utility.RandomMinMax(1250, 1300)))
+                        chest.DropItem(legendary);
+                    else
+                        legendary.Delete();
+                }
+            }
+            #endregion
         }
 
         private static Type MutateType(Type type, TreasureFacet facet)
