@@ -648,6 +648,15 @@ namespace Server.Network
         private static readonly string SendQueueWarnLogPath = "Logs/SendQueueWarn.log";
         private static readonly object _SendQueueWarnFileLock = new object();
 
+        // Written once on first access to NetState — confirms the log path is writable
+        // even when no client has crossed the backlog threshold yet.
+        static NetState()
+        {
+            WriteSendQueueWarn(string.Format(
+                "{0:yyyy-MM-dd HH:mm:ss} [SendQueueWarn] Telemetry initialized (threshold {1} KB, cooldown {2}s). Awaiting first event.",
+                DateTime.UtcNow, SendQueueWarnBytes / 1024, SendQueueWarnCooldownMs / 1000));
+        }
+
         private static void WriteSendQueueWarn(string line)
         {
             try

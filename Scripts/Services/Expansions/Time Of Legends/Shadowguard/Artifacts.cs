@@ -1139,6 +1139,19 @@ namespace Server.Items
             if (!m.InRange(GetWorldLocation(), 3))
                 return;
 
+            // House-permission gate: must be Owner, Co-Owner, or Friend of the house the Rift sits in.
+            // If it isn't in a house, carrying it in your own pack is fine.
+            if (Parent == null || !(Parent is Mobile))
+            {
+                var house = Server.Multis.BaseHouse.FindHouseAt(this);
+
+                if (house != null && !house.IsOwner(m) && !house.IsCoOwner(m) && !house.IsFriend(m))
+                {
+                    m.SendLocalizedMessage(502691); // You must be in your house to do this.
+                    return;
+                }
+            }
+
             LabelTo(m, 1156321); // *You peer into the Time Rift and see back to the very beginning of Time...*
 
             if (m_BuffExpires.TryGetValue(m, out DateTime expires) && expires > DateTime.UtcNow)
