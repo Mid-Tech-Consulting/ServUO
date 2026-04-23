@@ -24,17 +24,18 @@ namespace Server.Items
             {
                 BaneDragon bd = new BaneDragon();
 
-                // Color roll: rare overrides only. 56% stays the natural 1175 from BaneDragon ctor.
+                // Color roll: rare overrides only. 55% stays the natural 1175 from BaneDragon ctor.
                 int roll = Utility.Random(10000);
-                if (roll < 100) bd.Hue = 0x07B7;                   // 1% Red (ultra rare)
-                else if (roll < 250) bd.Hue = 1153;                 // 1.5% Luna White
-                else if (roll < 400) bd.Hue = 2406;                 // 1.5% Black
-                else if (roll < 1200) bd.Hue = 2048;                // 8% existing
-                else if (roll < 2000) bd.Hue = 2206;                // 8% existing
-                else if (roll < 2800) bd.Hue = 2216;                // 8% existing
-                else if (roll < 3600) bd.Hue = 2210;                // 8% existing
-                else if (roll < 4400) bd.Hue = 2228;                // 8% existing
-                // else: natural 1175 from BaneDragon constructor (56%)
+                if (roll < 100) bd.Hue = 0x000B;                    // 1% Sigil (ultra rare)
+                else if (roll < 200) bd.Hue = 0x07B7;               // 1% Red (ultra rare)
+                else if (roll < 350) bd.Hue = 1153;                 // 1.5% Luna White
+                else if (roll < 500) bd.Hue = 2406;                 // 1.5% Black
+                else if (roll < 1300) bd.Hue = 2048;                // 8% existing
+                else if (roll < 2100) bd.Hue = 2206;                // 8% existing
+                else if (roll < 2900) bd.Hue = 2216;                // 8% existing
+                else if (roll < 3700) bd.Hue = 2210;                // 8% existing
+                else if (roll < 4500) bd.Hue = 2228;                // 8% existing
+                // else: natural 1175 from BaneDragon constructor (55%)
 
                 return bd;
             }

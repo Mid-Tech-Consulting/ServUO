@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -645,6 +646,20 @@ namespace Server.Network
         private const int SendQueueWarnCooldownMs = 30000;
         private long _LastSendQueueWarnTick;
 
+        // Burst telemetry: fires much sooner than the backlog warn. Catches the
+        // moment of a view-enter flood before the client's decoder stalls.
+        private const int TelemetryWindowMs = 10000;
+        private const int BurstThresholdPacketsPerSec = 200;
+        private const int BurstWarnCooldownMs = 2000;
+
+        private Dictionary<byte, int> _RecentPacketCounts;
+        private long _RecentWindowStartTick;
+        private int _RecentMaxPacketSize;
+
+        private long _LastSecondBucket;
+        private int _PacketsInCurrentSecond;
+        private long _LastBurstWarnTick;
+
         private static readonly string SendQueueWarnLogPath = "Logs/SendQueueWarn.log";
         private static readonly object _SendQueueWarnFileLock = new object();
 
@@ -676,6 +691,25 @@ namespace Server.Network
             }
         }
 
+        // Returns up to 5 packet IDs with the highest counts, formatted as "DC=201 78=88 F3=64".
+        private static string FormatTopPackets(Dictionary<byte, int> counts)
+        {
+            if (counts == null || counts.Count == 0)
+                return "(none)";
+
+            var sb = new System.Text.StringBuilder();
+            int n = 0;
+
+            foreach (var kvp in counts.OrderByDescending(k => k.Value))
+            {
+                if (n++ > 0) sb.Append(' ');
+                sb.AppendFormat("{0:X2}={1}", kvp.Key, kvp.Value);
+                if (n >= 5) break;
+            }
+
+            return sb.ToString();
+        }
+
         public virtual void Send(Packet p)
         {
             if (p == null)
@@ -697,6 +731,14 @@ namespace Server.Network
                     if (buffer.Length <= 0 || length <= 0)
                     {
                         return;
+                    }
+
+                    // Capture 0xBF subcommand BEFORE encryption mutates the payload.
+                    // Layout: [0]=ID [1][2]=len [3][4]=subcommand.
+                    int telemetrySubCmd = -1;
+                    if (p.PacketID == 0xBF && length >= 5)
+                    {
+                        telemetrySubCmd = (buffer[3] << 8) | buffer[4];
                     }
 
                     PacketSendProfile prof = null;
@@ -753,17 +795,67 @@ namespace Server.Network
                                     pendingBytes = m_SendQueue.PendingBytes;
                                 }
 
+                                long nowTick = Core.TickCount;
+
+                                // Roll the 10-second telemetry window.
+                                if (_RecentPacketCounts == null)
+                                {
+                                    _RecentPacketCounts = new Dictionary<byte, int>();
+                                    _RecentWindowStartTick = nowTick;
+                                }
+                                else if (nowTick - _RecentWindowStartTick >= TelemetryWindowMs)
+                                {
+                                    _RecentPacketCounts.Clear();
+                                    _RecentWindowStartTick = nowTick;
+                                    _RecentMaxPacketSize = 0;
+                                }
+
+                                byte pktId = (byte)p.PacketID;
+                                _RecentPacketCounts.TryGetValue(pktId, out int pktCount);
+                                _RecentPacketCounts[pktId] = pktCount + 1;
+
+                                if (length > _RecentMaxPacketSize)
+                                    _RecentMaxPacketSize = length;
+
+                                // Burst detection: count packets in the current wall-clock second.
+                                long secondBucket = nowTick / 1000;
+                                if (secondBucket != _LastSecondBucket)
+                                {
+                                    _LastSecondBucket = secondBucket;
+                                    _PacketsInCurrentSecond = 1;
+                                }
+                                else
+                                {
+                                    _PacketsInCurrentSecond++;
+                                }
+
+                                if (_PacketsInCurrentSecond > BurstThresholdPacketsPerSec
+                                    && nowTick - _LastBurstWarnTick >= BurstWarnCooldownMs)
+                                {
+                                    _LastBurstWarnTick = nowTick;
+
+                                    WriteSendQueueWarn(string.Format(
+                                        "{0:yyyy-MM-dd HH:mm:ss} [BurstDetected]  Client: {1}: {2} packets/s  last10s: {3}  peakPkt={4}B",
+                                        DateTime.UtcNow, this, _PacketsInCurrentSecond,
+                                        FormatTopPackets(_RecentPacketCounts),
+                                        _RecentMaxPacketSize));
+                                }
+
                                 if (pendingBytes >= SendQueueWarnBytes)
                                 {
-                                    long now = Core.TickCount;
-
-                                    if (now - _LastSendQueueWarnTick >= SendQueueWarnCooldownMs)
+                                    if (nowTick - _LastSendQueueWarnTick >= SendQueueWarnCooldownMs)
                                     {
-                                        _LastSendQueueWarnTick = now;
+                                        _LastSendQueueWarnTick = nowTick;
+
+                                        string packetLabel = telemetrySubCmd >= 0
+                                            ? string.Format("BF/{0:X4}", telemetrySubCmd)
+                                            : p.PacketID.ToString("X2");
 
                                         WriteSendQueueWarn(string.Format(
-                                            "{0:yyyy-MM-dd HH:mm:ss} [SendQueueWarn] Client: {1}: backlog {2} KB (packet {3:X2})",
-                                            DateTime.UtcNow, this, pendingBytes / 1024, p.PacketID));
+                                            "{0:yyyy-MM-dd HH:mm:ss} [SendQueueWarn]  Client: {1}: backlog {2} KB (packet {3})  last10s: {4}  peakPkt={5}B",
+                                            DateTime.UtcNow, this, pendingBytes / 1024, packetLabel,
+                                            FormatTopPackets(_RecentPacketCounts),
+                                            _RecentMaxPacketSize));
                                     }
                                 }
 
