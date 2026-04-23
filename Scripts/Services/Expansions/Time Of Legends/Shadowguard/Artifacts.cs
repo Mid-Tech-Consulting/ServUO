@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Server;
+using Server.ContextMenus;
 using Server.Engines.Craft;
+using Server.Gumps;
 using Server.Mobiles;
+using Server.Multis;
 
 namespace Server.Items
 {
@@ -1119,7 +1122,7 @@ namespace Server.Items
 		}
 	}
 
-    public class UnstableTimeRift : Item
+    public class UnstableTimeRift : Item, ISecurable
     {
         public const int LuckBonusAmount = 1000;
         public static readonly TimeSpan BuffDuration = TimeSpan.FromHours(24.0);
@@ -1128,10 +1131,21 @@ namespace Server.Items
 
         public override int LabelNumber { get { return 1156320; } } // An Unstable Time Rift
 
+        [CommandProperty(AccessLevel.GameMaster)]
+        public SecureLevel Level { get; set; }
+
         [Constructable]
         public UnstableTimeRift()
             : base(14068)
         {
+            Level = SecureLevel.Owner;
+        }
+
+        public override void GetContextMenuEntries(Mobile from, List<ContextMenuEntry> list)
+        {
+            base.GetContextMenuEntries(from, list);
+
+            SetSecureLevelEntry.AddTo(from, this, list);
         }
 
         public override void OnDoubleClick(Mobile m)
@@ -1139,16 +1153,25 @@ namespace Server.Items
             if (!m.InRange(GetWorldLocation(), 3))
                 return;
 
-            // House-permission gate: must be Owner, Co-Owner, or Friend of the house the Rift sits in.
-            // If it isn't in a house, carrying it in your own pack is fine.
+            // If placed in a house it must be locked down and honor the secure level the owner set.
+            // Otherwise, carrying it in your own pack is fine.
             if (Parent == null || !(Parent is Mobile))
             {
-                var house = Server.Multis.BaseHouse.FindHouseAt(this);
+                var house = BaseHouse.FindHouseAt(this);
 
-                if (house != null && !house.IsOwner(m) && !house.IsCoOwner(m) && !house.IsFriend(m))
+                if (house != null)
                 {
-                    m.SendLocalizedMessage(502691); // You must be in your house to do this.
-                    return;
+                    if (!IsLockedDown)
+                    {
+                        m.SendLocalizedMessage(1114298); // This must be locked down in order to use it.
+                        return;
+                    }
+
+                    if (!house.HasSecureAccess(m, Level))
+                    {
+                        m.SendLocalizedMessage(1061637); // You are not allowed to access this.
+                        return;
+                    }
                 }
             }
 
@@ -1192,13 +1215,19 @@ namespace Server.Items
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(0);
+            writer.Write(1);
+            writer.Write((int)Level);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
             int version = reader.ReadInt();
+
+            if (version >= 1)
+                Level = (SecureLevel)reader.ReadInt();
+            else
+                Level = SecureLevel.Owner;
         }
     }
 
