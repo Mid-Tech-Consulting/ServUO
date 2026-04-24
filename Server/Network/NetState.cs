@@ -669,6 +669,15 @@ namespace Server.Network
         private const int ItemDrainBatchSize = 20;     // sustained: 200 items/s = 200 pkt/s
         private static readonly TimeSpan ItemDrainInterval = TimeSpan.FromMilliseconds(100);
 
+        // Sticky F3 cache: items recently sent to this client are remembered so we
+        // don't re-flood F3 when the player oscillates in/out of view (e.g., running
+        // back and forth in a dense house). Invalidated on 0x1D (RemoveItem), on
+        // which the client drops the item from its world. TTL is the longest a cache
+        // entry lives without being touched, a safety net for edge cases.
+        private readonly object _SentItemsLock = new object();
+        private const int SentItemsTTLMs = 60000; // 60 seconds
+        private Dictionary<Serial, long> _SentItemsExpiry;
+
         private long _ItemSendSecondBucket;
         private int _ItemsSentThisSecond;
         private Queue<Item> _PendingItemInfoSends;
@@ -728,13 +737,47 @@ namespace Server.Network
         // Over budget → queue for the drain timer. All paths that bulk-send items
         // during view-enter (SendEverything, Location setter) route through here.
         //
-        // OPL hash (0xDC) is intentionally skipped at view-enter: telemetry showed
-        // clients re-query 0xD6 for every 0xDC received, causing a 3× packet
-        // amplification. Tooltips still work — the client requests them on hover via
-        // BatchQueryProperties, which is throttled separately.
+        // OPL hash (0xDC) rides alongside F3 because the client needs it to know
+        // the item has a tooltip. The sticky cache dedupes both on repeat view-enters
+        // so running back and forth through the same area sends zero packets.
+        // Returns true if the caller should send F3 for this item. Updates the sticky
+        // cache optimistically — once we decide to send (inline or queued), we
+        // consider the client to have it.
+        private bool TryConsumeItemSendCache(Item item)
+        {
+            long now = Core.TickCount;
+
+            lock (_SentItemsLock)
+            {
+                if (_SentItemsExpiry == null)
+                    _SentItemsExpiry = new Dictionary<Serial, long>();
+
+                if (_SentItemsExpiry.TryGetValue(item.Serial, out long expiry) && expiry > now)
+                    return false;
+
+                _SentItemsExpiry[item.Serial] = now + SentItemsTTLMs;
+                return true;
+            }
+        }
+
+        private void InvalidateItemCache(Serial s)
+        {
+            if (!s.IsItem)
+                return;
+
+            lock (_SentItemsLock)
+            {
+                _SentItemsExpiry?.Remove(s);
+            }
+        }
+
         public void QueueItemInfoSend(Item item)
         {
             if (item == null || item.Deleted || Mobile == null)
+                return;
+
+            // Sticky cache: if the client already has this item (cache hit), skip entirely.
+            if (!TryConsumeItemSendCache(item))
                 return;
 
             bool sendNow;
@@ -773,7 +816,7 @@ namespace Server.Network
 
             if (sendNow)
             {
-                item.SendInfoTo(this, false);
+                item.SendInfoTo(this, Mobile.ViewOPL);
             }
         }
 
@@ -828,9 +871,11 @@ namespace Server.Network
                 }
             }
 
+            bool viewOpl = mob.ViewOPL;
+
             foreach (var item in toSend)
             {
-                item.SendInfoTo(this, false);
+                item.SendInfoTo(this, viewOpl);
             }
         }
 
@@ -863,6 +908,14 @@ namespace Server.Network
                     if (p.PacketID == 0xBF && length >= 5)
                     {
                         telemetrySubCmd = (buffer[3] << 8) | buffer[4];
+                    }
+
+                    // RemoveItem: invalidate sticky cache so next view-enter re-sends F3.
+                    // Layout: [0]=ID [1..4]=serial.
+                    if (p.PacketID == 0x1D && length >= 5)
+                    {
+                        int serialInt = (buffer[1] << 24) | (buffer[2] << 16) | (buffer[3] << 8) | buffer[4];
+                        InvalidateItemCache((Serial)serialInt);
                     }
 
                     PacketSendProfile prof = null;
