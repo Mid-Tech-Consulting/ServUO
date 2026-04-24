@@ -598,12 +598,12 @@ namespace Server.Engines.Shadowguard
 			Rectangle2D rec = SpawnRecs[Utility.Random(SpawnRecs.Length)];
             ConvertOffset(ref rec);
 
-			while(true)
+			for (int attempt = 0; attempt < 50; attempt++)
 			{
 				int x = Utility.RandomMinMax(rec.X, rec.X + rec.Width);
 				int y = Utility.RandomMinMax(rec.Y, rec.Y + rec.Height);
 				int z = Map.TerMur.GetAverageZ(x, y);
-				
+
 				if(Map.TerMur.CanSpawnMobile(x, y, z))
 				{
 					var armor = new EnsorcelledArmor(this);
@@ -858,12 +858,12 @@ namespace Server.Engines.Shadowguard
 			Rectangle2D rec = SpawnRecs[Utility.RandomMinMax(0, 3)];
             ConvertOffset(ref rec);
 
-			while(true)
+			for (int attempt = 0; attempt < 50; attempt++)
 			{
 				int x = Utility.RandomMinMax(rec.X, rec.X + rec.Width);
 				int y = Utility.RandomMinMax(rec.Y, rec.Y + rec.Height);
 				int z = Map.TerMur.GetAverageZ(x, y);
-				
+
 				if(Map.TerMur.CanSpawnMobile(x, y, z))
 				{
 					BaseCreature elemental = new VileWaterElemental();
@@ -1285,12 +1285,12 @@ namespace Server.Engines.Shadowguard
                 }
             }
 			
-			while(true)
+			for (int attempt = 0; attempt < 50; attempt++)
 			{
 				int x = Utility.RandomMinMax(rec.X, rec.X + rec.Width);
 				int y = Utility.RandomMinMax(rec.Y, rec.Y + rec.Height);
 				int z = Map.TerMur.GetAverageZ(x, y);
-				
+
 				if(Map.TerMur.CanSpawnMobile(x, y, z))
 				{
 					var drake = new VileDrake();

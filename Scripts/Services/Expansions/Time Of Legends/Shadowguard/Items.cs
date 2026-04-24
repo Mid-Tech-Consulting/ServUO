@@ -192,16 +192,19 @@ namespace Server.Engines.Shadowguard
                                             Effects.PlaySound(p, map, 0x243); //TODO: Get sound
                                         }
 
-                                        tree.Encounter.CheckEncounter();
+                                        if (tree.Encounter != null)
+                                            tree.Encounter.CheckEncounter();
                                         Delete();
                                     }
                                     else if (Encounter != null)
                                     {
-                                        foreach (var pm in Encounter.Region.GetEnumeratedMobiles().OfType<PlayerMobile>())
-                                        {
-                                            if (!pm.Alive)
-                                                continue;
+                                        var players = Encounter.Region.GetEnumeratedMobiles()
+                                            .OfType<PlayerMobile>()
+                                            .Where(pm => pm.Alive)
+                                            .ToList();
 
+                                        foreach (var pm in players)
+                                        {
                                             p = pm.Location;
                                             var creature = new VileTreefellow();
 
