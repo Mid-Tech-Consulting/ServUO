@@ -10183,6 +10183,10 @@ namespace Server
 					{
                         var eeable = map.GetObjectsInRange(newLocation, Core.GlobalRadarRange);
 
+						// Collect newly-visible items first; chunked later to avoid flooding
+						// the client's decoder when entering dense areas (Luna, houses, Shadowguard).
+						List<Item> newlyVisibleItems = null;
+
 						// We are attached to a client, so it's a bit more complex. We need to send new items and people to ourself, and ourself to other clients
 						foreach (IEntity o in eeable)
 						{
@@ -10195,7 +10199,10 @@ namespace Server
 
 								if (!Utility.InRange(oldLocation, loc, range) && Utility.InRange(newLocation, loc, range) && CanSee(item))
 								{
-									item.SendInfoTo(ourState);
+									if (newlyVisibleItems == null)
+										newlyVisibleItems = new List<Item>();
+
+									newlyVisibleItems.Add(item);
 								}
 							}
 							else if (o != this && o is Mobile)
@@ -10275,6 +10282,20 @@ namespace Server
 						}
 
 						eeable.Free();
+
+						// Flush collected items: inline for small scenes, chunked for dense ones.
+						if (newlyVisibleItems != null)
+						{
+							if (newlyVisibleItems.Count <= ViewEnterInlineThreshold)
+							{
+								for (int i = 0; i < newlyVisibleItems.Count; i++)
+									newlyVisibleItems[i].SendInfoTo(ourState);
+							}
+							else
+							{
+								SendItemsChunked(newlyVisibleItems, 0);
+							}
+						}
 					}
 					else
 					{
