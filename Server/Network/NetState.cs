@@ -665,8 +665,8 @@ namespace Server.Network
         // so packet rate = item rate. Tuned to keep peak <~300 pkt/s (well under the
         // ~260+ sustained rate that was locking Orion).
         private readonly object _ItemSendLock = new object();
-        private const int ItemSendInlineBudget = 300;  // near-instant for scenes up to 300 items
-        private const int ItemDrainBatchSize = 20;     // sustained: 200 items/s = 200 pkt/s
+        private const int ItemSendInlineBudget = 500;  // near-instant for scenes up to 500 items
+        private const int ItemDrainBatchSize = 25;     // sustained: 250 items/s
         private static readonly TimeSpan ItemDrainInterval = TimeSpan.FromMilliseconds(100);
 
         // Sticky F3 cache: items recently sent to this client are remembered so we
@@ -740,10 +740,23 @@ namespace Server.Network
         // OPL hash (0xDC) rides alongside F3 because the client needs it to know
         // the item has a tooltip. The sticky cache dedupes both on repeat view-enters
         // so running back and forth through the same area sends zero packets.
-        // Returns true if the caller should send F3 for this item. Updates the sticky
-        // cache optimistically — once we decide to send (inline or queued), we
-        // consider the client to have it.
-        private bool TryConsumeItemSendCache(Item item)
+
+        // Read-only check: has this item been sent to the client recently?
+        private bool IsItemCached(Item item)
+        {
+            long now = Core.TickCount;
+
+            lock (_SentItemsLock)
+            {
+                return _SentItemsExpiry != null
+                    && _SentItemsExpiry.TryGetValue(item.Serial, out long expiry)
+                    && expiry > now;
+            }
+        }
+
+        // Record that the item has actually been sent. Called AFTER send so items
+        // that get skipped (e.g., CanSee fails at drain time) don't poison the cache.
+        private void MarkItemCached(Item item)
         {
             long now = Core.TickCount;
 
@@ -752,11 +765,7 @@ namespace Server.Network
                 if (_SentItemsExpiry == null)
                     _SentItemsExpiry = new Dictionary<Serial, long>();
 
-                if (_SentItemsExpiry.TryGetValue(item.Serial, out long expiry) && expiry > now)
-                    return false;
-
                 _SentItemsExpiry[item.Serial] = now + SentItemsTTLMs;
-                return true;
             }
         }
 
@@ -777,7 +786,7 @@ namespace Server.Network
                 return;
 
             // Sticky cache: if the client already has this item (cache hit), skip entirely.
-            if (!TryConsumeItemSendCache(item))
+            if (IsItemCached(item))
                 return;
 
             bool sendNow;
@@ -817,6 +826,7 @@ namespace Server.Network
             if (sendNow)
             {
                 item.SendInfoTo(this, Mobile.ViewOPL);
+                MarkItemCached(item);
             }
         }
 
@@ -876,6 +886,7 @@ namespace Server.Network
             foreach (var item in toSend)
             {
                 item.SendInfoTo(this, viewOpl);
+                MarkItemCached(item);
             }
         }
 
