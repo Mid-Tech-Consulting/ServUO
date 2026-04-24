@@ -661,11 +661,11 @@ namespace Server.Network
         private long _LastBurstWarnTick;
 
         // Per-client token bucket for item view-enter sends. Orion client locks up
-        // at sustained rates >~200 pkt/s; cap item sends to a safe inline budget and
-        // defer overflow so even dense areas like Luna or large houses stay responsive.
+        // at sustained rates >~260 pkt/s; we leave headroom below that while still
+        // drawing dense houses in a reasonable time.
         private readonly object _ItemSendLock = new object();
-        private const int ItemSendInlineBudget = 60;   // item sends per second before deferral
-        private const int ItemDrainBatchSize = 6;      // items drained per tick → 60 items/s
+        private const int ItemSendInlineBudget = 150;  // burst allowance: small houses fill near-instantly
+        private const int ItemDrainBatchSize = 10;     // sustained rate: 100 items/s = 200 pkt/s F3+DC
         private static readonly TimeSpan ItemDrainInterval = TimeSpan.FromMilliseconds(100);
 
         private long _ItemSendSecondBucket;
