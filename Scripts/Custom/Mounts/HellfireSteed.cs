@@ -53,18 +53,19 @@ namespace Server.Mobiles
             ControlSlots = 3;
             MinTameSkill = 104.1;
 
-            // Color roll: rare overrides only. 56% stays the natural body color.
+            // Color roll: rare overrides only. 55% stays the natural body color.
             // 1653 is the rare body variant used for all special hues.
             int roll = Utility.Random(10000);
-            if (roll < 100) { BodyValue = 1653; Hue = 0x07B7; }           // 1% Red (ultra rare)
-            else if (roll < 250) { BodyValue = 1653; Hue = 1153; }         // 1.5% Luna White
-            else if (roll < 400) { BodyValue = 1653; Hue = 2406; }         // 1.5% Black
-            else if (roll < 1200) { BodyValue = 1653; Hue = 2048; }        // 8% existing
-            else if (roll < 2000) { BodyValue = 1653; Hue = 2206; }        // 8% existing
-            else if (roll < 2800) { BodyValue = 1653; Hue = 2216; }        // 8% existing
-            else if (roll < 3600) { BodyValue = 1653; Hue = 2210; }        // 8% existing
-            else if (roll < 4400) { BodyValue = 1653; Hue = 2228; }        // 8% existing
-            // else: natural body color unchanged (56%)
+            if (roll < 100) { BodyValue = 1653; Hue = 0x000B; }            // 1% Sigil (ultra rare)
+            else if (roll < 200) { BodyValue = 1653; Hue = 0x07B7; }       // 1% Red (ultra rare)
+            else if (roll < 350) { BodyValue = 1653; Hue = 1153; }         // 1.5% Luna White
+            else if (roll < 500) { BodyValue = 1653; Hue = 2406; }         // 1.5% Black
+            else if (roll < 1300) { BodyValue = 1653; Hue = 2048; }        // 8% existing
+            else if (roll < 2100) { BodyValue = 1653; Hue = 2206; }        // 8% existing
+            else if (roll < 2900) { BodyValue = 1653; Hue = 2216; }        // 8% existing
+            else if (roll < 3700) { BodyValue = 1653; Hue = 2210; }        // 8% existing
+            else if (roll < 4500) { BodyValue = 1653; Hue = 2228; }        // 8% existing
+            // else: natural body color unchanged (55%)
 
             switch (Utility.Random(12))
             {

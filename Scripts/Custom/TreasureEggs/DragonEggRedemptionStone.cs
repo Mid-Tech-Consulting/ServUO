@@ -165,11 +165,15 @@ namespace Server.Items
             AddLabel(65, 275, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
                 "Dragon Hildebrandt");
 
-            AddLabel(25, 320, 0x22, "Statuettes pop a pet when double-clicked.");
-            AddLabel(25, 340, 0x22, "Summoned pets have a small chance for a rare color.");
+            AddButton(30, 300, 4005, 4007, 5, GumpButtonType.Reply, 0);
+            AddLabel(65, 300, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
+                "Ozymandias' Hiryu");
 
-            AddButton(360, 355, 4020, 4022, 0, GumpButtonType.Reply, 0);
-            AddLabel(320, 355, 0, "Close");
+            AddLabel(25, 335, 0x22, "Statuettes pop a pet when double-clicked.");
+            AddLabel(25, 355, 0x22, "Summoned pets have a small chance for a rare color.");
+
+            AddButton(360, 370, 4020, 4022, 0, GumpButtonType.Reply, 0);
+            AddLabel(320, 370, 0, "Close");
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -206,6 +210,7 @@ namespace Server.Items
                 case 2: reward = new BaneDragonBondedStatuette(); break;
                 case 3: reward = new WildfireOstardBondedStatuette(); break;
                 case 4: reward = new DragonHildebrandtBondedStatuette(); break;
+                case 5: reward = new OzymandiasHiryuBondedStatuette(); break;
             }
 
             if (reward == null)
