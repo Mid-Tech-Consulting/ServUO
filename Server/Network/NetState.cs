@@ -660,12 +660,13 @@ namespace Server.Network
         private int _PacketsInCurrentSecond;
         private long _LastBurstWarnTick;
 
-        // Per-client token bucket for item view-enter sends. Orion client locks up
-        // at sustained rates >~260 pkt/s; we leave headroom below that while still
-        // drawing dense houses in a reasonable time.
+        // Per-client token bucket for item view-enter sends. Each item now only sends
+        // F3 (WorldItem) at view-enter — OPL is deferred to client-initiated 0xD6 queries —
+        // so packet rate = item rate. Tuned to keep peak <~300 pkt/s (well under the
+        // ~260+ sustained rate that was locking Orion).
         private readonly object _ItemSendLock = new object();
-        private const int ItemSendInlineBudget = 150;  // burst allowance: small houses fill near-instantly
-        private const int ItemDrainBatchSize = 10;     // sustained rate: 100 items/s = 200 pkt/s F3+DC
+        private const int ItemSendInlineBudget = 300;  // near-instant for scenes up to 300 items
+        private const int ItemDrainBatchSize = 20;     // sustained: 200 items/s = 200 pkt/s
         private static readonly TimeSpan ItemDrainInterval = TimeSpan.FromMilliseconds(100);
 
         private long _ItemSendSecondBucket;
@@ -725,8 +726,12 @@ namespace Server.Network
 
         // Rate-limit item view-enter sends. Under budget → inline (no latency).
         // Over budget → queue for the drain timer. All paths that bulk-send items
-        // during view-enter (SendEverything, Location setter) route through here
-        // so throttling is global per client, not per call site.
+        // during view-enter (SendEverything, Location setter) route through here.
+        //
+        // OPL hash (0xDC) is intentionally skipped at view-enter: telemetry showed
+        // clients re-query 0xD6 for every 0xDC received, causing a 3× packet
+        // amplification. Tooltips still work — the client requests them on hover via
+        // BatchQueryProperties, which is throttled separately.
         public void QueueItemInfoSend(Item item)
         {
             if (item == null || item.Deleted || Mobile == null)
@@ -768,10 +773,14 @@ namespace Server.Network
 
             if (sendNow)
             {
-                item.SendInfoTo(this, Mobile.ViewOPL);
+                item.SendInfoTo(this, false);
             }
         }
 
+        // Drain tick: dequeue until we've found ItemDrainBatchSize VALID items to send
+        // (or queue is empty). Stale entries — items the player can no longer see because
+        // they moved away between enqueue and drain — get skipped without consuming the
+        // batch budget, so the drain keeps up when a player oscillates in and out of view.
         private void DrainItemQueue()
         {
             List<Item> toSend = null;
@@ -784,11 +793,25 @@ namespace Server.Network
                 if (_PendingItemInfoSends == null || _PendingItemInfoSends.Count == 0)
                     return;
 
-                int take = Math.Min(ItemDrainBatchSize, _PendingItemInfoSends.Count);
-                toSend = new List<Item>(take);
+                mob = Mobile;
 
-                for (int i = 0; i < take; i++)
-                    toSend.Add(_PendingItemInfoSends.Dequeue());
+                if (mob == null)
+                {
+                    _PendingItemInfoSends.Clear();
+                    return;
+                }
+
+                toSend = new List<Item>(ItemDrainBatchSize);
+
+                while (toSend.Count < ItemDrainBatchSize && _PendingItemInfoSends.Count > 0)
+                {
+                    Item item = _PendingItemInfoSends.Dequeue();
+
+                    if (item == null || item.Deleted) continue;
+                    if (!mob.CanSee(item)) continue;
+
+                    toSend.Add(item);
+                }
 
                 long nowSec = Core.TickCount / 1000;
                 if (nowSec != _ItemSendSecondBucket)
@@ -803,21 +826,11 @@ namespace Server.Network
                     _ItemDrainPending = true;
                     Timer.DelayCall(ItemDrainInterval, DrainItemQueue);
                 }
-
-                mob = Mobile;
             }
-
-            if (mob == null)
-                return;
-
-            bool viewOpl = mob.ViewOPL;
 
             foreach (var item in toSend)
             {
-                if (item == null || item.Deleted) continue;
-                if (!mob.CanSee(item)) continue;
-
-                item.SendInfoTo(this, viewOpl);
+                item.SendInfoTo(this, false);
             }
         }
 
