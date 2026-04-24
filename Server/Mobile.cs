@@ -7623,13 +7623,9 @@ namespace Server
 		public virtual void OnSpeech(SpeechEventArgs e)
 		{ }
 		
-		// View-enter chunking: a dense house (1400+ items) sends F3 + DC per item,
-		// which on Orion clients causes a decoder stall that locks the UI thread.
-		// Threshold and chunk size are tuned so normal rooms stay inline (no latency)
-		// while houses and Shadowguard rooms drain over a few seconds.
-		private const int ViewEnterInlineThreshold = 100;
-		private const int ViewEnterChunkSize = 20;
-		private static readonly TimeSpan ViewEnterChunkDelay = TimeSpan.FromMilliseconds(100);
+		// Item sends are centrally rate-limited by NetState.QueueItemInfoSend — the
+		// bucket decides inline vs. deferred. Mobiles send inline here; they're
+		// typically few and latency matters for combat.
 
 		public void SendEverything()
 		{
@@ -7638,7 +7634,6 @@ namespace Server
 			if (m_Map == null || ns == null)
 				return;
 
-			List<Item> items = null;
 			var eable = m_Map.GetObjectsInRange(m_Location, Core.GlobalRadarRange);
 
 			foreach (var o in eable)
@@ -7647,15 +7642,11 @@ namespace Server
 				{
 					if (InRange(item.GetWorldLocation(), item.GetUpdateRange(this)) && CanSee(item))
 					{
-						if (items == null)
-							items = new List<Item>();
-
-						items.Add(item);
+						ns.QueueItemInfoSend(item);
 					}
 				}
 				else if (o is Mobile m)
 				{
-					// Mobiles send inline — they're typically few and latency-sensitive for combat.
 					if (Utility.InUpdateRange(this, m) && CanSee(m))
 					{
 						SendMobileIncomingTo(ns, m);
@@ -7664,20 +7655,6 @@ namespace Server
 			}
 
 			eable.Free();
-
-			if (items == null)
-				return;
-
-			if (items.Count <= ViewEnterInlineThreshold)
-			{
-				for (int i = 0; i < items.Count; i++)
-					items[i].SendInfoTo(ns);
-
-				return;
-			}
-
-			// Dense scene: drain items over multiple ticks to avoid the burst.
-			SendItemsChunked(items, 0);
 		}
 
 		private void SendMobileIncomingTo(NetState ns, Mobile m)
@@ -7703,35 +7680,6 @@ namespace Server
 			if (ViewOPL)
 			{
 				ns.Send(m.OPLPacket);
-			}
-		}
-
-		private void SendItemsChunked(List<Item> items, int startIndex)
-		{
-			NetState ns = m_NetState;
-
-			if (ns == null || startIndex >= items.Count)
-				return;
-
-			int end = Math.Min(startIndex + ViewEnterChunkSize, items.Count);
-
-			for (int i = startIndex; i < end; i++)
-			{
-				Item item = items[i];
-
-				// Re-check visibility — state can change between enumeration and delayed send.
-				if (item == null || item.Deleted)
-					continue;
-
-				if (m_Map == null || !InRange(item.GetWorldLocation(), item.GetUpdateRange(this)) || !CanSee(item))
-					continue;
-
-				item.SendInfoTo(ns);
-			}
-
-			if (end < items.Count)
-			{
-				Timer.DelayCall(ViewEnterChunkDelay, () => SendItemsChunked(items, end));
 			}
 		}
 
@@ -10183,10 +10131,6 @@ namespace Server
 					{
                         var eeable = map.GetObjectsInRange(newLocation, Core.GlobalRadarRange);
 
-						// Collect newly-visible items first; chunked later to avoid flooding
-						// the client's decoder when entering dense areas (Luna, houses, Shadowguard).
-						List<Item> newlyVisibleItems = null;
-
 						// We are attached to a client, so it's a bit more complex. We need to send new items and people to ourself, and ourself to other clients
 						foreach (IEntity o in eeable)
 						{
@@ -10199,10 +10143,8 @@ namespace Server
 
 								if (!Utility.InRange(oldLocation, loc, range) && Utility.InRange(newLocation, loc, range) && CanSee(item))
 								{
-									if (newlyVisibleItems == null)
-										newlyVisibleItems = new List<Item>();
-
-									newlyVisibleItems.Add(item);
+									// Rate-limited by NetState's token bucket; sends inline when budget permits.
+									ourState.QueueItemInfoSend(item);
 								}
 							}
 							else if (o != this && o is Mobile)
@@ -10282,20 +10224,6 @@ namespace Server
 						}
 
 						eeable.Free();
-
-						// Flush collected items: inline for small scenes, chunked for dense ones.
-						if (newlyVisibleItems != null)
-						{
-							if (newlyVisibleItems.Count <= ViewEnterInlineThreshold)
-							{
-								for (int i = 0; i < newlyVisibleItems.Count; i++)
-									newlyVisibleItems[i].SendInfoTo(ourState);
-							}
-							else
-							{
-								SendItemsChunked(newlyVisibleItems, 0);
-							}
-						}
 					}
 					else
 					{

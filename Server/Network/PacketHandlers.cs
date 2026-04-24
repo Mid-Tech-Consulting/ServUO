@@ -1948,9 +1948,9 @@ namespace Server.Network
 		// Throttle large OPL batches so Orion's decoder isn't flooded.
 		// A synchronous reply of 1800+ 0xD6 packets is what locks the client; we
 		// observed 872 pkt/s in telemetry during a confirmed freeze (see Logs/SendQueueWarn.log).
-		private const int BatchOPLInlineThreshold = 50;
-		private const int BatchOPLChunkSize = 25;
-		private static readonly TimeSpan BatchOPLChunkDelay = TimeSpan.FromMilliseconds(50);
+		private const int BatchOPLInlineThreshold = 30;
+		private const int BatchOPLChunkSize = 10;
+		private static readonly TimeSpan BatchOPLChunkDelay = TimeSpan.FromMilliseconds(100);
 
 		public static void BatchQueryProperties(NetState state, PacketReader pvSrc)
 		{

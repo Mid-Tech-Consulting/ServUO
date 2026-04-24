@@ -660,6 +660,19 @@ namespace Server.Network
         private int _PacketsInCurrentSecond;
         private long _LastBurstWarnTick;
 
+        // Per-client token bucket for item view-enter sends. Orion client locks up
+        // at sustained rates >~200 pkt/s; cap item sends to a safe inline budget and
+        // defer overflow so even dense areas like Luna or large houses stay responsive.
+        private readonly object _ItemSendLock = new object();
+        private const int ItemSendInlineBudget = 60;   // item sends per second before deferral
+        private const int ItemDrainBatchSize = 6;      // items drained per tick → 60 items/s
+        private static readonly TimeSpan ItemDrainInterval = TimeSpan.FromMilliseconds(100);
+
+        private long _ItemSendSecondBucket;
+        private int _ItemsSentThisSecond;
+        private Queue<Item> _PendingItemInfoSends;
+        private bool _ItemDrainPending;
+
         private static readonly string SendQueueWarnLogPath = "Logs/SendQueueWarn.log";
         private static readonly object _SendQueueWarnFileLock = new object();
 
@@ -708,6 +721,104 @@ namespace Server.Network
             }
 
             return sb.ToString();
+        }
+
+        // Rate-limit item view-enter sends. Under budget → inline (no latency).
+        // Over budget → queue for the drain timer. All paths that bulk-send items
+        // during view-enter (SendEverything, Location setter) route through here
+        // so throttling is global per client, not per call site.
+        public void QueueItemInfoSend(Item item)
+        {
+            if (item == null || item.Deleted || Mobile == null)
+                return;
+
+            bool sendNow;
+
+            lock (_ItemSendLock)
+            {
+                long nowSec = Core.TickCount / 1000;
+
+                if (nowSec != _ItemSendSecondBucket)
+                {
+                    _ItemSendSecondBucket = nowSec;
+                    _ItemsSentThisSecond = 0;
+                }
+
+                bool queueEmpty = _PendingItemInfoSends == null || _PendingItemInfoSends.Count == 0;
+                sendNow = queueEmpty && _ItemsSentThisSecond < ItemSendInlineBudget;
+
+                if (sendNow)
+                {
+                    _ItemsSentThisSecond++;
+                }
+                else
+                {
+                    if (_PendingItemInfoSends == null)
+                        _PendingItemInfoSends = new Queue<Item>();
+
+                    _PendingItemInfoSends.Enqueue(item);
+
+                    if (!_ItemDrainPending)
+                    {
+                        _ItemDrainPending = true;
+                        Timer.DelayCall(ItemDrainInterval, DrainItemQueue);
+                    }
+                }
+            }
+
+            if (sendNow)
+            {
+                item.SendInfoTo(this, Mobile.ViewOPL);
+            }
+        }
+
+        private void DrainItemQueue()
+        {
+            List<Item> toSend = null;
+            Mobile mob;
+
+            lock (_ItemSendLock)
+            {
+                _ItemDrainPending = false;
+
+                if (_PendingItemInfoSends == null || _PendingItemInfoSends.Count == 0)
+                    return;
+
+                int take = Math.Min(ItemDrainBatchSize, _PendingItemInfoSends.Count);
+                toSend = new List<Item>(take);
+
+                for (int i = 0; i < take; i++)
+                    toSend.Add(_PendingItemInfoSends.Dequeue());
+
+                long nowSec = Core.TickCount / 1000;
+                if (nowSec != _ItemSendSecondBucket)
+                {
+                    _ItemSendSecondBucket = nowSec;
+                    _ItemsSentThisSecond = 0;
+                }
+                _ItemsSentThisSecond += toSend.Count;
+
+                if (_PendingItemInfoSends.Count > 0)
+                {
+                    _ItemDrainPending = true;
+                    Timer.DelayCall(ItemDrainInterval, DrainItemQueue);
+                }
+
+                mob = Mobile;
+            }
+
+            if (mob == null)
+                return;
+
+            bool viewOpl = mob.ViewOPL;
+
+            foreach (var item in toSend)
+            {
+                if (item == null || item.Deleted) continue;
+                if (!mob.CanSee(item)) continue;
+
+                item.SendInfoTo(this, viewOpl);
+            }
         }
 
         public virtual void Send(Packet p)
