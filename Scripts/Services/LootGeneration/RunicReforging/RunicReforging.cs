@@ -2349,10 +2349,7 @@ namespace Server.Items
 
             if (item is BaseJewel && power >= ItemPower.MajorArtifact)
             {
-                if (chance > .25)
-                    neg.Antique = 1;
-                else
-                    item.LootType = LootType.Cursed;
+                neg.Antique = 1;
                 return 100;
             }
 
@@ -2497,11 +2494,6 @@ namespace Server.Items
                         if (0.85 > chance)
                         {
                             neg.Antique = 1;
-                            return 100;
-                        }
-                        else if (.95 > chance)
-                        {
-                            item.LootType = LootType.Cursed;
                             return 100;
                         }
                         else
