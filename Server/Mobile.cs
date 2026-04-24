@@ -7623,63 +7623,58 @@ namespace Server
 		public virtual void OnSpeech(SpeechEventArgs e)
 		{ }
 		
-		// Item sends are centrally rate-limited by NetState.QueueItemInfoSend — the
-		// bucket decides inline vs. deferred. Mobiles send inline here; they're
-		// typically few and latency matters for combat.
-
 		public void SendEverything()
 		{
 			NetState ns = m_NetState;
 
-			if (m_Map == null || ns == null)
-				return;
-
-			var eable = m_Map.GetObjectsInRange(m_Location, Core.GlobalRadarRange);
-
-			foreach (var o in eable)
+			if (m_Map != null && ns != null)
 			{
-				if (o is Item item)
+                var eable = m_Map.GetObjectsInRange(m_Location, Core.GlobalRadarRange);
+
+				foreach (var o in eable)
 				{
-					if (InRange(item.GetWorldLocation(), item.GetUpdateRange(this)) && CanSee(item))
+					if (o is Item)
 					{
-						ns.QueueItemInfoSend(item);
+						Item item = (Item)o;
+
+						if (InRange(item.GetWorldLocation(), item.GetUpdateRange(this)) && CanSee(item))
+						{
+							item.SendInfoTo(ns);
+						}
+					}
+					else if (o is Mobile)
+					{
+						Mobile m = (Mobile)o;
+
+						if (Utility.InUpdateRange(this, m) && CanSee(m))
+						{
+							ns.Send(MobileIncoming.Create(ns, this, m));
+
+							if (ns.IsEnhancedClient)
+							{
+								ns.Send(new HealthbarPoisonEC(m));
+								ns.Send(new HealthbarYellowEC(m));
+							}
+							else if (ns.StygianAbyss)
+							{
+								ns.Send(new HealthbarPoison(m));
+								ns.Send(new HealthbarYellow(m));
+							}
+
+							if (m.IsDeadBondedPet)
+							{
+								ns.Send(new BondedStatus(0, m.m_Serial, 1));
+							}
+
+							if (ViewOPL)
+							{
+								ns.Send(m.OPLPacket);
+							}
+						}
 					}
 				}
-				else if (o is Mobile m)
-				{
-					if (Utility.InUpdateRange(this, m) && CanSee(m))
-					{
-						SendMobileIncomingTo(ns, m);
-					}
-				}
-			}
 
-			eable.Free();
-		}
-
-		private void SendMobileIncomingTo(NetState ns, Mobile m)
-		{
-			ns.Send(MobileIncoming.Create(ns, this, m));
-
-			if (ns.IsEnhancedClient)
-			{
-				ns.Send(new HealthbarPoisonEC(m));
-				ns.Send(new HealthbarYellowEC(m));
-			}
-			else if (ns.StygianAbyss)
-			{
-				ns.Send(new HealthbarPoison(m));
-				ns.Send(new HealthbarYellow(m));
-			}
-
-			if (m.IsDeadBondedPet)
-			{
-				ns.Send(new BondedStatus(0, m.m_Serial, 1));
-			}
-
-			if (ViewOPL)
-			{
-				ns.Send(m.OPLPacket);
+				eable.Free();
 			}
 		}
 
@@ -10143,8 +10138,7 @@ namespace Server
 
 								if (!Utility.InRange(oldLocation, loc, range) && Utility.InRange(newLocation, loc, range) && CanSee(item))
 								{
-									// Rate-limited by NetState's token bucket; sends inline when budget permits.
-									ourState.QueueItemInfoSend(item);
+									item.SendInfoTo(ourState);
 								}
 							}
 							else if (o != this && o is Mobile)

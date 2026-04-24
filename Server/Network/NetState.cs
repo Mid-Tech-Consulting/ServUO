@@ -660,29 +660,6 @@ namespace Server.Network
         private int _PacketsInCurrentSecond;
         private long _LastBurstWarnTick;
 
-        // Per-client token bucket for item view-enter sends. Each item now only sends
-        // F3 (WorldItem) at view-enter — OPL is deferred to client-initiated 0xD6 queries —
-        // so packet rate = item rate. Tuned to keep peak <~300 pkt/s (well under the
-        // ~260+ sustained rate that was locking Orion).
-        private readonly object _ItemSendLock = new object();
-        private const int ItemSendInlineBudget = 500;  // near-instant for scenes up to 500 items
-        private const int ItemDrainBatchSize = 25;     // sustained: 250 items/s
-        private static readonly TimeSpan ItemDrainInterval = TimeSpan.FromMilliseconds(100);
-
-        // Sticky F3 cache: items recently sent to this client are remembered so we
-        // don't re-flood F3 when the player oscillates in/out of view (e.g., running
-        // back and forth in a dense house). Invalidated on 0x1D (RemoveItem), on
-        // which the client drops the item from its world. TTL is the longest a cache
-        // entry lives without being touched, a safety net for edge cases.
-        private readonly object _SentItemsLock = new object();
-        private const int SentItemsTTLMs = 60000; // 60 seconds
-        private Dictionary<Serial, long> _SentItemsExpiry;
-
-        private long _ItemSendSecondBucket;
-        private int _ItemsSentThisSecond;
-        private Queue<Item> _PendingItemInfoSends;
-        private bool _ItemDrainPending;
-
         private static readonly string SendQueueWarnLogPath = "Logs/SendQueueWarn.log";
         private static readonly object _SendQueueWarnFileLock = new object();
 
@@ -733,163 +710,6 @@ namespace Server.Network
             return sb.ToString();
         }
 
-        // Rate-limit item view-enter sends. Under budget → inline (no latency).
-        // Over budget → queue for the drain timer. All paths that bulk-send items
-        // during view-enter (SendEverything, Location setter) route through here.
-        //
-        // OPL hash (0xDC) rides alongside F3 because the client needs it to know
-        // the item has a tooltip. The sticky cache dedupes both on repeat view-enters
-        // so running back and forth through the same area sends zero packets.
-
-        // Read-only check: has this item been sent to the client recently?
-        private bool IsItemCached(Item item)
-        {
-            long now = Core.TickCount;
-
-            lock (_SentItemsLock)
-            {
-                return _SentItemsExpiry != null
-                    && _SentItemsExpiry.TryGetValue(item.Serial, out long expiry)
-                    && expiry > now;
-            }
-        }
-
-        // Record that the item has actually been sent. Called AFTER send so items
-        // that get skipped (e.g., CanSee fails at drain time) don't poison the cache.
-        private void MarkItemCached(Item item)
-        {
-            long now = Core.TickCount;
-
-            lock (_SentItemsLock)
-            {
-                if (_SentItemsExpiry == null)
-                    _SentItemsExpiry = new Dictionary<Serial, long>();
-
-                _SentItemsExpiry[item.Serial] = now + SentItemsTTLMs;
-            }
-        }
-
-        private void InvalidateItemCache(Serial s)
-        {
-            if (!s.IsItem)
-                return;
-
-            lock (_SentItemsLock)
-            {
-                _SentItemsExpiry?.Remove(s);
-            }
-        }
-
-        public void QueueItemInfoSend(Item item)
-        {
-            if (item == null || item.Deleted || Mobile == null)
-                return;
-
-            // Sticky cache: if the client already has this item (cache hit), skip entirely.
-            if (IsItemCached(item))
-                return;
-
-            bool sendNow;
-
-            lock (_ItemSendLock)
-            {
-                long nowSec = Core.TickCount / 1000;
-
-                if (nowSec != _ItemSendSecondBucket)
-                {
-                    _ItemSendSecondBucket = nowSec;
-                    _ItemsSentThisSecond = 0;
-                }
-
-                bool queueEmpty = _PendingItemInfoSends == null || _PendingItemInfoSends.Count == 0;
-                sendNow = queueEmpty && _ItemsSentThisSecond < ItemSendInlineBudget;
-
-                if (sendNow)
-                {
-                    _ItemsSentThisSecond++;
-                }
-                else
-                {
-                    if (_PendingItemInfoSends == null)
-                        _PendingItemInfoSends = new Queue<Item>();
-
-                    _PendingItemInfoSends.Enqueue(item);
-
-                    if (!_ItemDrainPending)
-                    {
-                        _ItemDrainPending = true;
-                        Timer.DelayCall(ItemDrainInterval, DrainItemQueue);
-                    }
-                }
-            }
-
-            if (sendNow)
-            {
-                item.SendInfoTo(this, Mobile.ViewOPL);
-                MarkItemCached(item);
-            }
-        }
-
-        // Drain tick: dequeue until we've found ItemDrainBatchSize VALID items to send
-        // (or queue is empty). Stale entries — items the player can no longer see because
-        // they moved away between enqueue and drain — get skipped without consuming the
-        // batch budget, so the drain keeps up when a player oscillates in and out of view.
-        private void DrainItemQueue()
-        {
-            List<Item> toSend = null;
-            Mobile mob;
-
-            lock (_ItemSendLock)
-            {
-                _ItemDrainPending = false;
-
-                if (_PendingItemInfoSends == null || _PendingItemInfoSends.Count == 0)
-                    return;
-
-                mob = Mobile;
-
-                if (mob == null)
-                {
-                    _PendingItemInfoSends.Clear();
-                    return;
-                }
-
-                toSend = new List<Item>(ItemDrainBatchSize);
-
-                while (toSend.Count < ItemDrainBatchSize && _PendingItemInfoSends.Count > 0)
-                {
-                    Item item = _PendingItemInfoSends.Dequeue();
-
-                    if (item == null || item.Deleted) continue;
-                    if (!mob.CanSee(item)) continue;
-
-                    toSend.Add(item);
-                }
-
-                long nowSec = Core.TickCount / 1000;
-                if (nowSec != _ItemSendSecondBucket)
-                {
-                    _ItemSendSecondBucket = nowSec;
-                    _ItemsSentThisSecond = 0;
-                }
-                _ItemsSentThisSecond += toSend.Count;
-
-                if (_PendingItemInfoSends.Count > 0)
-                {
-                    _ItemDrainPending = true;
-                    Timer.DelayCall(ItemDrainInterval, DrainItemQueue);
-                }
-            }
-
-            bool viewOpl = mob.ViewOPL;
-
-            foreach (var item in toSend)
-            {
-                item.SendInfoTo(this, viewOpl);
-                MarkItemCached(item);
-            }
-        }
-
         public virtual void Send(Packet p)
         {
             if (p == null)
@@ -919,14 +739,6 @@ namespace Server.Network
                     if (p.PacketID == 0xBF && length >= 5)
                     {
                         telemetrySubCmd = (buffer[3] << 8) | buffer[4];
-                    }
-
-                    // RemoveItem: invalidate sticky cache so next view-enter re-sends F3.
-                    // Layout: [0]=ID [1..4]=serial.
-                    if (p.PacketID == 0x1D && length >= 5)
-                    {
-                        int serialInt = (buffer[1] << 24) | (buffer[2] << 16) | (buffer[3] << 8) | buffer[4];
-                        InvalidateItemCache((Serial)serialInt);
                     }
 
                     PacketSendProfile prof = null;
