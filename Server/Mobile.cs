@@ -7623,58 +7623,115 @@ namespace Server
 		public virtual void OnSpeech(SpeechEventArgs e)
 		{ }
 		
+		// View-enter chunking: a dense house (1400+ items) sends F3 + DC per item,
+		// which on Orion clients causes a decoder stall that locks the UI thread.
+		// Threshold and chunk size are tuned so normal rooms stay inline (no latency)
+		// while houses and Shadowguard rooms drain over a few seconds.
+		private const int ViewEnterInlineThreshold = 100;
+		private const int ViewEnterChunkSize = 20;
+		private static readonly TimeSpan ViewEnterChunkDelay = TimeSpan.FromMilliseconds(100);
+
 		public void SendEverything()
 		{
 			NetState ns = m_NetState;
 
-			if (m_Map != null && ns != null)
+			if (m_Map == null || ns == null)
+				return;
+
+			List<Item> items = null;
+			var eable = m_Map.GetObjectsInRange(m_Location, Core.GlobalRadarRange);
+
+			foreach (var o in eable)
 			{
-                var eable = m_Map.GetObjectsInRange(m_Location, Core.GlobalRadarRange);
-
-				foreach (var o in eable)
+				if (o is Item item)
 				{
-					if (o is Item)
+					if (InRange(item.GetWorldLocation(), item.GetUpdateRange(this)) && CanSee(item))
 					{
-						Item item = (Item)o;
+						if (items == null)
+							items = new List<Item>();
 
-						if (InRange(item.GetWorldLocation(), item.GetUpdateRange(this)) && CanSee(item))
-						{
-							item.SendInfoTo(ns);
-						}
-					}
-					else if (o is Mobile)
-					{
-						Mobile m = (Mobile)o;
-
-						if (Utility.InUpdateRange(this, m) && CanSee(m))
-						{
-							ns.Send(MobileIncoming.Create(ns, this, m));
-
-							if (ns.IsEnhancedClient)
-							{
-								ns.Send(new HealthbarPoisonEC(m));
-								ns.Send(new HealthbarYellowEC(m));
-							}
-							else if (ns.StygianAbyss)
-							{
-								ns.Send(new HealthbarPoison(m));
-								ns.Send(new HealthbarYellow(m));
-							}
-
-							if (m.IsDeadBondedPet)
-							{
-								ns.Send(new BondedStatus(0, m.m_Serial, 1));
-							}
-
-							if (ViewOPL)
-							{
-								ns.Send(m.OPLPacket);
-							}
-						}
+						items.Add(item);
 					}
 				}
+				else if (o is Mobile m)
+				{
+					// Mobiles send inline — they're typically few and latency-sensitive for combat.
+					if (Utility.InUpdateRange(this, m) && CanSee(m))
+					{
+						SendMobileIncomingTo(ns, m);
+					}
+				}
+			}
 
-				eable.Free();
+			eable.Free();
+
+			if (items == null)
+				return;
+
+			if (items.Count <= ViewEnterInlineThreshold)
+			{
+				for (int i = 0; i < items.Count; i++)
+					items[i].SendInfoTo(ns);
+
+				return;
+			}
+
+			// Dense scene: drain items over multiple ticks to avoid the burst.
+			SendItemsChunked(items, 0);
+		}
+
+		private void SendMobileIncomingTo(NetState ns, Mobile m)
+		{
+			ns.Send(MobileIncoming.Create(ns, this, m));
+
+			if (ns.IsEnhancedClient)
+			{
+				ns.Send(new HealthbarPoisonEC(m));
+				ns.Send(new HealthbarYellowEC(m));
+			}
+			else if (ns.StygianAbyss)
+			{
+				ns.Send(new HealthbarPoison(m));
+				ns.Send(new HealthbarYellow(m));
+			}
+
+			if (m.IsDeadBondedPet)
+			{
+				ns.Send(new BondedStatus(0, m.m_Serial, 1));
+			}
+
+			if (ViewOPL)
+			{
+				ns.Send(m.OPLPacket);
+			}
+		}
+
+		private void SendItemsChunked(List<Item> items, int startIndex)
+		{
+			NetState ns = m_NetState;
+
+			if (ns == null || startIndex >= items.Count)
+				return;
+
+			int end = Math.Min(startIndex + ViewEnterChunkSize, items.Count);
+
+			for (int i = startIndex; i < end; i++)
+			{
+				Item item = items[i];
+
+				// Re-check visibility — state can change between enumeration and delayed send.
+				if (item == null || item.Deleted)
+					continue;
+
+				if (m_Map == null || !InRange(item.GetWorldLocation(), item.GetUpdateRange(this)) || !CanSee(item))
+					continue;
+
+				item.SendInfoTo(ns);
+			}
+
+			if (end < items.Count)
+			{
+				Timer.DelayCall(ViewEnterChunkDelay, () => SendItemsChunked(items, end));
 			}
 		}
 
