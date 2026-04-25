@@ -218,7 +218,7 @@ namespace Server.Engines.Craft
             //if ( from.Body.Type == BodyType.Human && !from.Mounted )
             //	from.Animate( 9, 5, 1, true, false, 0 );
             //new InternalTimer( from ).Start();
-            from.PlaySound(0x2A);
+            from.SendSound(0x2A);
         }
 
         // Delay to synchronize the sound with the hit on the anvil
@@ -234,7 +234,7 @@ namespace Server.Engines.Craft
 
             protected override void OnTick()
             {
-                m_From.PlaySound(0x2A);
+                m_From.SendSound(0x2A);
             }
         }
 

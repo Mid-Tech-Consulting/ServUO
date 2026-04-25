@@ -68,7 +68,7 @@ namespace Server.Engines.Craft
 
         public override void PlayCraftEffect(Mobile from)
         {
-            from.PlaySound(0x242);
+            from.SendSound(0x242);
         }
 
         private static readonly Type typeofPotion = typeof(BasePotion);
@@ -97,7 +97,7 @@ namespace Server.Engines.Craft
             }
             else
             {
-                from.PlaySound(0x240); // Sound of a filling bottle
+                from.SendSound(0x240); // Sound of a filling bottle
 
                 if (IsPotion(item.ItemType))
                 {

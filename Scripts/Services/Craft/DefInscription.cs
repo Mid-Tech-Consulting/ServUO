@@ -92,7 +92,7 @@ namespace Server.Engines.Craft
 
         public override void PlayCraftEffect(Mobile from)
         {
-            from.PlaySound(0x249);
+            from.SendSound(0x249);
         }
 
         private static readonly Type typeofSpellScroll = typeof(SpellScroll);

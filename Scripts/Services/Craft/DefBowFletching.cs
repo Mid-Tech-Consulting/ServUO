@@ -83,7 +83,7 @@ namespace Server.Engines.Craft
             // no animation
             //if ( from.Body.Type == BodyType.Human && !from.Mounted )
             //	from.Animate( 33, 5, 1, true, false, 0 );
-            from.PlaySound(0x55);
+            from.SendSound(0x55);
         }
 
         public override int PlayEndingEffect(Mobile from, bool failed, bool lostMaterial, bool toolBroken, int quality, bool makersMark, CraftItem item)

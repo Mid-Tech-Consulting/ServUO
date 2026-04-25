@@ -416,8 +416,10 @@ namespace Server.Engines.Harvest
 
         public virtual void DoHarvestingSound(Mobile from, Item tool, HarvestDefinition def, object toHarvest)
         {
+            // Send only to the harvester. Constant pickaxe/axe sounds from auto-macro
+            // harvesters were locking up nearby observers' clients.
             if (def.EffectSounds.Length > 0)
-                from.PlaySound(Utility.RandomList(def.EffectSounds));
+                from.SendSound(Utility.RandomList(def.EffectSounds));
         }
 
         public virtual void DoHarvestingEffect(Mobile from, Item tool, HarvestDefinition def, Map map, Point3D loc)

@@ -72,7 +72,7 @@ namespace Server.Engines.Craft
 
         public override void PlayCraftEffect(Mobile from)
         {
-            from.PlaySound(0x2B); // bellows
+            from.SendSound(0x2B); // bellows
             //if ( from.Body.Type == BodyType.Human && !from.Mounted )
             //	from.Animate( 9, 5, 1, true, false, 0 );
             //new InternalTimer( from ).Start();
@@ -92,7 +92,7 @@ namespace Server.Engines.Craft
             }
             else
             {
-                from.PlaySound(0x41); // glass breaking
+                from.SendSound(0x41); // glass breaking
 
                 if (quality == 0)
                     return 502785; // You were barely able to make this item.  It's quality is below average.
@@ -171,7 +171,7 @@ namespace Server.Engines.Craft
 
             protected override void OnTick()
             {
-                m_From.PlaySound(0x2A);
+                m_From.SendSound(0x2A);
             }
         }
     }

@@ -89,7 +89,7 @@ namespace Server.Engines.Craft
 
             protected override void OnTick() 
             { 
-                m_From.PlaySound(0x23D); 
+                m_From.SendSound(0x23D);
             }
         }
 
