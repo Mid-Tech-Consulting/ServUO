@@ -1,5 +1,59 @@
 # Orion Client Lockup Investigation
 
+## Status: RESOLVED (2026-04-25)
+
+**Actual root cause:** synchronous file I/O on the game thread, not packet
+flooding. Three log writers were blocking the game loop:
+
+1. **`Scripts/Commands/Logging.cs`** — opened a new `StreamWriter` per command
+   AND per property change AND per craft action. `CraftItem.cs:1910` logs
+   every successful craft via `CommandLogging.WriteLine`. Two macro-crafting
+   players at ~5 actions/sec each produced ~10 file open/write/close cycles
+   per second, stalling the game thread for ALL connected clients (not just
+   the crafters or the players nearby).
+2. **`Server/Network/NetState.cs` SendQueueWarn telemetry** — the diagnostic
+   logging we added to investigate the lockup was itself contributing. Each
+   burst event called `File.AppendAllText` (open + write + close) on the
+   game thread.
+3. **`Scripts/Services/Chat/Logging.cs`** — relatively minor but every chat
+   message hit disk; under load this added pressure.
+
+**Why the symptoms looked like packet flooding:** when the game thread stalls
+on disk I/O, *all* connected clients get starved of move-acks and state
+updates. A player whose own packet load is tiny (`F3=210` over 10 s) still
+appeared frozen because their commands weren't being processed promptly.
+This explains why telemetry showed lockups happening to clients who weren't
+receiving any meaningful packet volume — they were victims of game-thread
+starvation, not packet floods.
+
+**Real fixes shipped (commits `3d6da4a3`, `00e825e3`, `aeef5aeb`):**
+
+1. Disabled `CommandLogging` and `ChatLogging` by default.
+2. Removed the `WriteSendQueueWarn` helper, all call sites, and all rolling
+   telemetry tracking. Detection logic for the receive-side liveness kick
+   and the stuck-backlog `Dispose` still works in memory; just no log lines.
+3. Capped champion-spawn `Respawn()` at 4 mobs per tick — separately fixed
+   the Rikktor level-change burst that was a real packet flood (50+
+   `MobileIncoming` packets in one frame).
+4. Sent craft and harvest sounds only to the actor (`from.SendSound` instead
+   of `from.PlaySound`) — defense in depth for macro-craft scenarios.
+
+**Lessons reinforced:**
+- "Players freeze when X happens" doesn't always mean X is sending too many
+  packets to the player. The cause can be game-thread blocking from
+  unrelated server-side activity.
+- Diagnostic logging itself can be the bug. Add telemetry carefully and
+  ensure it's not on the critical path.
+- The user's hypothesis (logging was the cause) was correct from early in
+  the investigation. We chased throttling/caching theories for too long
+  before testing the simpler theory.
+
+The investigation that follows captures the work done before the actual
+cause was identified. Left in place because the data points and dead-end
+attempts may be useful context if someone runs into similar symptoms later.
+
+---
+
 ## Problem
 
 Players using the Orion UO client freeze in dense-item areas:
@@ -136,13 +190,25 @@ introduced correctness bugs that degraded UX below the lockup baseline.
 
 ## Lessons learned
 
-1. **Iterate from data, not intuition.** The first throttle attempts
-   assumed "peak pkt/s" was the metric. Real data showed "sustained
-   pkt/s over ~10 s" is closer to what locks Orion. Enhance telemetry
-   before tuning again.
-2. **Correctness > performance.** Multiple iterations fixed the lockup
-   but broke loading. Players would rather take the known freeze than a
-   randomly-empty house.
-3. **Protocol changes require client cooperation.** Server-side
-   workarounds for a client decoder limit are blunt. Getting Orion
-   community input first would have saved days of tuning.
+1. **Trust the user's hypothesis early.** From the beginning the user
+   suggested logging might be the cause. We dismissed it because the
+   data appeared to point at packet flooding. We were wrong; they were
+   right. When someone close to the system has a hypothesis that
+   contradicts your read of the data, take it seriously.
+2. **Symptoms can mislead in concurrent systems.** A player freezing
+   while receiving few packets looked like a client-decoder limit. It
+   was actually game-thread starvation from unrelated disk I/O. The
+   "victim" client had nothing to do with the cause.
+3. **Diagnostic instrumentation can BE the bug.** Synchronous
+   `File.AppendAllText` per event on the game thread defeats its own
+   purpose. If you must log on the hot path, use a persistent stream
+   with `AutoFlush`, or buffer to a background writer thread.
+4. **Correctness > performance.** Several throttle/cache iterations
+   "fixed" the lockup but broke item loading. Players would rather take
+   the known freeze than a randomly-empty house. We had to fully
+   rollback (`55b2db76`) before finding the actual cause.
+5. **Sometimes the right fix is not in the system you suspect.** All of
+   our packet-pipeline work was on a system that wasn't the bottleneck.
+   The fix turned out to be one-line `Enabled = false` in two unrelated
+   logger classes. When investigation goes long without progress,
+   broaden the search.
