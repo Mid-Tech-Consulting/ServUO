@@ -1560,6 +1560,7 @@ namespace Server.Engines.Shadowguard
             if (CurrentBoss == null && !Completed)
             {
                 Completed = true;
+                Timer.DelayCall(ResetDuration, () => Reset());
             }
         }
 	}

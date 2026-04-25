@@ -153,10 +153,10 @@ namespace Server.Engines.Shadowguard
 				m.SendLocalizedMessage(1010086); // What do you want to use this on?
 				m.BeginTarget(10, false, Server.Targeting.TargetFlags.None, (from, targeted) =>
 				{
-                    _Thrown = true;
-
                     if (targeted is ShadowguardCypress || targeted is ShadowguardCypress.ShadowguardCypressFoilage)
                     {
+                        _Thrown = true;
+
                         ShadowguardCypress tree = null;
 
                         if (targeted is ShadowguardCypress)

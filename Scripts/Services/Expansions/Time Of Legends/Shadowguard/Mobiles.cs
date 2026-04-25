@@ -608,7 +608,7 @@ namespace Server.Engines.Shadowguard
                         z = tile.Z + itemData.CalcHeight;
                 }
 
-                defender.MoveToWorld(new Point3D(x, y, Z), Map);
+                defender.MoveToWorld(new Point3D(x, y, z), Map);
             }
         }
 
