@@ -789,6 +789,14 @@ namespace Server.Engines.CannedEvil
             }
         }
 
+        // Cap how many mobiles we'll spawn in a single Respawn tick. Level
+        // transitions can require dozens of new mobs; spawning them all at once
+        // produces a 250+ packet burst (MobileIncoming + healthbar + OPL per mob)
+        // that locks up clients in range. Respawn is called every 1 second by
+        // OnSlice, so spreading the new spawns over multiple ticks gives the
+        // client breathing room without making the spawn feel slow.
+        private const int MaxSpawnsPerRespawnTick = 4;
+
         public void Respawn()
         {
             if (!m_Active || Deleted || m_Champion != null)
@@ -813,7 +821,8 @@ namespace Server.Engines.CannedEvil
 					++mobCount;
 			}
 
-			while (mobCount <= maxSpawn)
+			int spawnedThisTick = 0;
+			while (mobCount <= maxSpawn && spawnedThisTick < MaxSpawnsPerRespawnTick)
             {
                 Mobile m = Spawn();
 
@@ -828,6 +837,7 @@ namespace Server.Engines.CannedEvil
                 m_Creatures.Add(m);
                 m.MoveToWorld(loc, Map);
 				++mobCount;
+				++spawnedThisTick;
 
                 if (m is BaseCreature)
                 {
