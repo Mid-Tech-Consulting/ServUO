@@ -6,7 +6,10 @@ namespace Server.Engines.Chat
 {
     public class ChatLogging
     {
-        public static readonly bool Enabled = true;
+        // Disabled by default. Persistent streams per channel were OK individually,
+        // but every chat message still hit disk; under load this was contributing
+        // to game-thread stalls during heavy chat activity.
+        public static readonly bool Enabled = false;
 
         private static StreamWriter m_Output;
         private static Dictionary<string, StreamWriter> m_OutputPerChannel;

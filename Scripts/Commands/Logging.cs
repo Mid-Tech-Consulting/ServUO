@@ -8,7 +8,11 @@ namespace Server.Commands
     {
         private static readonly char[] m_NotSafe = new char[] { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };
         private static StreamWriter m_Output;
-        private static bool m_Enabled = true;
+        // Disabled by default. Every command and property change opened a new file
+        // stream on the game thread (fopen + fwrite + fclose per call). With craft
+        // logging firing on every craft action, two macro-crafting players generated
+        // ~10 disk I/O cycles per second, stalling the game loop.
+        private static bool m_Enabled = false;
         public static bool Enabled
         {
             get

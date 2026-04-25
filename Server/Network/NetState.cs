@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -640,39 +639,15 @@ namespace Server.Network
 
 		private readonly object _SendLock = new object();
 
-        // Telemetry: warn when a client's SendQueue backlog passes this threshold.
-        // Helps diagnose movement freezes in item-dense areas.
+        // Stuck-backlog thresholds. SendQueueWarnBytes is the level above which we
+        // consider the queue "elevated" for the time-based stuck check. If pendingBytes
+        // is above this continuously for StuckBacklogDurationMs, the client is presumed
+        // frozen and we Dispose the socket. SendQueueDisconnectBytes is the higher
+        // byte-based safety net for catastrophic backlog growth.
         private const int SendQueueWarnBytes = 256 * 1024;
-        private const int SendQueueWarnCooldownMs = 30000;
-        private long _LastSendQueueWarnTick;
-
-        // Safety net: if the backlog grows this large the client has plainly stopped
-        // draining (frozen UI on Orion). Dispose the socket so the player gets a
-        // "connection lost" and can immediately relog, instead of sitting frozen
-        // until SendQueue hits its hard 2 MB cap ~90 minutes later.
         private const int SendQueueDisconnectBytes = 1536 * 1024;
-
-        // Stuck-backlog detection: when Orion freezes, TCP backpressure stops
-        // the queue from growing further. Backlog plateaus around 300-500 KB and
-        // never reaches the byte-based safety net. We instead detect "elevated
-        // backlog that hasn't drained" — if pendingBytes has been >= warn threshold
-        // continuously for this long, the client is stuck. Dispose to recover.
-        private const int StuckBacklogDurationMs = 60000; // 60 seconds elevated = stuck
+        private const int StuckBacklogDurationMs = 60000;
         private long _StuckBacklogStartTick = -1;
-
-        // Burst telemetry: fires much sooner than the backlog warn. Catches the
-        // moment of a view-enter flood before the client's decoder stalls.
-        private const int TelemetryWindowMs = 10000;
-        private const int BurstThresholdPacketsPerSec = 200;
-        private const int BurstWarnCooldownMs = 2000;
-
-        private Dictionary<byte, int> _RecentPacketCounts;
-        private long _RecentWindowStartTick;
-        private int _RecentMaxPacketSize;
-
-        private long _LastSecondBucket;
-        private int _PacketsInCurrentSecond;
-        private long _LastBurstWarnTick;
 
         // OPL-hash dedup: looping a player through a dense house re-sends F3+DC for
         // the same items each circuit. F3 is fine (visual state may have changed);
@@ -684,37 +659,6 @@ namespace Server.Network
         private readonly object _SentOPLHashLock = new object();
         private const int OPLHashCacheTTLMs = 600000; // 10 minutes
         private Dictionary<Serial, long> _SentOPLHashes;
-
-        private static readonly string SendQueueWarnLogPath = "Logs/SendQueueWarn.log";
-        private static readonly object _SendQueueWarnFileLock = new object();
-
-        // Written once on first access to NetState — confirms the log path is writable
-        // even when no client has crossed the backlog threshold yet.
-        static NetState()
-        {
-            WriteSendQueueWarn(string.Format(
-                "{0:yyyy-MM-dd HH:mm:ss} [SendQueueWarn] Telemetry initialized (threshold {1} KB, cooldown {2}s). Awaiting first event.",
-                DateTime.UtcNow, SendQueueWarnBytes / 1024, SendQueueWarnCooldownMs / 1000));
-        }
-
-        private static void WriteSendQueueWarn(string line)
-        {
-            try
-            {
-                lock (_SendQueueWarnFileLock)
-                {
-                    var dir = System.IO.Path.GetDirectoryName(SendQueueWarnLogPath);
-                    if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
-                        System.IO.Directory.CreateDirectory(dir);
-
-                    System.IO.File.AppendAllText(SendQueueWarnLogPath, line + Environment.NewLine);
-                }
-            }
-            catch
-            {
-                // Swallow — telemetry failure should never break the send path.
-            }
-        }
 
         // Returns true if we should send the 0xDC OPL hash for this item to this client.
         // Skips the send if we've sent it within OPLHashCacheTTLMs.
@@ -767,25 +711,6 @@ namespace Server.Network
             }
         }
 
-        // Returns up to 5 packet IDs with the highest counts, formatted as "DC=201 78=88 F3=64".
-        private static string FormatTopPackets(Dictionary<byte, int> counts)
-        {
-            if (counts == null || counts.Count == 0)
-                return "(none)";
-
-            var sb = new System.Text.StringBuilder();
-            int n = 0;
-
-            foreach (var kvp in counts.OrderByDescending(k => k.Value))
-            {
-                if (n++ > 0) sb.Append(' ');
-                sb.AppendFormat("{0:X2}={1}", kvp.Key, kvp.Value);
-                if (n >= 5) break;
-            }
-
-            return sb.ToString();
-        }
-
         public virtual void Send(Packet p)
         {
             if (p == null)
@@ -807,14 +732,6 @@ namespace Server.Network
                     if (buffer.Length <= 0 || length <= 0)
                     {
                         return;
-                    }
-
-                    // Capture 0xBF subcommand BEFORE encryption mutates the payload.
-                    // Layout: [0]=ID [1][2]=len [3][4]=subcommand.
-                    int telemetrySubCmd = -1;
-                    if (p.PacketID == 0xBF && length >= 5)
-                    {
-                        telemetrySubCmd = (buffer[3] << 8) | buffer[4];
                     }
 
                     // 0x1D RemoveItem: client is dropping the item from its world,
@@ -883,98 +800,27 @@ namespace Server.Network
 
                                 long nowTick = Core.TickCount;
 
-                                // Roll the 10-second telemetry window.
-                                if (_RecentPacketCounts == null)
-                                {
-                                    _RecentPacketCounts = new Dictionary<byte, int>();
-                                    _RecentWindowStartTick = nowTick;
-                                }
-                                else if (nowTick - _RecentWindowStartTick >= TelemetryWindowMs)
-                                {
-                                    _RecentPacketCounts.Clear();
-                                    _RecentWindowStartTick = nowTick;
-                                    _RecentMaxPacketSize = 0;
-                                }
-
-                                byte pktId = (byte)p.PacketID;
-                                _RecentPacketCounts.TryGetValue(pktId, out int pktCount);
-                                _RecentPacketCounts[pktId] = pktCount + 1;
-
-                                if (length > _RecentMaxPacketSize)
-                                    _RecentMaxPacketSize = length;
-
-                                // Burst detection: count packets in the current wall-clock second.
-                                long secondBucket = nowTick / 1000;
-                                if (secondBucket != _LastSecondBucket)
-                                {
-                                    _LastSecondBucket = secondBucket;
-                                    _PacketsInCurrentSecond = 1;
-                                }
-                                else
-                                {
-                                    _PacketsInCurrentSecond++;
-                                }
-
-                                if (_PacketsInCurrentSecond > BurstThresholdPacketsPerSec
-                                    && nowTick - _LastBurstWarnTick >= BurstWarnCooldownMs)
-                                {
-                                    _LastBurstWarnTick = nowTick;
-
-                                    WriteSendQueueWarn(string.Format(
-                                        "{0:yyyy-MM-dd HH:mm:ss} [BurstDetected]  Client: {1}: {2} packets/s  last10s: {3}  peakPkt={4}B",
-                                        DateTime.UtcNow, this, _PacketsInCurrentSecond,
-                                        FormatTopPackets(_RecentPacketCounts),
-                                        _RecentMaxPacketSize));
-                                }
-
                                 if (pendingBytes >= SendQueueWarnBytes)
                                 {
                                     if (_StuckBacklogStartTick < 0)
                                         _StuckBacklogStartTick = nowTick;
-
-                                    if (nowTick - _LastSendQueueWarnTick >= SendQueueWarnCooldownMs)
-                                    {
-                                        _LastSendQueueWarnTick = nowTick;
-
-                                        string packetLabel = telemetrySubCmd >= 0
-                                            ? string.Format("BF/{0:X4}", telemetrySubCmd)
-                                            : p.PacketID.ToString("X2");
-
-                                        WriteSendQueueWarn(string.Format(
-                                            "{0:yyyy-MM-dd HH:mm:ss} [SendQueueWarn]  Client: {1}: backlog {2} KB (packet {3})  last10s: {4}  peakPkt={5}B",
-                                            DateTime.UtcNow, this, pendingBytes / 1024, packetLabel,
-                                            FormatTopPackets(_RecentPacketCounts),
-                                            _RecentMaxPacketSize));
-                                    }
                                 }
                                 else
                                 {
-                                    // Backlog drained back below the warn threshold — reset the timer.
                                     _StuckBacklogStartTick = -1;
                                 }
 
-                                // Byte-based safety net: client has clearly stopped draining.
+                                // Byte-based safety net.
                                 if (pendingBytes >= SendQueueDisconnectBytes)
                                 {
-                                    WriteSendQueueWarn(string.Format(
-                                        "{0:yyyy-MM-dd HH:mm:ss} [SendQueueDisconnect]  Client: {1}: backlog {2} KB exceeded threshold, disposing socket",
-                                        DateTime.UtcNow, this, pendingBytes / 1024));
-
                                     Dispose(false);
                                     return;
                                 }
 
-                                // Time-based stuck detection: backlog has been elevated for too long.
-                                // This catches Orion's frozen-but-TCP-backpressured state where the
-                                // queue plateaus around 300-500 KB and never reaches the byte cap.
+                                // Time-based stuck detection.
                                 if (_StuckBacklogStartTick > 0
                                     && nowTick - _StuckBacklogStartTick >= StuckBacklogDurationMs)
                                 {
-                                    long stuckSec = (nowTick - _StuckBacklogStartTick) / 1000;
-                                    WriteSendQueueWarn(string.Format(
-                                        "{0:yyyy-MM-dd HH:mm:ss} [SendQueueStuck]  Client: {1}: backlog {2} KB elevated for {3}s, disposing socket",
-                                        DateTime.UtcNow, this, pendingBytes / 1024, stuckSec));
-
                                     Dispose(false);
                                     return;
                                 }
@@ -1358,11 +1204,6 @@ namespace Server.Network
 
                 if (pendingBytes > 0)
                 {
-                    long silentSec = (curTicks - _LastReceivedTick) / 1000;
-                    WriteSendQueueWarn(string.Format(
-                        "{0:yyyy-MM-dd HH:mm:ss} [SendQueueStuck]  Client: {1}: silent for {2}s with {3} KB pending, disposing socket",
-                        DateTime.UtcNow, this, silentSec, pendingBytes / 1024));
-
                     Dispose(false);
                     return;
                 }
