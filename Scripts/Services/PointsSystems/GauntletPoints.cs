@@ -64,26 +64,10 @@ namespace Server.Engines.Points
 
                 if (Core.TOL)
                 {
-                    int ran = Utility.Random(m_RewardTable.Length + 1);
+                    Type[] list = m_RewardTable[Utility.Random(m_RewardTable.Length)];
+                    Type t = list.Length == 1 ? list[0] : list[Utility.Random(list.Length)];
 
-                    if (ran >= m_RewardTable.Length)
-                    {
-                        i = Loot.RandomArmorOrShieldOrWeaponOrJewelry(LootPackEntry.IsInTokuno(killer), LootPackEntry.IsMondain(killer), LootPackEntry.IsStygian(killer));
-                        RunicReforging.GenerateRandomArtifactItem(i, luck, Utility.RandomMinMax(800, 1200));
-                        NegativeAttributes attrs = RunicReforging.GetNegativeAttributes(i);
-
-                        if (attrs != null)
-                        {
-                            attrs.Prized = 1;
-                        }
-                    }
-                    else
-                    {
-                        Type[] list = m_RewardTable[ran];
-                        Type t = list.Length == 1 ? list[0] : list[Utility.Random(list.Length)];
-
-                        i = Activator.CreateInstance(t) as Item;
-                    }
+                    i = Activator.CreateInstance(t) as Item;
                 }
                 else
                 {
