@@ -72,13 +72,13 @@ namespace Server.Mobiles
             c.DropItem( new ParagonChest( Name, 5 ) );
         }
 
-        /*public override bool GivesMLMinorArtifact
+        public override bool GivesMLMinorArtifact
         {
             get
             {
                 return true;
             }
-        }*/
+        }
         public override bool AllureImmune
         {
             get

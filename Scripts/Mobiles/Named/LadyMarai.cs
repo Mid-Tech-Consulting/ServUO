@@ -61,13 +61,13 @@ namespace Server.Mobiles
             c.DropItem( new ParrotItem() );
         }
 
-        /*public override bool GivesMLMinorArtifact
+        public override bool GivesMLMinorArtifact
         {
             get
             {
                 return true;
             }
-        }*/
+        }
         public override void GenerateLoot()
         {
             AddLoot(LootPack.UltraRich, 3);
