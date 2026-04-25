@@ -3717,9 +3717,10 @@ namespace Server
         {
             state.Send(GetWorldPacketFor(state));
 
-            if (sendOplPacket)
+            if (sendOplPacket && state.ShouldSendOPLHash(this))
             {
                 state.Send(OPLPacket);
+                state.MarkOPLHashSent(this);
             }
         }
         

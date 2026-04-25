@@ -652,6 +652,14 @@ namespace Server.Network
         // until SendQueue hits its hard 2 MB cap ~90 minutes later.
         private const int SendQueueDisconnectBytes = 1536 * 1024;
 
+        // Stuck-backlog detection: when Orion freezes, TCP backpressure stops
+        // the queue from growing further. Backlog plateaus around 300-500 KB and
+        // never reaches the byte-based safety net. We instead detect "elevated
+        // backlog that hasn't drained" — if pendingBytes has been >= warn threshold
+        // continuously for this long, the client is stuck. Dispose to recover.
+        private const int StuckBacklogDurationMs = 60000; // 60 seconds elevated = stuck
+        private long _StuckBacklogStartTick = -1;
+
         // Burst telemetry: fires much sooner than the backlog warn. Catches the
         // moment of a view-enter flood before the client's decoder stalls.
         private const int TelemetryWindowMs = 10000;
@@ -665,6 +673,17 @@ namespace Server.Network
         private long _LastSecondBucket;
         private int _PacketsInCurrentSecond;
         private long _LastBurstWarnTick;
+
+        // OPL-hash dedup: looping a player through a dense house re-sends F3+DC for
+        // the same items each circuit. F3 is fine (visual state may have changed);
+        // the 0xDC OPL hash is pure-content and gets cached client-side after the
+        // first send. Some clients still re-query D6 for every DC they receive,
+        // amplifying the cumulative load. Track which items we've already told this
+        // client about, so we send DC only once per item per window. Invalidated
+        // when 0x1D fires (client drops the item) or when the TTL expires.
+        private readonly object _SentOPLHashLock = new object();
+        private const int OPLHashCacheTTLMs = 600000; // 10 minutes
+        private Dictionary<Serial, long> _SentOPLHashes;
 
         private static readonly string SendQueueWarnLogPath = "Logs/SendQueueWarn.log";
         private static readonly object _SendQueueWarnFileLock = new object();
@@ -694,6 +713,57 @@ namespace Server.Network
             catch
             {
                 // Swallow — telemetry failure should never break the send path.
+            }
+        }
+
+        // Returns true if we should send the 0xDC OPL hash for this item to this client.
+        // Skips the send if we've sent it within OPLHashCacheTTLMs.
+        public bool ShouldSendOPLHash(Item item)
+        {
+            if (item == null)
+                return false;
+
+            long now = Core.TickCount;
+
+            lock (_SentOPLHashLock)
+            {
+                if (_SentOPLHashes != null
+                    && _SentOPLHashes.TryGetValue(item.Serial, out long sentTick)
+                    && now - sentTick < OPLHashCacheTTLMs)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Record that we just sent the OPL hash. Caller is responsible for ordering
+        // this AFTER the actual Send(), so a skipped/failed send doesn't poison the cache.
+        public void MarkOPLHashSent(Item item)
+        {
+            if (item == null)
+                return;
+
+            long now = Core.TickCount;
+
+            lock (_SentOPLHashLock)
+            {
+                if (_SentOPLHashes == null)
+                    _SentOPLHashes = new Dictionary<Serial, long>();
+
+                _SentOPLHashes[item.Serial] = now;
+            }
+        }
+
+        private void InvalidateOPLHashCache(Serial s)
+        {
+            if (!s.IsItem)
+                return;
+
+            lock (_SentOPLHashLock)
+            {
+                _SentOPLHashes?.Remove(s);
             }
         }
 
@@ -745,6 +815,16 @@ namespace Server.Network
                     if (p.PacketID == 0xBF && length >= 5)
                     {
                         telemetrySubCmd = (buffer[3] << 8) | buffer[4];
+                    }
+
+                    // 0x1D RemoveItem: client is dropping the item from its world,
+                    // so the next time it comes back into view we need to send the
+                    // OPL hash again. Capture the serial pre-encryption.
+                    // Layout: [0]=ID [1..4]=serial.
+                    if (p.PacketID == 0x1D && length >= 5)
+                    {
+                        int serialInt = (buffer[1] << 24) | (buffer[2] << 16) | (buffer[3] << 8) | buffer[4];
+                        InvalidateOPLHashCache((Serial)serialInt);
                     }
 
                     PacketSendProfile prof = null;
@@ -849,6 +929,9 @@ namespace Server.Network
 
                                 if (pendingBytes >= SendQueueWarnBytes)
                                 {
+                                    if (_StuckBacklogStartTick < 0)
+                                        _StuckBacklogStartTick = nowTick;
+
                                     if (nowTick - _LastSendQueueWarnTick >= SendQueueWarnCooldownMs)
                                     {
                                         _LastSendQueueWarnTick = nowTick;
@@ -864,14 +947,33 @@ namespace Server.Network
                                             _RecentMaxPacketSize));
                                     }
                                 }
+                                else
+                                {
+                                    // Backlog drained back below the warn threshold — reset the timer.
+                                    _StuckBacklogStartTick = -1;
+                                }
 
-                                // Safety net: client has clearly stopped draining. Dispose so the
-                                // player sees a clean "connection lost" instead of a frozen UI.
+                                // Byte-based safety net: client has clearly stopped draining.
                                 if (pendingBytes >= SendQueueDisconnectBytes)
                                 {
                                     WriteSendQueueWarn(string.Format(
                                         "{0:yyyy-MM-dd HH:mm:ss} [SendQueueDisconnect]  Client: {1}: backlog {2} KB exceeded threshold, disposing socket",
                                         DateTime.UtcNow, this, pendingBytes / 1024));
+
+                                    Dispose(false);
+                                    return;
+                                }
+
+                                // Time-based stuck detection: backlog has been elevated for too long.
+                                // This catches Orion's frozen-but-TCP-backpressured state where the
+                                // queue plateaus around 300-500 KB and never reaches the byte cap.
+                                if (_StuckBacklogStartTick > 0
+                                    && nowTick - _StuckBacklogStartTick >= StuckBacklogDurationMs)
+                                {
+                                    long stuckSec = (nowTick - _StuckBacklogStartTick) / 1000;
+                                    WriteSendQueueWarn(string.Format(
+                                        "{0:yyyy-MM-dd HH:mm:ss} [SendQueueStuck]  Client: {1}: backlog {2} KB elevated for {3}s, disposing socket",
+                                        DateTime.UtcNow, this, pendingBytes / 1024, stuckSec));
 
                                     Dispose(false);
                                     return;
@@ -1000,6 +1102,7 @@ namespace Server.Network
                 if (byteCount > 0)
                 {
                     m_NextCheckActivity = Core.TickCount + 90000;
+                    _LastReceivedTick = Core.TickCount;
 
 					byte[] buffer;
 
@@ -1228,11 +1331,41 @@ namespace Server.Network
 
         private long m_NextCheckActivity;
 
+        // Time of last packet we actually RECEIVED from the client. This is the only
+        // reliable liveness signal — TCP-level send completion can succeed for minutes
+        // against a frozen client without any bytes coming back. If a player's UI
+        // freezes (Orion or any client) they stop sending move/click/heartbeat
+        // packets, and this stops being updated.
+        private long _LastReceivedTick = Core.TickCount;
+        private const int FrozenClientTimeoutMs = 30000; // 30s of silence = disconnect
+
         public void CheckAlive(long curTicks)
         {
             if (Socket == null)
             {
                 return;
+            }
+
+            // Receive-side liveness check: if we have stuff queued to send AND
+            // haven't heard from the client in a while, they're probably frozen.
+            if (curTicks - _LastReceivedTick >= FrozenClientTimeoutMs)
+            {
+                int pendingBytes;
+                lock (m_SendQueue)
+                {
+                    pendingBytes = m_SendQueue.PendingBytes;
+                }
+
+                if (pendingBytes > 0)
+                {
+                    long silentSec = (curTicks - _LastReceivedTick) / 1000;
+                    WriteSendQueueWarn(string.Format(
+                        "{0:yyyy-MM-dd HH:mm:ss} [SendQueueStuck]  Client: {1}: silent for {2}s with {3} KB pending, disposing socket",
+                        DateTime.UtcNow, this, silentSec, pendingBytes / 1024));
+
+                    Dispose(false);
+                    return;
+                }
             }
 
             if (m_NextCheckActivity - curTicks >= 0)
