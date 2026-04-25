@@ -2053,6 +2053,19 @@ namespace Server.Items
                     while (ApplyItemPower(item, false) < ItemPower.LesserArtifact);
                 }
 
+                // Safeguard: an item that was Cursed at Greater/Lesser Artifact tier can drift
+                // up to Major/Legendary after the bonus-budget properties are applied.
+                // Major and Legendary artifacts should never be Cursed — swap to Antique.
+                ItemPower finalPower = item is ICombatEquipment ? ((ICombatEquipment)item).ItemPower : power;
+
+                if (finalPower >= ItemPower.MajorArtifact && item.LootType == LootType.Cursed)
+                {
+                    item.LootType = LootType.Regular;
+
+                    if (neg != null)
+                        neg.Antique = 1;
+                }
+
                 // hues
                 if (power == ItemPower.LegendaryArtifact && (item is BaseArmor || item is BaseClothing))
                 {
