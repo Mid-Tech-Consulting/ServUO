@@ -853,6 +853,8 @@ namespace Server
     {
         public const string DateFormat = "[MMMM dd hh:mm:ss.f tt]: ";
 
+        private readonly object _SyncLock = new object();
+        private readonly StreamWriter _Writer;
         private bool _NewLine;
 
         public string FileName { get; private set; }
@@ -865,56 +867,59 @@ namespace Server
         {
             FileName = file;
 
-            using (
-                var writer =
-                    new StreamWriter(
-                        new FileStream(FileName, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.Read)))
+            // Keep one StreamWriter open for the lifetime of the logger. The previous
+            // implementation re-opened the file on every Write/WriteLine which made
+            // every Console.WriteLine a synchronous disk I/O call — under load that
+            // stalled the game thread and backed up packets to clients (lockup
+            // symptom that matched the fa8aafb3 deploy).
+            _Writer = new StreamWriter(
+                new FileStream(FileName, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.Read))
             {
-                writer.WriteLine(">>>Logging started on {0:f}.", DateTime.Now);
-                //f = Tuesday, April 10, 2001 3:51 PM 
-            }
+                AutoFlush = true
+            };
 
+            _Writer.WriteLine(">>>Logging started on {0:f}.", DateTime.Now);
             _NewLine = true;
         }
 
         public override void Write(char ch)
         {
-            using (var writer = new StreamWriter(new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read)))
+            lock (_SyncLock)
             {
                 if (_NewLine)
                 {
-                    writer.Write(DateTime.UtcNow.ToString(DateFormat));
+                    _Writer.Write(DateTime.UtcNow.ToString(DateFormat));
                     _NewLine = false;
                 }
 
-                writer.Write(ch);
+                _Writer.Write(ch);
             }
         }
 
         public override void Write(string str)
         {
-            using (var writer = new StreamWriter(new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read)))
+            lock (_SyncLock)
             {
                 if (_NewLine)
                 {
-                    writer.Write(DateTime.UtcNow.ToString(DateFormat));
+                    _Writer.Write(DateTime.UtcNow.ToString(DateFormat));
                     _NewLine = false;
                 }
 
-                writer.Write(str);
+                _Writer.Write(str);
             }
         }
 
         public override void WriteLine(string line)
         {
-            using (var writer = new StreamWriter(new FileStream(FileName, FileMode.Append, FileAccess.Write, FileShare.Read)))
+            lock (_SyncLock)
             {
                 if (_NewLine)
                 {
-                    writer.Write(DateTime.UtcNow.ToString(DateFormat));
+                    _Writer.Write(DateTime.UtcNow.ToString(DateFormat));
                 }
 
-                writer.WriteLine(line);
+                _Writer.WriteLine(line);
                 _NewLine = true;
             }
         }
