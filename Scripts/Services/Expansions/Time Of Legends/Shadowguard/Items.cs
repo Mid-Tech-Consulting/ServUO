@@ -273,16 +273,6 @@ namespace Server.Engines.Shadowguard
             }
         }
 
-        public override void Delete()
-        {
-            base.Delete();
-
-            if (Encounter != null)
-            {
-                Encounter.OnAppleDeleted();
-            }
-        }
-
 		public ShadowguardApple(Serial serial) : base(serial)
 		{
 		}
@@ -350,8 +340,6 @@ namespace Server.Engines.Shadowguard
                 {
                     Encounter.Apple = new ShadowguardApple(Encounter, this);
                     from.Backpack.DropItem(Encounter.Apple);
-
-                    Encounter.OnApplePicked();
                 }
 			}
 		}
@@ -482,7 +470,7 @@ namespace Server.Engines.Shadowguard
 			if(IsChildOf(m.Backpack))
 			{
 				m.SendLocalizedMessage(1010086); // What do you want to use this on?
-				m.BeginTarget(3, false, Server.Targeting.TargetFlags.None, (from, targeted) =>
+				m.BeginTarget(10, false, Server.Targeting.TargetFlags.None, (from, targeted) =>
 				{
 					if(targeted is PurifyingFlames)
 					{

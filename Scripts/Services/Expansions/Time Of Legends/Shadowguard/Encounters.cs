@@ -342,34 +342,6 @@ namespace Server.Engines.Shadowguard
             }
 		}
 
-        public void OnApplePicked()
-        {
-            if (Trees == null)
-                return;
-
-            foreach (var tree in Trees.Where(t => t != null && !t.Deleted))
-            {
-                if (tree.Foilage != null)
-                {
-                    tree.Foilage.ItemID--;
-                }
-            }
-        }
-
-        public void OnAppleDeleted()
-        {
-            if (Trees == null)
-                return;
-
-            foreach (var tree in Trees.Where(t => t != null && !t.Deleted))
-            {
-                if (tree.Foilage != null)
-                {
-                    tree.Foilage.ItemID++;
-                }
-            }
-        }
-
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
