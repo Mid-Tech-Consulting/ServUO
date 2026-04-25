@@ -646,6 +646,12 @@ namespace Server.Network
         private const int SendQueueWarnCooldownMs = 30000;
         private long _LastSendQueueWarnTick;
 
+        // Safety net: if the backlog grows this large the client has plainly stopped
+        // draining (frozen UI on Orion). Dispose the socket so the player gets a
+        // "connection lost" and can immediately relog, instead of sitting frozen
+        // until SendQueue hits its hard 2 MB cap ~90 minutes later.
+        private const int SendQueueDisconnectBytes = 1536 * 1024;
+
         // Burst telemetry: fires much sooner than the backlog warn. Catches the
         // moment of a view-enter flood before the client's decoder stalls.
         private const int TelemetryWindowMs = 10000;
@@ -857,6 +863,18 @@ namespace Server.Network
                                             FormatTopPackets(_RecentPacketCounts),
                                             _RecentMaxPacketSize));
                                     }
+                                }
+
+                                // Safety net: client has clearly stopped draining. Dispose so the
+                                // player sees a clean "connection lost" instead of a frozen UI.
+                                if (pendingBytes >= SendQueueDisconnectBytes)
+                                {
+                                    WriteSendQueueWarn(string.Format(
+                                        "{0:yyyy-MM-dd HH:mm:ss} [SendQueueDisconnect]  Client: {1}: backlog {2} KB exceeded threshold, disposing socket",
+                                        DateTime.UtcNow, this, pendingBytes / 1024));
+
+                                    Dispose(false);
+                                    return;
                                 }
 
                                 if (buffered && m_SendBufferPool.Count < SendBufferCapacity)

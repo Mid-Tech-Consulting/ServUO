@@ -1945,6 +1945,16 @@ namespace Server.Network
 		}
 		#endregion
 
+		// OPL content responses (0xD6) are the biggest contributor to the packet
+		// flood that locks up Orion clients — telemetry showed D6 firing ~1:1 with
+		// DC hashes, i.e. clients re-request full OPL for every hash they receive.
+		// Small batches respond inline (no perceptible latency on normal hovers);
+		// large batches drain in chunks over multiple ticks so the reply stream
+		// smooths out. Item drawing (F3 + DC) is NOT affected by this.
+		private const int BatchOPLInlineThreshold = 30;
+		private const int BatchOPLChunkSize = 20;
+		private static readonly TimeSpan BatchOPLChunkDelay = TimeSpan.FromMilliseconds(100);
+
 		public static void BatchQueryProperties(NetState state, PacketReader pvSrc)
 		{
 			if (state == null || state.Mobile == null || !state.Mobile.ViewOPL)
@@ -1962,29 +1972,66 @@ namespace Server.Network
 
 			int count = length / 4;
 
+			// Small batches: inline, same behavior as before, zero added latency.
+			if (count <= BatchOPLInlineThreshold)
+			{
+				for (int i = 0; i < count; ++i)
+				{
+					SendOPLForSerial(from, pvSrc.ReadInt32());
+				}
+				return;
+			}
+
+			// Large batch (dense house / Roof room load): drain in chunks.
+			var serials = new List<Serial>(count);
 			for (int i = 0; i < count; ++i)
 			{
-				Serial s = pvSrc.ReadInt32();
+				serials.Add(pvSrc.ReadInt32());
+			}
 
-				if (s.IsMobile)
+			SendOPLBatchChunked(from, serials, 0);
+		}
+
+		private static void SendOPLForSerial(Mobile from, Serial s)
+		{
+			if (s.IsMobile)
+			{
+				Mobile m = World.FindMobile(s);
+
+				if (m != null && from.CanSee(m) && from.InUpdateRange(m))
 				{
-					Mobile m = World.FindMobile(s);
-
-					if (m != null && from.CanSee(m) && from.InUpdateRange(m))
-					{
-						m.SendPropertiesTo(from);
-					}
+					m.SendPropertiesTo(from);
 				}
-				else if (s.IsItem)
+			}
+			else if (s.IsItem)
+			{
+				Item item = World.FindItem(s);
+
+				if (item != null && !item.Deleted && from.CanSee(item) &&
+					from.InUpdateRange(item.GetWorldLocation()))
 				{
-					Item item = World.FindItem(s);
-
-					if (item != null && !item.Deleted && from.CanSee(item) &&
-                        from.InUpdateRange(item.GetWorldLocation()))
-					{
-						item.SendPropertiesTo(from);
-					}
+					item.SendPropertiesTo(from);
 				}
+			}
+		}
+
+		private static void SendOPLBatchChunked(Mobile from, List<Serial> serials, int startIndex)
+		{
+			if (from == null || from.NetState == null || !from.ViewOPL || startIndex >= serials.Count)
+			{
+				return;
+			}
+
+			int end = Math.Min(startIndex + BatchOPLChunkSize, serials.Count);
+
+			for (int i = startIndex; i < end; i++)
+			{
+				SendOPLForSerial(from, serials[i]);
+			}
+
+			if (end < serials.Count)
+			{
+				Timer.DelayCall(BatchOPLChunkDelay, () => SendOPLBatchChunked(from, serials, end));
 			}
 		}
 
