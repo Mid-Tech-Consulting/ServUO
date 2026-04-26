@@ -40,7 +40,7 @@ namespace Server.Items
 
         public override void OnMiss(Mobile attacker, Mobile defender)
         {
-            //Validates in OnSwing for accuracy scalar
+            ResetContextTimer(attacker);
             ClearCurrentAbility(attacker);
 
             attacker.SendLocalizedMessage(1060089); // You fail to execute your special move
@@ -48,7 +48,7 @@ namespace Server.Items
 
         public override void OnHit(Mobile attacker, Mobile defender, int damage)
         {
-            //Validates in OnSwing for accuracy scalar
+            ResetContextTimer(attacker);
             ClearCurrentAbility(attacker);
 
             attacker.SendLocalizedMessage(1060216); // Your shot was successful
