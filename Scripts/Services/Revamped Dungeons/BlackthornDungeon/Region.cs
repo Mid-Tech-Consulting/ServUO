@@ -38,9 +38,6 @@ namespace Server.Engines.Blackthorn
             {
                 foreach (Mobile m in GetEnumeratedMobiles().Where(m => m is PlayerMobile && m.AccessLevel == AccessLevel.Player))
                 {
-                    if (m.Hidden)
-                        m.RevealingAction();
-
                     if (m.Y > 2575 && m.LastMoveTime + 120000 < Core.TickCount)
                         MoveLocation(m);
                 }
