@@ -40,11 +40,6 @@ namespace Server.Spells.Mysticism
             {
                 Caster.SendLocalizedMessage(1080194); // Your target cannot be affected by spell plague.
             }
-            else if (CheckResisted(m))
-            {
-                m.SendLocalizedMessage(1080199); //You resist spell plague.
-                Caster.SendLocalizedMessage(1080200); //Your target resists spell plague.
-            }
             else if (CheckHSequence(m))
             {
                 SpellHelper.CheckReflect((int)Circle, Caster, ref m);
@@ -94,16 +89,12 @@ namespace Server.Spells.Mysticism
             {
                 int amount = m_Table[from][0].Amount;
                 bool doExplosion = false;
-                double mod = from.Skills[SkillName.MagicResist].Value >= 70.0 ? (from.Skills[SkillName.MagicResist].Value / 1000 * 3) : 0.0;
 
-                if (mod < 0)
-                    mod = .01;
-
-                if (amount == 0 && .90 - mod > Utility.RandomDouble())
+                if (amount == 0 && .90 > Utility.RandomDouble())
                     doExplosion = true;
-                else if (amount == 1 && .60 - mod > Utility.RandomDouble())
+                else if (amount == 1 && .60 > Utility.RandomDouble())
                     doExplosion = true;
-                else if (amount == 2 && .30 - mod > Utility.RandomDouble())
+                else if (amount == 2 && .30 > Utility.RandomDouble())
                     doExplosion = true;
 
                 if (doExplosion)
