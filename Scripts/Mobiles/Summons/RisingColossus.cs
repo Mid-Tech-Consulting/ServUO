@@ -50,7 +50,12 @@ namespace Server.Mobiles
             VirtualArmor = 58;
             ControlSlots = 5;
 
-            m_DispelDifficulty = 91 + (int)((baseskill * 83) / 5.2);
+            // Flat DispelDifficulty so a 100-magery mage casting Mass Dispel
+            // (DispelFocus = 45) gets ~83% chance per cast — reliably dispelable
+            // with one or two casts. At 120 magery it's effectively guaranteed.
+            // Original was 91 + (baseskill * 83 / 5.2) which produced 1400-2000,
+            // making the colossus undispelable by any normal mage.
+            m_DispelDifficulty = 70;
 
             SetWeaponAbility(WeaponAbility.ArmorIgnore);
             SetWeaponAbility(WeaponAbility.CrushingBlow);

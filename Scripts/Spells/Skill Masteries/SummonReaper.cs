@@ -140,7 +140,11 @@ namespace Server.Spells.SkillMasteries
                     }
                 });
 
-            m_DispelDifficulty = 91 + (int)((caster.Skills[SkillName.Spellweaving].Base * 83) / 5.2);
+            // Flat DispelDifficulty so a 100-magery mage casting Mass Dispel
+            // (DispelFocus = 45) reliably dispels in one or two casts. Same
+            // broken formula as RisingColossus — 91 + (skill * 83 / 5.2)
+            // produced ~1400-2000, undispelable by any normal mage.
+            m_DispelDifficulty = 70;
 
             _NextAura = Core.TickCount + 3000;
             SetWeaponAbility(WeaponAbility.WhirlwindAttack);
