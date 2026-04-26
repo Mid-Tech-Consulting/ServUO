@@ -374,24 +374,24 @@ namespace Server.Engines.Blackthorn
                 {
                     foreach (Mobile damager in rights.Where(mob => mob.InRange(Beacon.Location, 12)))
                     {
-                        if (0.15 < Utility.RandomDouble())
-                            continue;
-
-                        Item i = CreateItem(damager);
-                        
-                        if (i != null)
+                        for (int j = 0; j < 2; j++)
                         {
-                            damager.PlaySound(0x5B4);
-                            damager.SendLocalizedMessage(1154554); // You recover an artifact bearing the crest of Minax from the rubble.
+                            Item i = CreateItem(damager);
 
-                            if (!damager.PlaceInBackpack(i))
+                            if (i != null)
                             {
-                                if (damager.BankBox != null && damager.BankBox.TryDropItem(damager, i, false))
-                                    damager.SendLocalizedMessage(1079730); // The item has been placed into your bank box.
-                                else
+                                damager.PlaySound(0x5B4);
+                                damager.SendLocalizedMessage(1154554); // You recover an artifact bearing the crest of Minax from the rubble.
+
+                                if (!damager.PlaceInBackpack(i))
                                 {
-                                    damager.SendLocalizedMessage(1072523); // You find an artifact, but your backpack and bank are too full to hold it.
-                                    i.MoveToWorld(damager.Location, damager.Map);
+                                    if (damager.BankBox != null && damager.BankBox.TryDropItem(damager, i, false))
+                                        damager.SendLocalizedMessage(1079730); // The item has been placed into your bank box.
+                                    else
+                                    {
+                                        damager.SendLocalizedMessage(1072523); // You find an artifact, but your backpack and bank are too full to hold it.
+                                        i.MoveToWorld(damager.Location, damager.Map);
+                                    }
                                 }
                             }
                         }
