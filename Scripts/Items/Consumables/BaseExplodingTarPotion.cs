@@ -77,6 +77,70 @@ namespace Server.Items
 			Explode( (Mobile) states[ 0 ], (Point3D) states[ 1 ], (Map) states[ 2 ] );
 		}
 
+        // Tracks the active end-of-effect timer per victim so a fresh tar hit can
+        // cancel the old timer (otherwise stacked hits could leak stuck-walk state)
+        // and so we can clear lingering state on login if the timer fires while the
+        // victim is offline.
+        private static readonly Dictionary<Mobile, Timer> _ActiveEffects = new Dictionary<Mobile, Timer>();
+
+        private static bool _LoginHookInstalled;
+
+        public static void EnsureLoginHook()
+        {
+            if (_LoginHookInstalled)
+                return;
+
+            _LoginHookInstalled = true;
+            EventSink.Login += OnLogin;
+        }
+
+        private static void OnLogin(LoginEventArgs e)
+        {
+            // If a tarred player logged out and the end-of-effect timer fired
+            // against an offline NetState, the Disable packet would silently be
+            // dropped and the entry would linger. On next login, clean up so the
+            // player is guaranteed to be in normal speed.
+            if (e.Mobile != null && _ActiveEffects.ContainsKey(e.Mobile))
+            {
+                EndTarEffect(e.Mobile);
+            }
+        }
+
+        private static void StartTarEffect(Mobile target)
+        {
+            EnsureLoginHook();
+
+            // Cancel any prior tar timer for this victim — fresh hit refreshes duration.
+            if (_ActiveEffects.TryGetValue(target, out Timer existing))
+            {
+                existing.Stop();
+            }
+
+            target.SendSpeedControl(SpeedControlType.WalkSpeed);
+
+            // Local copy of the target reference for closure safety.
+            Mobile victim = target;
+            _ActiveEffects[target] = Timer.DelayCall(TimeSpan.FromMinutes(1.0), () =>
+            {
+                EndTarEffect(victim);
+            });
+        }
+
+        private static void EndTarEffect(Mobile target)
+        {
+            if (target == null)
+                return;
+
+            if (_ActiveEffects.TryGetValue(target, out Timer t))
+            {
+                t.Stop();
+                _ActiveEffects.Remove(target);
+            }
+
+            if (target.NetState != null)
+                target.SendSpeedControl(SpeedControlType.Disable);
+        }
+
         public virtual void Explode(Mobile from, Point3D loc, Map map)
         {
             if (Deleted || map == null)
@@ -112,12 +176,7 @@ namespace Server.Items
                         player.SendLocalizedMessage(1095151);
                     }
 
-                    mobile.SendSpeedControl(SpeedControlType.WalkSpeed);
-
-                    Timer.DelayCall(TimeSpan.FromMinutes(1.0), delegate()
-                    {
-                        mobile.SendSpeedControl(SpeedControlType.Disable);
-                    });
+                    StartTarEffect(mobile);
                 }
             }
 
