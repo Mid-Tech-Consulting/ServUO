@@ -77,11 +77,8 @@ namespace Server.Items
 			Explode( (Mobile) states[ 0 ], (Point3D) states[ 1 ], (Map) states[ 2 ] );
 		}
 
-        // Tracks the active end-of-effect timer per victim so a fresh tar hit can
-        // cancel the old timer (otherwise stacked hits could leak stuck-walk state)
-        // and so we can clear lingering state on login if the timer fires while the
-        // victim is offline.
         private static readonly Dictionary<Mobile, Timer> _ActiveEffects = new Dictionary<Mobile, Timer>();
+        private static readonly Dictionary<Mobile, Timer> _ImmunityTimers = new Dictionary<Mobile, Timer>();
 
         private static bool _LoginHookInstalled;
 
@@ -96,10 +93,8 @@ namespace Server.Items
 
         private static void OnLogin(LoginEventArgs e)
         {
-            // If a tarred player logged out and the end-of-effect timer fired
-            // against an offline NetState, the Disable packet would silently be
-            // dropped and the entry would linger. On next login, clean up so the
-            // player is guaranteed to be in normal speed.
+            // If the slow timer fired while the victim was offline the Disable packet
+            // was silently dropped; resend it on login so the client is in normal speed.
             if (e.Mobile != null && _ActiveEffects.ContainsKey(e.Mobile))
             {
                 EndTarEffect(e.Mobile);
@@ -110,20 +105,33 @@ namespace Server.Items
         {
             EnsureLoginHook();
 
-            // Cancel any prior tar timer for this victim — fresh hit refreshes duration.
-            if (_ActiveEffects.TryGetValue(target, out Timer existing))
-            {
-                existing.Stop();
-            }
+            // Skip if already slowed or within the immunity window.
+            if (_ActiveEffects.ContainsKey(target) || _ImmunityTimers.ContainsKey(target))
+                return;
 
             target.SendSpeedControl(SpeedControlType.WalkSpeed);
 
-            // Local copy of the target reference for closure safety.
             Mobile victim = target;
-            _ActiveEffects[target] = Timer.DelayCall(TimeSpan.FromMinutes(1.0), () =>
+
+            _ActiveEffects[target] = Timer.DelayCall(TimeSpan.FromSeconds(8.0), () =>
             {
                 EndTarEffect(victim);
             });
+
+            _ImmunityTimers[target] = Timer.DelayCall(TimeSpan.FromMinutes(1.0), () =>
+            {
+                if (_ImmunityTimers.TryGetValue(victim, out Timer it))
+                {
+                    it.Stop();
+                    _ImmunityTimers.Remove(victim);
+                }
+            });
+        }
+
+        public static void OnMobileDamaged(Mobile target)
+        {
+            if (target != null && _ActiveEffects.ContainsKey(target))
+                EndTarEffect(target);
         }
 
         private static void EndTarEffect(Mobile target)

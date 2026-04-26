@@ -412,6 +412,7 @@ namespace Server
 
             Spells.Mysticism.SleepSpell.OnDamage(m);
             Spells.Mysticism.PurgeMagicSpell.OnMobileDoDamage(from);
+            BaseExplodingTarPotion.OnMobileDamaged(m);
             #endregion
 
             BaseCostume.OnDamaged(m);
