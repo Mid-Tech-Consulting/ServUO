@@ -83,7 +83,7 @@ namespace Server.Items
             switch (message)
             {
                 case TransmogMessage.MustBeInBackpack: return "That item must be on your character.";
-                case TransmogMessage.InvalidItemType: return "You can only transmog clothing, armor, shields, weapons, and jewelry.";
+                case TransmogMessage.InvalidItemType: return "You can only transmog clothing, armor, shields, and jewelry.";
                 case TransmogMessage.SelectBothItems: return "You have not selected both items yet.";
                 case TransmogMessage.ItemsAreIdentical: return "These items already look the same.";
                 case TransmogMessage.LayerMismatch: return "Both items must be of the same equipment type.";
@@ -221,7 +221,7 @@ namespace Server.Items
                 Item newSample = m_CurrentSample;
                 TransmogMessage message = TransmogMessage.SelectEquipment;
 
-                if (!(target is BaseWeapon || target is BaseArmor || target is BaseClothing
+                if (!(target is BaseArmor || target is BaseClothing
                       || target is BaseJewel || target is BaseShield))
                 {
                     message = TransmogMessage.InvalidItemType;
