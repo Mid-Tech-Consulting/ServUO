@@ -16,6 +16,9 @@ namespace Server.Engines.Chat
 
         public static void Initialize()
         {
+            if (!Enabled)
+                return;
+
             if (!Directory.Exists("Logs"))
                 Directory.CreateDirectory("Logs");
 

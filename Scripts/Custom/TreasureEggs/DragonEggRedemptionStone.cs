@@ -132,8 +132,8 @@ namespace Server.Items
             Disposable = true;
             Dragable = true;
 
-            AddBackground(0, 0, 440, 400, 5054);
-            AddBackground(10, 10, 420, 380, 3500);
+            AddBackground(0, 0, 440, 430, 5054);
+            AddBackground(10, 10, 420, 410, 3500);
 
             AddLabel(120, 22, 53, "Dragon Egg Redemption");
 
@@ -172,8 +172,8 @@ namespace Server.Items
             AddLabel(25, 335, 0x22, "Statuettes pop a pet when double-clicked.");
             AddLabel(25, 355, 0x22, "Summoned pets have a small chance for a rare color.");
 
-            AddButton(360, 370, 4020, 4022, 0, GumpButtonType.Reply, 0);
-            AddLabel(320, 370, 0, "Close");
+            AddButton(360, 390, 4020, 4022, 0, GumpButtonType.Reply, 0);
+            AddLabel(320, 390, 0, "Close");
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)

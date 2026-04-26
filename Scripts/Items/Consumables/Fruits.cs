@@ -586,7 +586,7 @@ namespace Server.Items
         }
     }
 
-    public class Apple : Food
+    public class Apple : Food, ICommodity
     {
         [Constructable]
         public Apple()
@@ -606,6 +606,9 @@ namespace Server.Items
             : base(serial)
         {
         }
+
+        TextDefinition ICommodity.Description { get { return LabelNumber; } }
+        bool ICommodity.IsDeedable { get { return true; } }
 
         public override void Serialize(GenericWriter writer)
         {

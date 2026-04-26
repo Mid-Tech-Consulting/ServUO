@@ -33,6 +33,9 @@ namespace Server.Commands
         }
         public static void Initialize()
         {
+            if (!m_Enabled)
+                return;
+
             EventSink.Command += new CommandEventHandler(EventSink_Command);
 
             if (!Directory.Exists("Logs"))
