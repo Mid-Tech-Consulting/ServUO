@@ -517,6 +517,20 @@ namespace Server.Items
             context.Timer.Stop();
         }
 
+        public static void ResetContextTimer(Mobile m)
+        {
+            WeaponAbilityContext existing = GetContext(m);
+
+            if (existing == null)
+                return;
+
+            RemoveContext(m, existing);
+
+            Timer timer = new WeaponAbilityTimer(m);
+            timer.Start();
+            AddContext(m, new WeaponAbilityContext(timer));
+        }
+
         private static WeaponAbilityContext GetContext(Mobile m)
         {
             return (m_PlayersTable[m] as WeaponAbilityContext);
