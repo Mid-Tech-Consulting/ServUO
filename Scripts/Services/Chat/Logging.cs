@@ -113,10 +113,13 @@ namespace Server.Engines.Chat
 
         public static void LogLeave(string channel, string username)
         {
+            if (!Enabled)
+                return;
+
             WriteLine(channel, "{0} left the channel.", username);
 
-            if ( m_OutputPerChannel.ContainsKey( channel ) )
-            	m_OutputPerChannel[channel].Dispose();
+            if (m_OutputPerChannel != null && m_OutputPerChannel.ContainsKey(channel))
+                m_OutputPerChannel[channel].Dispose();
         }
 
         public static void Log(string channel, string message)
