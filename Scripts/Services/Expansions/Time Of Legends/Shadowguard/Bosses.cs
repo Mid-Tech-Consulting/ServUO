@@ -239,7 +239,7 @@ namespace Server.Engines.Shadowguard
             if(inst != null)
                 max += inst.PartySize() * 2;
 
-			if(map == null || this.SummonTypes == null || this.SummonTypes.Length == 0 || TotalSummons() > max)
+			if(map == null || this.SummonTypes == null || this.SummonTypes.Length == 0 || TotalSummons() >= max)
 				return;
 				
 			int count = Utility.RandomList(1, 2, 2, 2, 3, 3, 4, 5);
@@ -548,7 +548,7 @@ namespace Server.Engines.Shadowguard
 			{
 				SlayerEntry slayer = SlayerGroup.GetEntryByName( weapon.Slayer );
 				
-				if(slayer != null && slayer.Slays(m))
+				if(slayer != null && slayer.Slays(this))
 				{
 					if(slayer == slayer.Group.Super)
 						damage *= 2;
@@ -784,7 +784,6 @@ namespace Server.Engines.Shadowguard
 					_NextNuke = DateTime.UtcNow + TimeSpan.FromSeconds(Utility.RandomMinMax(60, 90));
 					
 					Say(1112362); // You will burn to a pile of ash! yellow hue
-					Point3D p = Combatant.Location;
 
 					Timer.DelayCall(TimeSpan.FromSeconds(3), () =>
 					{

@@ -429,7 +429,7 @@ namespace Server.Engines.Shadowguard
             {
                 Queue.Remove(m);
 
-                return false;
+                return true;
             }
 
             return false;
@@ -458,14 +458,19 @@ namespace Server.Engines.Shadowguard
                     continue;
                 }
 
+                bool alreadyInEncounter = false;
                 foreach (ShadowguardEncounter inst in Encounters.Where(inst => inst.PartyLeader == m))
                 {
                     if (i == 0)
                         message = true;
 
                     RemoveFromQueue(m);
-                    continue;
+                    alreadyInEncounter = true;
+                    break;
                 }
+
+                if (alreadyInEncounter)
+                    continue;
 
                 if (Queue.Count > 0)
                 {
@@ -498,11 +503,11 @@ namespace Server.Engines.Shadowguard
                     Party p = Party.Get(mob);
 
                     if (p != null)
-                        p.Members.ForEach(info => info.Mobile.SendLocalizedMessage(1156190, i + 1 > 1 ? i.ToString() : "next")); 	
-                        //A Shadowguard encounter has opened. You are currently ~1_NUM~ in the 
+                        p.Members.ForEach(info => info.Mobile.SendLocalizedMessage(1156190, i + 1 > 1 ? (i + 1).ToString() : "next"));
+                        //A Shadowguard encounter has opened. You are currently ~1_NUM~ in the
                         //queue. If you are next, you may proceed to the entry stone to join.
                     else
-                        mob.SendLocalizedMessage(1156190, i + 1 > 1 ? i.ToString() : "next");
+                        mob.SendLocalizedMessage(1156190, i + 1 > 1 ? (i + 1).ToString() : "next");
                 });
             }
         }
