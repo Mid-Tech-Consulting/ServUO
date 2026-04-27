@@ -200,6 +200,11 @@ namespace Server.Spells.Ninjitsu
 				return MorphResult.Fail;
 			}
 
+			if (!BaseMount.CheckMountAllowed(m, true))
+			{
+				return MorphResult.Fail;
+			}
+
 			AnimalFormEntry entry = m_Entries[entryID];
 
 			AddLastAnimalForm(m, entryID); //On OSI, it's the last /attempted/ one not the last succeeded one
