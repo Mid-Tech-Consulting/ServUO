@@ -101,7 +101,7 @@ namespace Server.Spells.Mysticism
                 {
                     SpellPlagueTimer timer = m_Table[from][0];
 
-                    timer.NextUse = DateTime.UtcNow + TimeSpan.FromSeconds(1.5);
+                    timer.NextUse = DateTime.UtcNow + TimeSpan.FromSeconds(1.0);
 
                     DoExplosion(from, timer.Caster, false, amount);
                     timer.Amount++;
