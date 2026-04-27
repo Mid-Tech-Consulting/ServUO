@@ -639,16 +639,6 @@ namespace Server.Network
 
 		private readonly object _SendLock = new object();
 
-        // Stuck-backlog thresholds. SendQueueWarnBytes is the level above which we
-        // consider the queue "elevated" for the time-based stuck check. If pendingBytes
-        // is above this continuously for StuckBacklogDurationMs, the client is presumed
-        // frozen and we Dispose the socket. SendQueueDisconnectBytes is the higher
-        // byte-based safety net for catastrophic backlog growth.
-        private const int SendQueueWarnBytes = 256 * 1024;
-        private const int SendQueueDisconnectBytes = 1536 * 1024;
-        private const int StuckBacklogDurationMs = 60000;
-        private long _StuckBacklogStartTick = -1;
-
         // OPL-hash dedup: looping a player through a dense house re-sends F3+DC for
         // the same items each circuit. F3 is fine (visual state may have changed);
         // the 0xDC OPL hash is pure-content and gets cached client-side after the
@@ -790,39 +780,10 @@ namespace Server.Network
                             lock (_SendLock)
                             {
                                 SendQueue.Gram gram;
-                                int pendingBytes;
 
                                 lock (m_SendQueue)
                                 {
                                     gram = m_SendQueue.Enqueue(buffer, length);
-                                    pendingBytes = m_SendQueue.PendingBytes;
-                                }
-
-                                long nowTick = Core.TickCount;
-
-                                if (pendingBytes >= SendQueueWarnBytes)
-                                {
-                                    if (_StuckBacklogStartTick < 0)
-                                        _StuckBacklogStartTick = nowTick;
-                                }
-                                else
-                                {
-                                    _StuckBacklogStartTick = -1;
-                                }
-
-                                // Byte-based safety net.
-                                if (pendingBytes >= SendQueueDisconnectBytes)
-                                {
-                                    Dispose(false);
-                                    return;
-                                }
-
-                                // Time-based stuck detection.
-                                if (_StuckBacklogStartTick > 0
-                                    && nowTick - _StuckBacklogStartTick >= StuckBacklogDurationMs)
-                                {
-                                    Dispose(false);
-                                    return;
                                 }
 
                                 if (buffered && m_SendBufferPool.Count < SendBufferCapacity)
@@ -948,7 +909,6 @@ namespace Server.Network
                 if (byteCount > 0)
                 {
                     m_NextCheckActivity = Core.TickCount + 90000;
-                    _LastReceivedTick = Core.TickCount;
 
 					byte[] buffer;
 
@@ -1177,36 +1137,11 @@ namespace Server.Network
 
         private long m_NextCheckActivity;
 
-        // Time of last packet we actually RECEIVED from the client. This is the only
-        // reliable liveness signal — TCP-level send completion can succeed for minutes
-        // against a frozen client without any bytes coming back. If a player's UI
-        // freezes (Orion or any client) they stop sending move/click/heartbeat
-        // packets, and this stops being updated.
-        private long _LastReceivedTick = Core.TickCount;
-        private const int FrozenClientTimeoutMs = 30000; // 30s of silence = disconnect
-
         public void CheckAlive(long curTicks)
         {
             if (Socket == null)
             {
                 return;
-            }
-
-            // Receive-side liveness check: if we have stuff queued to send AND
-            // haven't heard from the client in a while, they're probably frozen.
-            if (curTicks - _LastReceivedTick >= FrozenClientTimeoutMs)
-            {
-                int pendingBytes;
-                lock (m_SendQueue)
-                {
-                    pendingBytes = m_SendQueue.PendingBytes;
-                }
-
-                if (pendingBytes > 0)
-                {
-                    Dispose(false);
-                    return;
-                }
             }
 
             if (m_NextCheckActivity - curTicks >= 0)
