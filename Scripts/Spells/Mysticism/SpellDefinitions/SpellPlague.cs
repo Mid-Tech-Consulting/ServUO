@@ -121,9 +121,9 @@ namespace Server.Spells.Mysticism
 
             int damage = (int)((prim + sec) / 12) + Utility.RandomMinMax(1, 6);
 
-            // Damage increases with each explosion: initial is weakest (25%), last triggered is strongest (100%)
-            int level = initial ? 0 : amount + 1;
-            damage = damage * (level + 1) / 4;
+            // Initial explosion is full damage; triggered explosions scale up from 33% to 100%
+            if (!initial)
+                damage = damage * (amount + 1) / 3;
 
             from.PlaySound(0x658);
 
