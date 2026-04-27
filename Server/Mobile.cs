@@ -11065,12 +11065,12 @@ namespace Server
 			// Restores it if the equip ultimately fails for another reason.
 			Item swappedOut = null;
 
-			if (item is Server.Items.BaseWeapon && !(item is Server.Items.BaseShield) && !(item is Server.Items.BaseEquipableLight))
+			if (item is IWeapon)
 			{
 				Layer conflictLayer = item.Layer == Layer.OneHanded ? Layer.TwoHanded : Layer.OneHanded;
 				Item conflict = FindItemOnLayer(conflictLayer);
 
-				if (conflict is Server.Items.BaseWeapon && !(conflict is Server.Items.BaseShield))
+				if (conflict is IWeapon)
 				{
 					swappedOut = conflict;
 					AddToBackpack(conflict);
