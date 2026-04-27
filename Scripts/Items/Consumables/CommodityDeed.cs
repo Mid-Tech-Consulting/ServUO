@@ -1,7 +1,7 @@
 using System;
 using Server.Targeting;
 
-namespace Server.Items
+namespace Server.Items 
 {
     public interface ICommodity /* added IsDeedable prop so expansion-based deedables can determine true/false */
     {
@@ -133,7 +133,21 @@ namespace Server.Items
             }
             else
             {
-                list.Add(1115599, string.Format("{0}\t#{1}", Commodity.Amount, Commodity.LabelNumber));
+                ICommodity commodity = Commodity as ICommodity;
+
+                if (commodity != null)
+                {
+                    TextDefinition desc = commodity.Description;
+
+                    if (desc.Number > 0)
+                        list.Add(1115599, string.Format("{0}\t#{1}", Commodity.Amount, desc.Number));
+                    else
+                        list.Add(1115599, string.Format("{0}\t{1}", Commodity.Amount, desc.String));
+                }
+                else
+                {
+                    list.Add(1115599, string.Format("{0}\t#{1}", Commodity.Amount, Commodity.LabelNumber));
+                }
             }
         }
 
