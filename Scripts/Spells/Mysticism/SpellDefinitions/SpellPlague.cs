@@ -90,11 +90,13 @@ namespace Server.Spells.Mysticism
                 int amount = m_Table[from][0].Amount;
                 bool doExplosion = false;
 
-                if (amount == 0 && .90 > Utility.RandomDouble())
+                double resistReduction = Math.Max(0.0, Math.Floor((from.Skills[SkillName.MagicResist].Value - 70.0) / 10.0) * 0.03);
+
+                if (amount == 0 && (.90 - resistReduction) > Utility.RandomDouble())
                     doExplosion = true;
-                else if (amount == 1 && .60 > Utility.RandomDouble())
+                else if (amount == 1 && (.60 - resistReduction) > Utility.RandomDouble())
                     doExplosion = true;
-                else if (amount == 2 && .30 > Utility.RandomDouble())
+                else if (amount == 2 && (.30 - resistReduction) > Utility.RandomDouble())
                     doExplosion = true;
 
                 if (doExplosion)
@@ -119,8 +121,9 @@ namespace Server.Spells.Mysticism
 
             int damage = (int)((prim + sec) / 12) + Utility.RandomMinMax(1, 6);
 
-            if (amount > 1)
-                damage /= amount;
+            // Damage increases with each explosion: initial is weakest (25%), last triggered is strongest (100%)
+            int level = initial ? 0 : amount + 1;
+            damage = damage * (level + 1) / 4;
 
             from.PlaySound(0x658);
 
