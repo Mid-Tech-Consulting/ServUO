@@ -71,6 +71,12 @@ namespace Server.Engines.VvV
             {
                 if (ViceVsVirtueSystem.IsVvV(m))
                 {
+                    if (Backpack != null)
+                    {
+                        foreach (Item item in Backpack.Items)
+                            item.SendPropertiesTo(m);
+                    }
+
                     m.SendGump(new VvVRewardGump(this, (PlayerMobile)m));
                 }
                 else
