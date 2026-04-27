@@ -88,6 +88,7 @@ namespace Server.SkillHandlers
         {
             if (_Table == null || !_Table.ContainsKey(m))
             {
+                m.RevealingAction();
                 m.Freeze(TimeSpan.FromSeconds(1));
 
                 m.Animate(AnimationType.Spell, 1);
@@ -97,7 +98,9 @@ namespace Server.SkillHandlers
                 if (_Table == null)
                     _Table = new Dictionary<Mobile, Timer>();
 
-                _Table[m] = new SpiritSpeakTimerNew(m);
+                var timer = new SpiritSpeakTimerNew(m);
+                _Table[m] = timer;
+                timer.Start();
                 return true;
             }
 
@@ -116,7 +119,6 @@ namespace Server.SkillHandlers
                 if(_Table[m] != null)
                     _Table[m].Stop();
 
-                m.SendSpeedControl(SpeedControlType.Disable);
                 _Table.Remove(m);
 
                 if (_Table.Count == 0)
@@ -152,7 +154,6 @@ namespace Server.SkillHandlers
             public SpiritSpeakTimerNew(Mobile m)
                 : base(TimeSpan.FromSeconds(1))
             {
-                Start();
                 Caster = m;
             }
 
@@ -223,11 +224,6 @@ namespace Server.SkillHandlers
                         Caster.Mana -= mana;
                         Caster.SendLocalizedMessage(number);
 
-                        if (min > max)
-                        {
-                            min = max;
-                        }
-
                         Caster.Hits += Utility.RandomMinMax(min, max);
 
                         Caster.FixedParticles(0x375A, 1, 15, 9501, 2100, 4, EffectLayer.Waist);
@@ -235,7 +231,6 @@ namespace Server.SkillHandlers
                 }
 
                 SpiritSpeak.Remove(Caster);
-                Stop();
             }
         }
 	}
