@@ -1,7 +1,7 @@
 using System;
 using Server.Targeting;
 
-namespace Server.Items
+namespace Server.Items 
 {
     public interface ICommodity /* added IsDeedable prop so expansion-based deedables can determine true/false */
     {
