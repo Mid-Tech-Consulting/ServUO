@@ -3,49 +3,40 @@ using System.Collections.Generic;
 
 namespace Server.Items
 {
-
     public class MortalStrike : WeaponAbility
     {
-        public static readonly TimeSpan PlayerDuration = TimeSpan.FromSeconds(6.0);
-        public static readonly TimeSpan NPCDuration = TimeSpan.FromSeconds(12.0);
+        public static readonly TimeSpan PlayerDuration = TimeSpan.FromSeconds(8.0);
+        public static readonly TimeSpan NPCDuration = TimeSpan.FromSeconds(14.0);
 
         private static readonly Dictionary<Mobile, Timer> m_Table = new Dictionary<Mobile, Timer>();
-        private static readonly List<Mobile> m_EffectReduction = new List<Mobile>();
+        private static readonly List<Mobile> m_Immune = new List<Mobile>();
 
         public MortalStrike()
         {
         }
 
-        public override int BaseMana
-        {
-            get
-            {
-                return 30;
-            }
-        }
+        public override int BaseMana { get { return 30; } }
+
+        // Base hit always deals 70% weapon damage; 130% case is handled in OnHit
+        public override double DamageScalar { get { return 0.7; } }
+
         public static bool IsWounded(Mobile m)
         {
             return m_Table.ContainsKey(m);
         }
 
+        public static bool IsImmune(Mobile m)
+        {
+            return m_Immune.Contains(m);
+        }
+
         public static void BeginWound(Mobile m, TimeSpan duration)
         {
-            Timer t;
-
             if (m_Table.ContainsKey(m))
-            {
                 EndWound(m, true);
-            }
 
-            if (Core.HS && m_EffectReduction.Contains(m))
-            {
-                double d = duration.TotalSeconds;
-                duration = TimeSpan.FromSeconds(d / 2);
-            }
-
-            t = new InternalTimer(m, duration);
+            Timer t = new InternalTimer(m, duration);
             m_Table[m] = t;
-
             t.Start();
 
             m.YellowHealthbar = true;
@@ -69,15 +60,14 @@ namespace Server.Items
             m.YellowHealthbar = false;
             m.SendLocalizedMessage(1060208); // You are no longer mortally wounded.
 
-            if (Core.HS && natural && !m_EffectReduction.Contains(m))
+            if (natural && !m_Immune.Contains(m))
             {
-                m_EffectReduction.Add(m);
+                m_Immune.Add(m);
 
-                Timer.DelayCall(TimeSpan.FromSeconds(8), () =>
-                    {
-                        if (m_EffectReduction.Contains(m))
-                            m_EffectReduction.Remove(m);
-                    });
+                Timer.DelayCall(TimeSpan.FromSeconds(8.0), () =>
+                {
+                    m_Immune.Remove(m);
+                });
             }
         }
 
@@ -88,25 +78,36 @@ namespace Server.Items
 
             ClearCurrentAbility(attacker);
 
-            attacker.SendLocalizedMessage(1060086); // You deliver a mortal wound!
-            defender.SendLocalizedMessage(1060087); // You have been mortally wounded!
-
             defender.PlaySound(0x1E1);
             defender.FixedParticles(0x37B9, 244, 25, 9944, 31, 0, EffectLayer.Waist);
 
-            // Do not reset timer if one is already in place.
-            if (Core.HS || !IsWounded(defender))
+            if (IsWounded(defender) || IsImmune(defender))
             {
-                if (Spells.SkillMasteries.ResilienceSpell.UnderEffects(defender)) //Halves time
-                    BeginWound(defender, defender.Player ? TimeSpan.FromSeconds(3.0) : TimeSpan.FromSeconds(6));
-                else
-                    BeginWound(defender, defender.Player ? PlayerDuration : NPCDuration);
+                // DamageScalar already applied 70%; add 60% of original (6/7 of current) to reach 130% total
+                int extra = damage * 6 / 7;
+                AOS.Damage(defender, attacker, extra, 100, 0, 0, 0, 0);
+            }
+            else
+            {
+                attacker.SendLocalizedMessage(1060086); // You deliver a mortal wound!
+                defender.SendLocalizedMessage(1060087); // You have been mortally wounded!
+
+                TimeSpan duration = defender.Player ? PlayerDuration : NPCDuration;
+
+                if (attacker.Weapon is BaseRanged)
+                    duration = TimeSpan.FromSeconds(duration.TotalSeconds / 2.0);
+
+                if (Spells.SkillMasteries.ResilienceSpell.UnderEffects(defender))
+                    duration = TimeSpan.FromSeconds(duration.TotalSeconds / 2.0);
+
+                BeginWound(defender, duration);
             }
         }
 
         private class InternalTimer : Timer
         {
             private readonly Mobile m_Mobile;
+
             public InternalTimer(Mobile m, TimeSpan duration)
                 : base(duration)
             {
