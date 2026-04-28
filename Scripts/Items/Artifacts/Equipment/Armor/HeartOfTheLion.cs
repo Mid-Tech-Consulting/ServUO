@@ -9,8 +9,14 @@ namespace Server.Items
         public HeartOfTheLion()
         {
             Hue = 0x501;
-            Attributes.Luck = 95;
-            Attributes.DefendChance = 15;
+
+            SkillName[] skills = new[] { SkillName.Swords, SkillName.Fencing, SkillName.Archery, SkillName.Macing };
+            SkillBonuses.SetValues(0, skills[Utility.Random(skills.Length)], 20.0);
+
+            Attributes.WeaponSpeed = 5;
+            Attributes.BonusStam = 8;
+            Attributes.RegenMana = 2;
+            Attributes.LowerManaCost = 5;
             ArmorAttributes.LowerStatReq = 100;
             ArmorAttributes.MageArmor = 1;
         }

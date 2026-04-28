@@ -13,7 +13,12 @@ namespace Server.Engines.VvV
 
         public VvVEpaulette()
         {
+            SkillBonuses.SetValues(0, SkillName.Tactics, 10.0);
+            Attributes.WeaponSpeed = 10;
+            Attributes.BonusStam = 8;
+            Attributes.BonusDex = 5;
             Attributes.AttackChance = 5;
+            Attributes.RegenMana = 2;
         }
 
         public VvVEpaulette(Serial serial)
@@ -45,7 +50,12 @@ namespace Server.Engines.VvV
 
         public VvVGargishEpaulette()
         {
+            SkillBonuses.SetValues(0, SkillName.Tactics, 10.0);
+            Attributes.WeaponSpeed = 10;
+            Attributes.BonusStam = 8;
+            Attributes.BonusDex = 5;
             Attributes.AttackChance = 5;
+            Attributes.RegenMana = 2;
         }
 
         public VvVGargishEpaulette(Serial serial)

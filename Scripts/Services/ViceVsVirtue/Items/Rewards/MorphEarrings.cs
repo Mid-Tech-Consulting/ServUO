@@ -22,6 +22,12 @@ namespace Server.Items
         [Constructable]
         public MorphEarrings()
         {
+            SkillBonuses.SetValues(0, SkillName.MagicResist, 10.0);
+            Attributes.CastSpeed = 1;
+            Attributes.AttackChance = 10;
+            Attributes.DefendChance = 10;
+            Attributes.WeaponSpeed = 5;
+            Attributes.BonusStr = 5;
         }
 
         public override void OnRemoved(object parent)
