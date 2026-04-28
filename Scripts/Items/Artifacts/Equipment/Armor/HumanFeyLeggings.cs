@@ -8,12 +8,15 @@ namespace Server.Items
         [Constructable]
         public HumanFeyLeggings()
         {
+            Attributes.BonusHits = 6;
+            Attributes.DefendChance = 20;
+            ArmorAttributes.MageArmor = 1;
+
             SkillBonuses.SetValues(0, SkillName.MagicResist, 10.0);
             Attributes.LowerManaCost = 5;
             Attributes.BonusDex = 5;
             Attributes.BonusStam = 8;
             Attributes.RegenHits = 2;
-            ArmorAttributes.MageArmor = 1;
         }
 
         public HumanFeyLeggings(Serial serial)

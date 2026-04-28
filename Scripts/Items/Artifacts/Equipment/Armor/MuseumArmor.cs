@@ -192,6 +192,12 @@ namespace Server.Items
             : base()
         {
             Hue = 0x835;
+            Attributes.SpellChanneling = 1;
+            Attributes.Luck = 250;
+            Attributes.CastSpeed = -1;
+            Attributes.AttackChance = 15;
+            Attributes.DefendChance = 15;
+            AbsorptionAttributes.EaterDamage = 5;
             SkillBonuses.SetValues(0, SkillName.Parry, 20.0);
         }
 

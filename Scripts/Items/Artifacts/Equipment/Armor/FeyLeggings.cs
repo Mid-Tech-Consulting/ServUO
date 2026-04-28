@@ -15,15 +15,19 @@ namespace Server.Items
         [Constructable]
         public FeyLeggings()
         {
-            SkillBonuses.SetValues(0, SkillName.MagicResist, 10.0);
+            Attributes.BonusHits = 6;
+            Attributes.DefendChance = 20;
+
+            _ElfOnly = false;
+
+            ArmorAttributes.MageArmor = 1;
+            SkillBonuses.SetValues(0, SkillName.Fishing, 20.0);
+            SkillBonuses.SetValues(1, SkillName.MagicResist, 10.0);
+
             Attributes.LowerManaCost = 5;
             Attributes.BonusDex = 5;
             Attributes.BonusStam = 8;
             Attributes.RegenHits = 2;
-
-            _ElfOnly = true;
-
-            ArmorAttributes.MageArmor = 1;
         }
 
         public FeyLeggings(Serial serial)
