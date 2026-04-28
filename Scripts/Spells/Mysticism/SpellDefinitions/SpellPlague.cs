@@ -90,18 +90,20 @@ namespace Server.Spells.Mysticism
                 int amount = m_Table[from][0].Amount;
                 bool doExplosion = false;
 
-                if (amount == 0 && .90 > Utility.RandomDouble())
+                double resistReduction = Math.Max(0.0, Math.Floor((from.Skills[SkillName.MagicResist].Value - 70.0) / 10.0) * 0.03);
+
+                if (amount == 0 && (.90 - resistReduction) > Utility.RandomDouble())
                     doExplosion = true;
-                else if (amount == 1 && .60 > Utility.RandomDouble())
+                else if (amount == 1 && (.60 - resistReduction) > Utility.RandomDouble())
                     doExplosion = true;
-                else if (amount == 2 && .30 > Utility.RandomDouble())
+                else if (amount == 2 && (.30 - resistReduction) > Utility.RandomDouble())
                     doExplosion = true;
 
                 if (doExplosion)
                 {
                     SpellPlagueTimer timer = m_Table[from][0];
 
-                    timer.NextUse = DateTime.UtcNow + TimeSpan.FromSeconds(1.5);
+                    timer.NextUse = DateTime.UtcNow + TimeSpan.FromSeconds(1.0);
 
                     DoExplosion(from, timer.Caster, false, amount);
                     timer.Amount++;
@@ -119,8 +121,9 @@ namespace Server.Spells.Mysticism
 
             int damage = (int)((prim + sec) / 12) + Utility.RandomMinMax(1, 6);
 
-            if (amount > 1)
-                damage /= amount;
+            // Initial explosion is full damage; triggered explosions scale up from 33% to 100%
+            if (!initial)
+                damage = damage * (amount + 1) / 3;
 
             from.PlaySound(0x658);
 
