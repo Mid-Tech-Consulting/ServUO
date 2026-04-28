@@ -119,7 +119,7 @@ namespace Server.Spells.Mysticism
             if (caster.Skills[SkillName.Focus].Value > sec)
                 sec = caster.Skills[SkillName.Focus].Value;
 
-            double damage = (prim + sec) / 12.0 + Utility.RandomMinMax(14, 19);
+            double damage = (prim + sec) / 12.0 + Utility.RandomMinMax(20, 25);
 
             // Initial explosion is full damage; triggered explosions scale up from 33% to 100%
             if (!initial)
