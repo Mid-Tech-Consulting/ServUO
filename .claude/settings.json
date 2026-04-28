@@ -21,7 +21,11 @@
       "Bash(git commit -m ' *)",
       "Bash(git checkout *)",
       "Bash(git remote *)",
-      "WebFetch(domain:www.uoguide.com)"
+      "WebFetch(domain:www.uoguide.com)",
+      "Read(//c/Orion Launcher/logs/**)",
+      "Bash(awk '/0000: 54/{print NR\": \"$0}' \"/c/Orion Launcher/logs/log_2026_04_25___10_04_27_111.txt\")",
+      "Bash(awk ' *)",
+      "Bash(git pull *)"
     ],
     "additionalDirectories": [
       "C:\\code\\Scripts\\Custom Arth\\Test\\Reward Tickets"
