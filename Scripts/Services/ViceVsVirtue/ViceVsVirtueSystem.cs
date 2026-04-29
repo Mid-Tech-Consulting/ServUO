@@ -442,6 +442,14 @@ namespace Server.Engines.VvV
             {
                 Instance.HandlePlayerDeath(pm);
             }
+
+            if (pm != null && TempCombatants != null)
+            {
+                TempCombatants.Where(t => t.From == pm).IterateReverse(temp =>
+                    {
+                        RemoveTempCombatant(temp);
+                    });
+            }
         }
 
         public static bool IsVvV(Mobile m, bool checkpet = true, bool guildedonly = false)
