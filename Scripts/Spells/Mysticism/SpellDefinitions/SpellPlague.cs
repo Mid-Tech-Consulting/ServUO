@@ -119,11 +119,11 @@ namespace Server.Spells.Mysticism
             if (caster.Skills[SkillName.Focus].Value > sec)
                 sec = caster.Skills[SkillName.Focus].Value;
 
-            int damage = (int)((prim + sec) / 12) + Utility.RandomMinMax(1, 6);
+            double damage = (prim + sec) / 12.0 + Utility.RandomMinMax(31, 36); // 51 to 56 base damage
 
             // Initial explosion is full damage; triggered explosions scale up from 33% to 100%
             if (!initial)
-                damage = damage * (amount + 1) / 3;
+                damage = damage * (amount + 1) / 3.0;
 
             from.PlaySound(0x658);
 
@@ -132,8 +132,7 @@ namespace Server.Spells.Mysticism
 
             int sdiBonus = SpellHelper.GetSpellDamageBonus(caster, from, SkillName.Mysticism, from is PlayerMobile);
 
-            damage *= (100 + sdiBonus);
-            damage /= 100;
+            damage = damage * (100 + sdiBonus) / 100.0;
 
             SpellHelper.Damage(null, TimeSpan.Zero, from, caster, damage, 0, 0, 0, 0, 0, DFAlgorithm.Standard, 100, 0);
         }
