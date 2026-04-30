@@ -6,6 +6,8 @@ namespace Server.Items
 {
 	public class HealingStone : Item
 	{
+		private const double MinSkillToUse = 50.0;
+
 		private Mobile m_Caster;
 		private int m_LifeForce;
         private int m_MaxLifeForce;
@@ -53,10 +55,10 @@ namespace Server.Items
 			else if ( from != m_Caster )
 			{
 			}
-            else if (from.Skills[SkillName.Mysticism].Value <= 0
-                || (from.Skills[SkillName.Focus].Value <= 0 && from.Skills[SkillName.Imbuing].Value <= 0))
+            else if (from.Skills[SkillName.Mysticism].Value < MinSkillToUse
+                || (from.Skills[SkillName.Focus].Value < MinSkillToUse && from.Skills[SkillName.Imbuing].Value < MinSkillToUse))
             {
-                // Caster soul-stoned off the skills required to use a Healing Stone.
+                // Real-mystic floor: leaving token points of skill after stoning out shouldn't qualify.
                 from.SendLocalizedMessage(1115265); // Your Mysticism, Focus, or Imbuing Skills are not enough to use the heal stone to cure yourself.
             }
             else if (!BasePotion.HasFreeHand(from))
