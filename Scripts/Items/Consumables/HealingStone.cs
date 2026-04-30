@@ -53,6 +53,12 @@ namespace Server.Items
 			else if ( from != m_Caster )
 			{
 			}
+            else if (from.Skills[SkillName.Mysticism].Value <= 0
+                || (from.Skills[SkillName.Focus].Value <= 0 && from.Skills[SkillName.Imbuing].Value <= 0))
+            {
+                // Caster soul-stoned off the skills required to use a Healing Stone.
+                from.SendLocalizedMessage(1115265); // Your Mysticism, Focus, or Imbuing Skills are not enough to use the heal stone to cure yourself.
+            }
             else if (!BasePotion.HasFreeHand(from))
             {
                 from.SendLocalizedMessage(1080116); // You must have a free hand to use a Healing Stone.

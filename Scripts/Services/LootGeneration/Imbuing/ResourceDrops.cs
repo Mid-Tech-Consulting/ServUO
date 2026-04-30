@@ -79,7 +79,7 @@ namespace Server.Items
             m_IngredientTable.Add(new IngredientDropEntry(typeof(HighPlainsBoura), true, 1.0, typeof(BouraPelt)));
 
             //Silver snake skin
-            m_IngredientTable.Add(new IngredientDropEntry(typeof(SilverSerpent), true, "TerMur", .10, typeof(SilverSnakeSkin)));
+            m_IngredientTable.Add(new IngredientDropEntry(typeof(SilverSerpent), true, "TerMur", .20, typeof(SilverSnakeSkin)));
 
             //Harpsichord Roll
             m_IngredientTable.Add(new IngredientDropEntry(typeof(BaseCreature), true, "TerMur", .05, typeof(HarpsichordRoll)));
@@ -120,7 +120,10 @@ namespace Server.Items
             m_IngredientTable.Add(new IngredientDropEntry(typeof(FireElementalRenowned), true, 1.0, typeof(LavaSerpentCrust)));
 
             //Undying Flesh
-            m_IngredientTable.Add(new IngredientDropEntry(typeof(UndeadGuardian), true, .10, typeof(UndyingFlesh)));
+            m_IngredientTable.Add(new IngredientDropEntry(typeof(UndeadGuardian), true, .15, typeof(UndyingFlesh)));
+            m_IngredientTable.Add(new IngredientDropEntry(typeof(PutridUndeadGuardian), true, .25, typeof(UndyingFlesh)));
+            m_IngredientTable.Add(new IngredientDropEntry(typeof(PutridUndeadGargoyle), true, .25, typeof(UndyingFlesh)));
+            m_IngredientTable.Add(new IngredientDropEntry(typeof(EffetePutridGargoyle), true, .15, typeof(UndyingFlesh)));
             m_IngredientTable.Add(new IngredientDropEntry(typeof(Niporailem), true, 1.0, typeof(UndyingFlesh)));
             m_IngredientTable.Add(new IngredientDropEntry(typeof(ChaosVortex), true, .25, typeof(UndyingFlesh)));
 
