@@ -372,6 +372,7 @@ namespace Server.Mobiles
         // artifact pool above and never roll on this list.
         private static readonly Type[] m_MagicalTalismans = new Type[]
         {
+            // Mage pool (7)
             typeof(TalismanOfTheMystic),
             typeof(TalismanOfTheNecromancer),
             typeof(TalismanOfTheSpellweaver),
@@ -379,6 +380,18 @@ namespace Server.Mobiles
             typeof(TalismanOfTheBokutoMage),
             typeof(TalismanOfTheStealthMage),
             typeof(TalismanOfTheTamerMage),
+            // Dexer pool (11)
+            typeof(TalismanOfTheWarrior),
+            typeof(TalismanOfTheBrute),
+            typeof(TalismanOfTheFencer),
+            typeof(TalismanOfTheMarksman),
+            typeof(TalismanOfTheSkirmisher),
+            typeof(TalismanOfTheSamurai),
+            typeof(TalismanOfTheNinja),
+            typeof(TalismanOfTheCrusader),
+            typeof(TalismanOfTheDeathKnight),
+            typeof(TalismanOfTheMysticWarrior),
+            typeof(TalismanOfTheSpellsword),
         };
 
         public static void GiveMagicalTalisman(Mobile m)
