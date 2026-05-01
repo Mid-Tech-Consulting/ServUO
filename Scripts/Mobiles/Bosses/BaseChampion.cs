@@ -383,13 +383,28 @@ namespace Server.Mobiles
 
         public static void GiveMagicalTalisman(Mobile m)
         {
-            Type type = m_MagicalTalismans[Utility.Random(m_MagicalTalismans.Length)];
-            Item talisman = Loot.Construct(type);
+            // Same drop pool as the talismans, but with a Bogling Hide Mukluks slot too —
+            // race-picks the correct gargoyle vs. human variant when boots come up.
+            int roll = Utility.Random(m_MagicalTalismans.Length + 1);
 
-            if (talisman != null)
+            if (roll < m_MagicalTalismans.Length)
             {
-                m.AddToBackpack(talisman);
-                m.SendMessage(0x22, "You have received a magical talisman!");
+                Item talisman = Loot.Construct(m_MagicalTalismans[roll]);
+
+                if (talisman != null)
+                {
+                    m.AddToBackpack(talisman);
+                    m.SendMessage(0x22, "You have received a magical talisman!");
+                }
+            }
+            else
+            {
+                Item boots = m.Race == Race.Gargoyle
+                    ? (Item)new GargishBoglingHideMukluks()
+                    : (Item)new BoglingHideMukluks();
+
+                m.AddToBackpack(boots);
+                m.SendMessage(0x22, "You have received Bogling Hide Mukluks!");
             }
         }
         #endregion
