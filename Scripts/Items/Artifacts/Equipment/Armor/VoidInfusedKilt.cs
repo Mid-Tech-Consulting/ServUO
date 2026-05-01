@@ -11,13 +11,15 @@ namespace Server.Items
         public VoidInfusedKilt()
             : base()
         {
-            Hue = 2124;		
-            Attributes.AttackChance = 5;			
-            Attributes.BonusStr = 5;	
+            Hue = 2124;
+            Attributes.AttackChance = 10;
+            Attributes.BonusStr = 5;
             Attributes.BonusDex = 5;
             Attributes.RegenMana = 1;
             Attributes.RegenStam = 1;
+            Attributes.LowerManaCost = 8;
             AbsorptionAttributes.EaterDamage = 10;
+            SkillBonuses.SetValues(0, SkillName.MagicResist, 15.0);
         }
 
         public VoidInfusedKilt(Serial serial)
@@ -29,35 +31,35 @@ namespace Server.Items
         {
             get
             {
-                return 13;
+                return 15;
             }
         }
         public override int BaseFireResistance
         {
             get
             {
-                return 12;
+                return 15;
             }
         }
         public override int BaseColdResistance
         {
             get
             {
-                return 8;
+                return 15;
             }
         }
         public override int BasePoisonResistance
         {
             get
             {
-                return 9;
+                return 15;
             }
         }
         public override int BaseEnergyResistance
         {
             get
             {
-                return 9;
+                return 15;
             }
         }
         public override int InitMinHits

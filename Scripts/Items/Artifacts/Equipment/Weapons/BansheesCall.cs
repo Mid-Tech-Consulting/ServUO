@@ -10,13 +10,14 @@ namespace Server.Items
         [Constructable]
         public BansheesCall() 
         {
-            Hue = 1266;		
-            WeaponAttributes.HitHarm = 40;
-            Attributes.BonusStr = 5;
+            Hue = 1266;
+            WeaponAttributes.HitHarm = 50;
             WeaponAttributes.HitLeechHits = 45;
+            WeaponAttributes.HitLowerDefend = 50;
+            Attributes.BonusStr = 5;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 50;
-            Velocity = 35;		
+            Velocity = 70;
             AosElementDamages.Cold = 100;
         }
 

@@ -13,11 +13,16 @@ namespace Server.Items
         {	
             Hue = 1165;
             Attributes.BonusHits = 2;
+            Attributes.BonusStam = 8;
             Attributes.AttackChance = 10;
-            Attributes.WeaponDamage = 45;
+            Attributes.WeaponDamage = 50;
             Attributes.WeaponSpeed = 35;
-            WeaponAttributes.HitLowerDefend = 40;	
-            WeaponAttributes.HitFireball = 40;
+            WeaponAttributes.HitLowerDefend = 40;
+            WeaponAttributes.HitFireball = 60;
+            WeaponAttributes.HitLeechMana = 60;
+            WeaponAttributes.HitLeechHits = 60;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Fire = 100;
         }
 
         public CavalrysFolly(Serial serial)

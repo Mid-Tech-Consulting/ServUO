@@ -11,12 +11,15 @@ namespace Server.Items
         public VampiricEssence()
         {
             Hue = 39;
-            WeaponAttributes.HitLeechHits = 100;			
+            WeaponAttributes.HitLeechHits = 100;
             WeaponAttributes.HitHarm = 50;
+            WeaponAttributes.HitColdArea = 80;
+            WeaponAttributes.HitLeechMana = 80;
+            WeaponAttributes.BloodDrinker = 1;
             Attributes.WeaponSpeed = 20;
             Attributes.WeaponDamage = 50;
+            Slayer = SlayerName.Exorcism;
             AosElementDamages.Cold = 100;
-            WeaponAttributes.BloodDrinker = 1;
         }
 
         public VampiricEssence(Serial serial)

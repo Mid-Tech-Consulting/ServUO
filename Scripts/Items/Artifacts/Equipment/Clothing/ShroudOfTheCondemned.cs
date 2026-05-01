@@ -17,6 +17,7 @@ namespace Server.Items
             Hue = 2075;
             Attributes.BonusHits = 3;
             Attributes.BonusInt = 5;
+            SkillBonuses.SetValues(0, SkillName.Necromancy, 10.0);
         }
 
         public ShroudOfTheCondemned(Serial serial)

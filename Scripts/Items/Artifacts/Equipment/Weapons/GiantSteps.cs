@@ -11,12 +11,15 @@ namespace Server.Items
         public GiantSteps()
             : base()
         {
-            Hue = 656;				
+            Hue = 656;
             Attributes.BonusStr = 5;
             Attributes.BonusDex = 5;
             Attributes.BonusHits = 5;
             Attributes.RegenHits = 2;
+            Attributes.RegenMana = 2;
             Attributes.WeaponDamage = 10;
+            Attributes.LowerManaCost = 8;
+            SkillBonuses.SetValues(0, SkillName.Tactics, 10.0);
         }
 
         public GiantSteps(Serial serial)
@@ -28,35 +31,35 @@ namespace Server.Items
         {
             get
             {
-                return 18;
+                return 20;
             }
         }
         public override int BaseFireResistance
         {
             get
             {
-                return 16;
+                return 20;
             }
         }
         public override int BaseColdResistance
         {
             get
             {
-                return 4;
+                return 20;
             }
         }
         public override int BasePoisonResistance
         {
             get
             {
-                return 8;
+                return 20;
             }
         }
         public override int BaseEnergyResistance
         {
             get
             {
-                return 12;
+                return 20;
             }
         }
         public override int InitMinHits

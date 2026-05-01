@@ -11,13 +11,15 @@ namespace Server.Items
         public Mangler()
             : base()
         {
-            Hue = 2001;			
+            Hue = 2001;
             WeaponAttributes.HitLeechMana = 50;
+            WeaponAttributes.HitHarm = 50;
+            WeaponAttributes.UseBestSkill = 1;
+            WeaponAttributes.HitLowerDefend = 30;
             Attributes.WeaponDamage = 50;
             Attributes.WeaponSpeed = 25;
-            WeaponAttributes.HitHarm = 50;
-            WeaponAttributes.UseBestSkill = 1;			
-            WeaponAttributes.HitLowerDefend = 30;		
+            Attributes.SpellChanneling = 1;
+            Slayer = SlayerName.ReptilianDeath;		
         }
 
         public Mangler(Serial serial)

@@ -14,11 +14,15 @@ namespace Server.Items
             Hue = 1366;
             AbsorptionAttributes.EaterDamage = 10;
             Attributes.BonusDex = 5;
+            Attributes.BonusStam = 8;
             Attributes.RegenHits = 2;
             Attributes.RegenStam = 2;
-            Attributes.RegenMana = 1;
-            Attributes.DefendChance = 5;
+            Attributes.RegenMana = 2;
+            Attributes.DefendChance = 10;
+            Attributes.AttackChance = 10;
             Attributes.LowerManaCost = 5;
+            Attributes.LowerRegCost = 30;
+            Attributes.WeaponSpeed = 10;
         }
 
         public BasiliskHideBreastplate(Serial serial)
@@ -30,7 +34,7 @@ namespace Server.Items
         {
             get
             {
-                return 12;
+                return 15;
             }
         }
         public override int BaseFireResistance
@@ -44,21 +48,21 @@ namespace Server.Items
         {
             get
             {
-                return 6;
+                return 15;
             }
         }
         public override int BasePoisonResistance
         {
             get
             {
-                return 11;
+                return 15;
             }
         }
         public override int BaseEnergyResistance
         {
             get
             {
-                return 5;
+                return 15;
             }
         }
         public override int InitMinHits

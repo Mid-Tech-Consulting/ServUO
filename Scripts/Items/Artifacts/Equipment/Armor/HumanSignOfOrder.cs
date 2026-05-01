@@ -9,11 +9,14 @@ namespace Server.Items
         public HumanSignOfOrder()
             : base()
         {
-            SkillBonuses.SetValues(0, SkillName.Chivalry, 10.0);
+            SkillBonuses.SetValues(0, SkillName.Chivalry, 20.0);
             Attributes.AttackChance = 5;
             Attributes.DefendChance = 10;
             Attributes.CastSpeed = 1;
             Attributes.CastRecovery = 1;
+            Attributes.BonusStr = 5;
+            Attributes.WeaponSpeed = 5;
+            ArmorAttributes.ReactiveParalyze = 1;
         }
 
         public HumanSignOfOrder(Serial serial)

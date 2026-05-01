@@ -9,10 +9,14 @@ namespace Server.Items
         public DragonHideShield()
             : base()
         {		
-			Hue = 44;	
+			Hue = 44;
             AbsorptionAttributes.EaterFire = 20;
             Attributes.RegenHits = 2;
             Attributes.DefendChance = 10;
+            Attributes.WeaponSpeed = 5;
+            Attributes.AttackChance = 10;
+            Attributes.SpellChanneling = 1;
+            Attributes.CastSpeed = 1;
         }
 
         public DragonHideShield(Serial serial)

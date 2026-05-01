@@ -16,8 +16,10 @@ namespace Server.Items
             WeaponAttributes.HitLeechHits = 60;
             WeaponAttributes.HitLeechStam = 60;
             WeaponAttributes.HitLeechMana = 60;
-            Attributes.WeaponSpeed = 20;
+            WeaponAttributes.HitColdArea = 80;
+            Attributes.WeaponSpeed = 40;
             Attributes.WeaponDamage = 60;
+            Slayer = SlayerName.Exorcism;
             AosElementDamages.Chaos = 100;
         }
 

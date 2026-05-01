@@ -11,12 +11,14 @@ namespace Server.Items
         public SwordOfShatteredHopes()
             : base()
         {
-            Hue = 91;				
+            Hue = 91;
             WeaponAttributes.HitDispel = 25;
             WeaponAttributes.SplinteringWeapon = 20;
-            Attributes.WeaponSpeed = 30;	
-            Attributes.WeaponDamage = 50;			
+            WeaponAttributes.HitLightning = 60;
+            WeaponAttributes.HitLowerDefend = 50;
             WeaponAttributes.ResistFireBonus = 15;
+            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponDamage = 50;
         }
 
         public SwordOfShatteredHopes(Serial serial)

@@ -7,14 +7,34 @@ namespace Server.Items
 		public override bool IsArtifact { get { return true; } }
 		public override int LabelNumber { get { return 1114785; } } // Night Eyes
 		
+        private static readonly SkillName[] m_RandomSkills =
+        {
+            SkillName.Magery,
+            SkillName.EvalInt,
+            SkillName.Necromancy,
+            SkillName.SpiritSpeak,
+            SkillName.Focus,
+            SkillName.Meditation,
+            SkillName.Cartography,
+            SkillName.Mining,
+            SkillName.Blacksmith,
+            SkillName.Tailoring,
+            SkillName.Fishing,
+        };
+
         [Constructable]
         public NightEyes()
             : base()
-        {	
-            Hue = 26;	
+        {
+            Hue = 26;
             Attributes.NightSight = 1;
             Attributes.DefendChance = 10;
-            Attributes.CastRecovery = 3;			
+            Attributes.CastRecovery = 3;
+            Attributes.LowerRegCost = 20;
+            Attributes.LowerManaCost = 8;
+            Attributes.Luck = 150;
+            Attributes.SpellDamage = 10;
+            SkillBonuses.SetValues(0, m_RandomSkills[Utility.Random(m_RandomSkills.Length)], 20.0);
         }
 
         public NightEyes(Serial serial)

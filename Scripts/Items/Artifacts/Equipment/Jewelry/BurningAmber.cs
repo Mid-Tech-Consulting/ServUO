@@ -10,11 +10,15 @@ namespace Server.Items
         [Constructable]
         public BurningAmber()
         {
-            Hue = 1174;		
+            Hue = 1174;
             Attributes.CastRecovery = 3;
+            Attributes.CastSpeed = 1;
             Attributes.RegenMana = 2;
             Attributes.BonusDex = 5;
+            Attributes.AttackChance = 15;
+            Attributes.Luck = 200;
             Resistances.Fire = 20;
+            SkillBonuses.SetValues(0, SkillName.Chivalry, 20.0);
         }
 
         public BurningAmber(Serial serial)

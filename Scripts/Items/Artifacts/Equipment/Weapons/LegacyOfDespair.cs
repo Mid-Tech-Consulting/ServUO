@@ -10,12 +10,13 @@ namespace Server.Items
         [Constructable]
         public LegacyOfDespair()
         {	
-            Hue = 48;		
+            Hue = 48;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 60;
             WeaponAttributes.HitLowerDefend = 50;
             WeaponAttributes.HitLowerAttack = 50;
-            WeaponAttributes.HitCurse = 10;		
+            WeaponAttributes.HitCurse = 10;
+            WeaponAttributes.HitLightning = 70;
             AosElementDamages.Cold = 75;
             AosElementDamages.Poison = 25;			
         }

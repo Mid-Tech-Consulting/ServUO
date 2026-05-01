@@ -12,9 +12,12 @@ namespace Server.Items
             : base()
         {
             ItemID = 0x4000;
-            Hue = 1420;		
+            Hue = 1420;
             Attributes.BonusMana = 5;
-            Attributes.LowerManaCost = 1;
+            Attributes.LowerManaCost = 8;
+            Attributes.RegenMana = 2;
+            Attributes.SpellDamage = 10;
+            SkillBonuses.SetValues(0, SkillName.Focus, 20.0);
         }
 
         public MysticsGarb(Serial serial)

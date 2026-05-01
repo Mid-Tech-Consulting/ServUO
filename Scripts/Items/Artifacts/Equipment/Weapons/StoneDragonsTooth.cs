@@ -11,14 +11,17 @@ namespace Server.Items
         public StoneDragonsTooth()
             : base()
         {
-            Hue = 2407;		
+            Hue = 2407;
             Attributes.WeaponSpeed = 10;
             Attributes.WeaponDamage = 50;
             Attributes.RegenHits = 3;
+            Attributes.SpellChanneling = 1;
+            Attributes.Luck = 150;
             WeaponAttributes.HitMagicArrow = 40;
-            WeaponAttributes.HitLowerDefend = 30;	
-            WeaponAttributes.ResistFireBonus = 10;	
-            AbsorptionAttributes.EaterPoison = 10;		
+            WeaponAttributes.HitLowerDefend = 30;
+            WeaponAttributes.ResistFireBonus = 10;
+            WeaponAttributes.MageWeapon = 30;
+            AbsorptionAttributes.EaterPoison = 10;
             AosElementDamages.Poison = 100;			
         }
 

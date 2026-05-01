@@ -11,13 +11,15 @@ namespace Server.Items
         [Constructable]
         public JadeWarAxe()
         {	
-            Hue = 1162;			
+            Hue = 1162;
             AbsorptionAttributes.EaterFire = 10;
             Slayer = SlayerName.ReptilianDeath;
-            WeaponAttributes.HitFireball = 30;	
-            WeaponAttributes.HitLowerDefend = 60;		
+            WeaponAttributes.HitFireball = 70;
+            WeaponAttributes.HitLowerDefend = 60;
             Attributes.WeaponSpeed = 20;
             Attributes.WeaponDamage = 50;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Fire = 100;
         }
 
         public JadeWarAxe(Serial serial)

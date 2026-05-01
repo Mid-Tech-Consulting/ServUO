@@ -10,12 +10,20 @@ namespace Server.Items
         [Constructable]
         public Lavaliere()
         {
-            Hue = 1194;		
+            Hue = 1194;
             AbsorptionAttributes.EaterKinetic = 20;
             Attributes.DefendChance = 10;
-            Resistances.Physical = 15;
             Attributes.LowerManaCost = 10;
             Attributes.LowerRegCost = 20;
+            Attributes.BonusInt = 10;
+            Attributes.RegenMana = 2;
+            Attributes.SpellDamage = 20;
+            Resistances.Physical = 15;
+            Resistances.Fire = 15;
+            Resistances.Cold = 15;
+            Resistances.Poison = 15;
+            Resistances.Energy = 15;
+            SkillBonuses.SetValues(0, SkillName.EvalInt, 15.0);
         }
 
         public Lavaliere(Serial serial)

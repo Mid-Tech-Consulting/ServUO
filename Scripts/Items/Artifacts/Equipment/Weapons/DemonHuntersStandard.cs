@@ -10,14 +10,16 @@ namespace Server.Items
         [Constructable]
         public DemonHuntersStandard()
         {
-            Hue = 1377;				
-            Attributes.CastSpeed = 1;			
+            Hue = 1377;
+            Attributes.CastSpeed = 1;
             Attributes.WeaponSpeed = 25;
             Attributes.WeaponDamage = 50;
             WeaponAttributes.HitLeechStam = 50;
-            WeaponAttributes.HitLightning = 40;	
-            WeaponAttributes.HitLowerDefend = 30;
+            WeaponAttributes.HitLightning = 70;
+            WeaponAttributes.HitLowerDefend = 50;
             Slayer = SlayerName.Exorcism;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Cold = 100;
         }
 
         public DemonHuntersStandard(Serial serial)

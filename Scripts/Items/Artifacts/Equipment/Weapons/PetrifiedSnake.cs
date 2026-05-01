@@ -11,15 +11,16 @@ namespace Server.Items
         public PetrifiedSnake()
             : base()
         {		
-            Hue = 460;		
-            AbsorptionAttributes.EaterPoison = 20;	
+            Hue = 460;
+            AbsorptionAttributes.EaterPoison = 20;
             Slayer = SlayerName.ReptilianDeath;
-            WeaponAttributes.HitMagicArrow = 30;
-            WeaponAttributes.HitLowerDefend = 30;		
+            WeaponAttributes.HitMagicArrow = 60;
+            WeaponAttributes.HitLowerDefend = 30;
+            WeaponAttributes.HitPoisonArea = 80;
+            WeaponAttributes.ResistPoisonBonus = 10;
             Attributes.WeaponSpeed = 30;
-            Attributes.WeaponDamage = 50;	
-            AosElementDamages.Poison = 100;		
-            WeaponAttributes.ResistPoisonBonus = 10;			
+            Attributes.WeaponDamage = 50;
+            AosElementDamages.Poison = 100;			
         }
 
         public PetrifiedSnake(Serial serial)
