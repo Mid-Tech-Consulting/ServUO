@@ -300,7 +300,7 @@ namespace Server.Items
 
     // ============================================================
     // Dexer talismans — universal pair: Anatomy 5 + Tactics 5.
-    // Bonuses: 10 HCI / 10 DCI / 30 SSI / 50 DI on every variant
+    // Bonuses: 10 HCI / 10 DCI / 15 SSI / 50 DI on every variant
     // (parallel to the mage pool's 10 HCI / 10 DCI / 1 FC / 50 SDI).
     // Hue 1153 distinguishes them visually from the mage pool.
     // ============================================================
@@ -323,7 +323,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Healing, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -350,7 +350,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Healing, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -377,7 +377,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Healing, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -404,7 +404,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Healing, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -431,7 +431,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Healing, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -458,7 +458,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Parry, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -485,7 +485,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Stealth, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -512,7 +512,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Healing, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -539,7 +539,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.SpiritSpeak, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -566,7 +566,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Focus, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
@@ -593,7 +593,7 @@ namespace Server.Items
             SkillBonuses.SetValues(3, SkillName.Swords, 5.0);
             Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
-            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponSpeed = 15;
             Attributes.WeaponDamage = 50;
         }
 
