@@ -14,11 +14,12 @@ namespace Server.Items
         [Constructable]
         public SummonersKilt()
         {
-            Hue = 1266;			
+            Hue = 1266;
             Attributes.BonusMana = 5;
             Attributes.RegenMana = 2;
-            Attributes.SpellDamage = 5;
-            SAAbsorptionAttributes.CastingFocus = 2;
+            Attributes.SpellDamage = 20;
+            Attributes.BonusInt = 5;
+            SAAbsorptionAttributes.CastingFocus = 5;
             Attributes.LowerManaCost = 8;
             Attributes.LowerRegCost = 10;
         }
@@ -32,14 +33,14 @@ namespace Server.Items
         {
             get
             {
-                return 5;
+                return 20;
             }
         }
         public override int BaseFireResistance
         {
             get
             {
-                return 7;
+                return 20;
             }
         }
         public override int BaseColdResistance
@@ -53,7 +54,7 @@ namespace Server.Items
         {
             get
             {
-                return 6;
+                return 20;
             }
         }
         public override int BaseEnergyResistance

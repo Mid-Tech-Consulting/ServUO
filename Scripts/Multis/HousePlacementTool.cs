@@ -399,31 +399,31 @@ namespace Server.Items
             new HousePlacementEntry(typeof(Keep),               1011313,	2625,	1312,	3019,	1509,	52,	562500, 0, 11,	0,	0x007C),
             new HousePlacementEntry(typeof(Castle),             1011314,	4076,	2038,	4688,	2344,	78,	865000, 0, 16,	0,	0x007E),
 
-            new HousePlacementEntry(typeof(TrinsicKeep),        1158748,	2625,	1312,	3019,	1509,	52,	29643750, 0, 11,	0,	0x147E),
-            new HousePlacementEntry(typeof(GothicRoseCastle),   1158749,	4076,	2038,	4688,	2344,	78,	44808750, 0, 16,	0,	0x147F),
-            new HousePlacementEntry(typeof(ElsaCastle),         1158750,	4076,	2038,	4688,	2344,	78,	45450000, 0, 16,	0,	0x1480),
-            new HousePlacementEntry(typeof(Spires),             1158761,	4076,	2038,	4688,	2344,	78,	47025000, 0, 16,	0,	0x1481),
-            new HousePlacementEntry(typeof(CastleOfOceania),    1158760,	4076,	2038,	4688,	2344,	78,	48971250, 0, 16,	0,	0x1482),
-            new HousePlacementEntry(typeof(FeudalCastle),       1158762,	4076,	2038,	4688,	2344,	78,	27337500, 0, 16,	0,	0x1483),
-            new HousePlacementEntry(typeof(RobinsNest),         1158850,	2625,	1312,	3019,	1509,	52,	25301250, 0, 11,	0,	0x1484),
-            new HousePlacementEntry(typeof(TraditionalKeep),    1158851,	2625,	1312,	3019,	1509,	52,	26685000, 0, 11,	0,	0x1485),
-            new HousePlacementEntry(typeof(VillaCrowley),       1158852,	2625,	1312,	3019,	1509,	52,	21813750, 0, 11,	0,	0x1486),
-            new HousePlacementEntry(typeof(DarkthornKeep),      1158853,	2625,	1312,	3019,	1509,	52,	27990000, 0, 11,	0,	0x1487),
-            new HousePlacementEntry(typeof(SandalwoodKeep),     1158854,	2625,	1312,	3019,	1509,	52,	23456250, 0, 11,	0,	0x1488),
-            new HousePlacementEntry(typeof(CasaMoga),           1158855,	2625,	1312,	3019,	1509,	52,	26313750, 0, 11,	0,	0x1489),
+            new HousePlacementEntry(typeof(TrinsicKeep),        1158748,	2625,	1312,	3019,	1509,	52,	7000000, 0, 11,	0,	0x147E),
+            new HousePlacementEntry(typeof(GothicRoseCastle),   1158749,	4076,	2038,	4688,	2344,	78,	8000000, 0, 16,	0,	0x147F),
+            new HousePlacementEntry(typeof(ElsaCastle),         1158750,	4076,	2038,	4688,	2344,	78,	9000000, 0, 16,	0,	0x1480),
+            new HousePlacementEntry(typeof(Spires),             1158761,	4076,	2038,	4688,	2344,	78,	9000000, 0, 16,	0,	0x1481),
+            new HousePlacementEntry(typeof(CastleOfOceania),    1158760,	4076,	2038,	4688,	2344,	78,	10000000, 0, 16,	0,	0x1482),
+            new HousePlacementEntry(typeof(FeudalCastle),       1158762,	4076,	2038,	4688,	2344,	78,	7000000, 0, 16,	0,	0x1483),
+            new HousePlacementEntry(typeof(RobinsNest),         1158850,	2625,	1312,	3019,	1509,	52,	6000000, 0, 11,	0,	0x1484),
+            new HousePlacementEntry(typeof(TraditionalKeep),    1158851,	2625,	1312,	3019,	1509,	52,	6500000, 0, 11,	0,	0x1485),
+            new HousePlacementEntry(typeof(VillaCrowley),       1158852,	2625,	1312,	3019,	1509,	52,	5500000, 0, 11,	0,	0x1486),
+            new HousePlacementEntry(typeof(DarkthornKeep),      1158853,	2625,	1312,	3019,	1509,	52,	7000000, 0, 11,	0,	0x1487),
+            new HousePlacementEntry(typeof(SandalwoodKeep),     1158854,	2625,	1312,	3019,	1509,	52,	6000000, 0, 11,	0,	0x1488),
+            new HousePlacementEntry(typeof(CasaMoga),           1158855,	2625,	1312,	3019,	1509,	52,	6500000, 0, 11,	0,	0x1489),
 
-            new HousePlacementEntry(typeof(RobinsRoost),                1158960,    4076,   2038,   4688,   2344,   78,	43863750, 0, 16,	0,	0x148A),
-            new HousePlacementEntry(typeof(Camelot),                    1158961,    4076,   2038,   4688,   2344,   78,	47092500, 0, 16,	0,  0x148B),
-            new HousePlacementEntry(typeof(LacrimaeInCaelo),            1158962,    4076,   2038,   4688,   2344,   78,	45315000, 0, 16,	0,  0x148C),
-            new HousePlacementEntry(typeof(OkinawaSweetDreamCastle),    1158963,    4076,   2038,   4688,   2344,   78,	40128750, 0, 16,	0,  0x148D),
-            new HousePlacementEntry(typeof(TheSandstoneCastle),         1158964,    4076,   2038,   4688,   2344,   78,	48690000, 0, 16,	0,  0x148E),
-            new HousePlacementEntry(typeof(GrimswindSisters),           1158965,    4076,   2038,   4688,   2344,   78, 42142500, 0, 16,    0,  0x148F),
+            new HousePlacementEntry(typeof(RobinsRoost),                1158960,    4076,   2038,   4688,   2344,   78,	8000000, 0, 16,	0,	0x148A),
+            new HousePlacementEntry(typeof(Camelot),                    1158961,    4076,   2038,   4688,   2344,   78,	9500000, 0, 16,	0,  0x148B),
+            new HousePlacementEntry(typeof(LacrimaeInCaelo),            1158962,    4076,   2038,   4688,   2344,   78,	8500000, 0, 16,	0,  0x148C),
+            new HousePlacementEntry(typeof(OkinawaSweetDreamCastle),    1158963,    4076,   2038,   4688,   2344,   78,	7500000, 0, 16,	0,  0x148D),
+            new HousePlacementEntry(typeof(TheSandstoneCastle),         1158964,    4076,   2038,   4688,   2344,   78,	9500000, 0, 16,	0,  0x148E),
+            new HousePlacementEntry(typeof(GrimswindSisters),           1158965,    4076,   2038,   4688,   2344,   78, 7500000, 0, 16,    0,  0x148F),
         };
 
         private static readonly HousePlacementEntry[] m_CustomHouseContest = new HousePlacementEntry[]
         {
-            new HousePlacementEntry(typeof(HouseFoundation), 1158538,	2625,	1312,	3019,	1509,	78,	525000, 0,	10,	0,	0x147C), // 23x23 3-Story Customizable Keep
-            new HousePlacementEntry(typeof(HouseFoundation), 1158539,	4076,	2038,	4688,	2344,	78,	525000, 0,	10,	0,	0x147D),  // 32x32 3-Story Customizable Castle
+            new HousePlacementEntry(typeof(HouseFoundation), 1158538,	2625,	1312,	3019,	1509,	78,	4000000, 0,	10,	0,	0x147C), // 23x23 3-Story Customizable Keep
+            new HousePlacementEntry(typeof(HouseFoundation), 1158539,	4076,	2038,	4688,	2344,	78,	5000000, 0,	10,	0,	0x147D),  // 32x32 3-Story Customizable Castle
         };
 
         private static readonly HousePlacementEntry[] m_TwoStoryFoundations = new HousePlacementEntry[]

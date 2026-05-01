@@ -10,14 +10,16 @@ namespace Server.Items
         [Constructable]
         public DemonBridleRing()
         {
-            Hue = 39;		
+            Hue = 39;
             Attributes.CastRecovery = 2;
-            Attributes.CastSpeed = 1;	
+            Attributes.CastSpeed = 1;
             Attributes.RegenHits = 1;
             Attributes.RegenMana = 1;
             Attributes.DefendChance = 10;
+            Attributes.AttackChance = 15;
             Attributes.LowerManaCost = 4;
-            Resistances.Fire = 5;
+            Resistances.Fire = 15;
+            SkillBonuses.SetValues(0, SkillName.Necromancy, 10.0);
         }
 
         public DemonBridleRing(Serial serial)

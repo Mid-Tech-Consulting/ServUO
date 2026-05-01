@@ -644,26 +644,30 @@ namespace Server.Network
         // the 0xDC OPL hash is pure-content and gets cached client-side after the
         // first send. Some clients still re-query D6 for every DC they receive,
         // amplifying the cumulative load. Track which items we've already told this
-        // client about, so we send DC only once per item per window. Invalidated
-        // when 0x1D fires (client drops the item) or when the TTL expires.
+        // client about, so we send DC only once per item per window. The cache stores
+        // the hash that was sent — a property change (lockdown, secure, etc.) produces
+        // a new hash, which is a cache miss and gets sent through. Invalidated when
+        // 0x1D fires (client drops the item) or when the TTL expires.
         private readonly object _SentOPLHashLock = new object();
         private const int OPLHashCacheTTLMs = 600000; // 10 minutes
-        private Dictionary<Serial, long> _SentOPLHashes;
+        private Dictionary<Serial, (long Tick, int Hash)> _SentOPLHashes;
 
         // Returns true if we should send the 0xDC OPL hash for this item to this client.
-        // Skips the send if we've sent it within OPLHashCacheTTLMs.
+        // Skips the send if we've already sent the same hash within OPLHashCacheTTLMs.
         public bool ShouldSendOPLHash(Item item)
         {
             if (item == null)
                 return false;
 
             long now = Core.TickCount;
+            int currentHash = item.PropertyList.Hash;
 
             lock (_SentOPLHashLock)
             {
                 if (_SentOPLHashes != null
-                    && _SentOPLHashes.TryGetValue(item.Serial, out long sentTick)
-                    && now - sentTick < OPLHashCacheTTLMs)
+                    && _SentOPLHashes.TryGetValue(item.Serial, out var entry)
+                    && entry.Hash == currentHash
+                    && now - entry.Tick < OPLHashCacheTTLMs)
                 {
                     return false;
                 }
@@ -680,13 +684,14 @@ namespace Server.Network
                 return;
 
             long now = Core.TickCount;
+            int currentHash = item.PropertyList.Hash;
 
             lock (_SentOPLHashLock)
             {
                 if (_SentOPLHashes == null)
-                    _SentOPLHashes = new Dictionary<Serial, long>();
+                    _SentOPLHashes = new Dictionary<Serial, (long Tick, int Hash)>();
 
-                _SentOPLHashes[item.Serial] = now;
+                _SentOPLHashes[item.Serial] = (now, currentHash);
             }
         }
 

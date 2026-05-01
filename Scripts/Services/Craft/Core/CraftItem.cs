@@ -2006,7 +2006,9 @@ namespace Server.Engines.Craft
 			}
 			else
 			{
-				ConsumeType consumeType = (UseAllRes ? ConsumeType.Half : ConsumeType.All);
+				// Failed skill check: burn 50% of resources (floor, min 1 per ingredient)
+				// regardless of UseAllRes, so a fizzle isn't a total loss.
+				ConsumeType consumeType = ConsumeType.Half;
 				int resHue = 0;
 				int maxAmount = 0;
 

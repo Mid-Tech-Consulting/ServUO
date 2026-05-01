@@ -11,11 +11,13 @@ namespace Server.Items
         [Constructable]
         public TheImpalersPick()
         {
-            Hue = 2101;		
+            Hue = 2101;
             WeaponAttributes.HitManaDrain = 10;
+            WeaponAttributes.HitLightning = 70;
+            WeaponAttributes.HitLowerDefend = 50;
+            WeaponAttributes.HitPoisonArea = 100;
+            WeaponAttributes.BloodDrinker = 1;
             Slayer = SlayerName.Repond;
-            WeaponAttributes.HitLightning = 40;
-            WeaponAttributes.HitLowerDefend = 40;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 45;	
         }

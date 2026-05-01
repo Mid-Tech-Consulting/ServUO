@@ -11,16 +11,17 @@ namespace Server.Items
         public ResonantStaffofEnlightenment()
         {
             Hue = 2401;
-            WeaponAttributes.HitMagicArrow = 40;
-            WeaponAttributes.MageWeapon = 20;
+            WeaponAttributes.HitMagicArrow = 70;
+            WeaponAttributes.MageWeapon = 30;
+            WeaponAttributes.HitLowerDefend = 50;
             Attributes.SpellChanneling = 1;
             Attributes.DefendChance = 10;
             Attributes.WeaponSpeed = 20;
-            Attributes.WeaponDamage = -40;
-            Attributes.LowerManaCost = 5;			
-            AbsorptionAttributes.ResonanceCold = 20;	
-            AosElementDamages.Cold = 100;		
-			Attributes.BonusInt = 5;			
+            Attributes.WeaponDamage = 40;
+            Attributes.LowerManaCost = 5;
+            Attributes.BonusInt = 5;
+            AbsorptionAttributes.ResonanceCold = 20;
+            AosElementDamages.Cold = 100;			
         }
 
         public ResonantStaffofEnlightenment(Serial serial)

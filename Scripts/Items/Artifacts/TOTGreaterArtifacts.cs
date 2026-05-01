@@ -93,6 +93,11 @@ namespace Server.Items
             : base()
         {
             Attributes.SpellDamage = 12;
+
+            SkillBonuses.SetValues(0, SkillName.Magery, 15.0);
+            Attributes.BonusInt = 5;
+            Attributes.BonusMana = 8;
+            SAAbsorptionAttributes.EaterDamage = 15;
         }
 
         public KasaOfTheRajin(Serial serial)
@@ -192,6 +197,9 @@ namespace Server.Items
             Attributes.LowerManaCost = 15;
             ArmorAttributes.LowerStatReq = 100;
             ArmorAttributes.MageArmor = 1;
+
+            SkillName[] skills = new[] { SkillName.EvalInt, SkillName.MagicResist, SkillName.Focus, SkillName.SpiritSpeak };
+            SkillBonuses.SetValues(0, skills[Utility.Random(skills.Length)], 15.0);
         }
 
         public RuneBeetleCarapace(Serial serial)
@@ -259,6 +267,10 @@ namespace Server.Items
             Attributes.BonusInt = 8;
             Attributes.Luck = 125;
             Attributes.WeaponDamage = 25;
+
+            SkillBonuses.SetValues(0, SkillName.Tactics, 10.0);
+            AbsorptionAttributes.EaterFire = 15;
+            Attributes.WeaponSpeed = 5;
         }
 
         public Stormgrip(Serial serial)

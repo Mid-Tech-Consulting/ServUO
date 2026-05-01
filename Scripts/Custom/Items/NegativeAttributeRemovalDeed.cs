@@ -65,6 +65,12 @@ namespace Server.Items
                 if (m_Deed.Deleted)
                     return;
 
+                if (target is IVvVItem vvvItem && vvvItem.IsVvVItem)
+                {
+                    from.SendMessage("You cannot remove negative attributes from Vice vs Virtue items.");
+                    return;
+                }
+
                 NegativeAttributes neg = GetNegativeAttributes(target);
 
                 if (neg == null)

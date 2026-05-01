@@ -10,10 +10,15 @@ namespace Server.Items
         {
             Hue = 53;
             Slayer = SlayerName.Silver;
-            Attributes.AttackChance = 12;			
+            Attributes.AttackChance = 12;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 35;
             WeaponAttributes.HitLeechStam = 40;
+            WeaponAttributes.HitLeechHits = 80;
+            WeaponAttributes.HitFireArea = 80;
+            WeaponAttributes.HitLeechMana = 80;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Fire = 100;
         }
 
         public RaptorClaw(Serial serial)

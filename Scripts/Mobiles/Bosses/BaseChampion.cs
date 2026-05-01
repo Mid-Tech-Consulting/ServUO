@@ -148,7 +148,9 @@ namespace Server.Mobiles
 
         public virtual void GivePowerScrolls()
         {
-            if (this.Map != Map.Felucca)
+            // Siege ruleset — champion spawns on every facet that has them award power scrolls.
+            var map = Map;
+            if (map != Map.Felucca && map != Map.Ilshenar && map != Map.Tokuno && map != Map.Malas)
                 return;
 
             List<Mobile> toGive = new List<Mobile>();
@@ -364,13 +366,40 @@ namespace Server.Mobiles
                 m.SendMessage(0x22, "You have received a custom artifact!");
             }
         }
+
+        // Facet-exclusive — only drops on Ilshenar / Tokuno / Malas champ kills, so players
+        // have to leave Felucca to chase these. Felucca champs continue to drop the custom
+        // artifact pool above and never roll on this list.
+        private static readonly Type[] m_MagicalTalismans = new Type[]
+        {
+            typeof(TalismanOfTheMystic),
+            typeof(TalismanOfTheNecromancer),
+            typeof(TalismanOfTheSpellweaver),
+            typeof(TalismanOfThePureMage),
+            typeof(TalismanOfTheBokutoMage),
+            typeof(TalismanOfTheStealthMage),
+            typeof(TalismanOfTheTamerMage),
+        };
+
+        public static void GiveMagicalTalisman(Mobile m)
+        {
+            Type type = m_MagicalTalismans[Utility.Random(m_MagicalTalismans.Length)];
+            Item talisman = Loot.Construct(type);
+
+            if (talisman != null)
+            {
+                m.AddToBackpack(talisman);
+                m.SendMessage(0x22, "You have received a magical talisman!");
+            }
+        }
         #endregion
 
         public override void OnDeath(Container c)
         {
-            if (this.Map == Map.Felucca)
+            var map = Map;
+
+            if (map == Map.Felucca || map == Map.Ilshenar || map == Map.Tokuno || map == Map.Malas)
             {
-                //TODO: Confirm SE change or AoS one too?
                 List<DamageStore> rights = GetLootingRights();
                 List<Mobile> toGive = new List<Mobile>();
 
@@ -382,23 +411,37 @@ namespace Server.Mobiles
                         toGive.Add(ds.m_Mobile);
                 }
 
-                if (SkullType != ChampionSkullType.None)
+                if (map == Map.Felucca)
                 {
-                    if (toGive.Count > 0)
-                        toGive[Utility.Random(toGive.Count)].AddToBackpack(new ChampionSkull(this.SkullType));
-                    else
-                        c.DropItem(new ChampionSkull(this.SkullType));
-                }
-
-                if(Core.SA)
-                    RefinementComponent.Roll(c, 3, 0.10);
-
-                // Custom artifact drops - 25% chance per eligible player
-                foreach (Mobile m in toGive)
-                {
-                    if (m is PlayerMobile && 0.25 > Utility.RandomDouble())
+                    if (SkullType != ChampionSkullType.None)
                     {
-                        GiveCustomArtifact(m);
+                        if (toGive.Count > 0)
+                            toGive[Utility.Random(toGive.Count)].AddToBackpack(new ChampionSkull(SkullType));
+                        else
+                            c.DropItem(new ChampionSkull(SkullType));
+                    }
+
+                    if (Core.SA)
+                        RefinementComponent.Roll(c, 3, 0.10);
+
+                    // Custom artifact drops - 25% chance per eligible player (Felucca only)
+                    foreach (Mobile m in toGive)
+                    {
+                        if (m is PlayerMobile && 0.25 > Utility.RandomDouble())
+                        {
+                            GiveCustomArtifact(m);
+                        }
+                    }
+                }
+                else // Ilshenar / Tokuno / Malas — facet-exclusive talisman pool
+                {
+                    // Magical talisman drops - 25% chance per eligible player
+                    foreach (Mobile m in toGive)
+                    {
+                        if (m is PlayerMobile && 0.20 > Utility.RandomDouble())
+                        {
+                            GiveMagicalTalisman(m);
+                        }
                     }
                 }
             }

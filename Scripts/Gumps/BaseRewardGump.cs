@@ -88,21 +88,25 @@ namespace Server.Gumps
                 CollectionItem item = Collection[Index];
 				int height = Math.Max(item.Height, 20);
 
-				if (Points >= item.Points)
-                {
-                    AddButton(35, offset + (int)(height / 2) - 5, 0x837, 0x838, 200 + Index, GumpButtonType.Reply, 0);
-                    AddTooltip(item.Tooltip);
-                }
-				
-				int y = offset - item.Y;
-
-                if (item.Height < 20)
-                    y += (20 - item.Height) / 2;
-
                 Item i = null;
 
                 if (Owner.Backpack != null && item.Type != null)
                     i = Owner.Backpack.FindItemByType(item.Type);
+
+				if (Points >= item.Points)
+                {
+                    AddButton(35, offset + (int)(height / 2) - 5, 0x837, 0x838, 200 + Index, GumpButtonType.Reply, 0);
+
+                    if (i != null)
+                        AddItemProperty(i.Serial);
+                    else if (item.Tooltip > 0)
+                        AddTooltip(item.Tooltip);
+                }
+
+				int y = offset - item.Y;
+
+                if (item.Height < 20)
+                    y += (20 - item.Height) / 2;
 
                 int hue = GetItemHue(i, item);
 

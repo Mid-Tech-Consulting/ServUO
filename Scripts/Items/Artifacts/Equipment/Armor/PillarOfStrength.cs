@@ -14,6 +14,10 @@ namespace Server.Items
             Attributes.BonusStr = 10;
             Attributes.BonusHits = 10;
             Attributes.WeaponDamage = 20;
+            Attributes.BonusDex = 10;
+            Attributes.BonusStam = 10;
+            Attributes.LowerManaCost = 8;
+            Attributes.RegenMana = 6;
         }
 
         public PillarOfStrength(Serial serial)

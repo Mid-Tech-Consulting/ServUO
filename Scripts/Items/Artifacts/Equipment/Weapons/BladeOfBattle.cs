@@ -10,9 +10,10 @@ namespace Server.Items
         [Constructable]
         public BladeOfBattle() 
         {
-            Hue = 2045;		
-            WeaponAttributes.HitLowerDefend = 40;
+            Hue = 2045;
+            WeaponAttributes.HitLowerDefend = 50;
             WeaponAttributes.BattleLust = 1;
+            WeaponAttributes.HitLightning = 60;
             Attributes.AttackChance = 15;
             Attributes.DefendChance = 10;
             Attributes.WeaponSpeed = 25;

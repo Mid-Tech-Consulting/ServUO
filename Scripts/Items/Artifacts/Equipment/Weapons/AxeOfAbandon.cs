@@ -11,14 +11,17 @@ namespace Server.Items
         [Constructable]
         public AxeOfAbandon() 
         {		
-            Hue = 556;		
+            Hue = 556;
             WeaponAttributes.HitLowerDefend = 40;
-            WeaponAttributes.BattleLust = 1;		
+            WeaponAttributes.BattleLust = 1;
+            WeaponAttributes.HitFireball = 60;
             Attributes.AttackChance = 15;
-            Attributes.DefendChance = 10;	
-            Attributes.CastSpeed = 1;	
+            Attributes.DefendChance = 10;
+            Attributes.CastSpeed = 1;
             Attributes.WeaponSpeed = 30;
-            Attributes.WeaponDamage = 50;		
+            Attributes.WeaponDamage = 50;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Fire = 100;		
         }
 
         public AxeOfAbandon(Serial serial)

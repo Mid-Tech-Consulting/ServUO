@@ -13,6 +13,14 @@ namespace Server.Items
             Attributes.DefendChance = 15;
             ArmorAttributes.LowerStatReq = 100;
             ArmorAttributes.MageArmor = 1;
+
+            SkillName[] skills = new[] { SkillName.Swords, SkillName.Fencing, SkillName.Archery, SkillName.Macing };
+            SkillBonuses.SetValues(0, skills[Utility.Random(skills.Length)], 20.0);
+
+            Attributes.WeaponSpeed = 5;
+            Attributes.BonusStam = 8;
+            Attributes.RegenMana = 2;
+            Attributes.LowerManaCost = 5;
         }
 
         public HeartOfTheLion(Serial serial)

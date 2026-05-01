@@ -10,12 +10,15 @@ namespace Server.Items
         [Constructable]
         public BreastplateOfTheBerserker() 
         {	
-            Hue = 1172;	
+            Hue = 1172;
             Attributes.WeaponSpeed = 10;
-            Attributes.WeaponDamage = 15;		
+            Attributes.WeaponDamage = 15;
             Attributes.LowerManaCost = 4;
-            Attributes.BonusHits = 5;			
-			Attributes.RegenStam = 3;
+            Attributes.BonusHits = 5;
+            Attributes.BonusDex = 5;
+            Attributes.BonusStam = 8;
+            Attributes.RegenStam = 3;
+            SkillBonuses.SetValues(0, SkillName.Tactics, 20.0);
         }
 
         public BreastplateOfTheBerserker(Serial serial)

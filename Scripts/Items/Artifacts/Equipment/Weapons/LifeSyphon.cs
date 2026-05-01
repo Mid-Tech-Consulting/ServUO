@@ -11,13 +11,18 @@ namespace Server.Items
         public LifeSyphon()
             : base()
         {		
-            Hue = 1172;		
-            WeaponAttributes.BloodDrinker = 1;	
-            WeaponAttributes.HitHarm = 30;			
-            WeaponAttributes.HitLeechHits = 100;	
+            Hue = 1172;
+            WeaponAttributes.BloodDrinker = 1;
+            WeaponAttributes.HitHarm = 30;
+            WeaponAttributes.HitLeechHits = 100;
+            WeaponAttributes.HitLowerDefend = 50;
+            WeaponAttributes.HitColdArea = 80;
             Attributes.BonusHits = 10;
             Attributes.WeaponSpeed = 25;
-            Attributes.WeaponDamage = 50;	
+            Attributes.WeaponDamage = 50;
+            Slayer = SlayerName.Exorcism;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Cold = 100;	
         }
 
         public LifeSyphon(Serial serial)

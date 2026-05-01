@@ -10,12 +10,14 @@ namespace Server.Items
         [Constructable]
         public DeathsHead() 
         {	
-            Hue = 1154;	
-            WeaponAttributes.HitFatigue = 10;
-            WeaponAttributes.HitLightning = 45;	
-            WeaponAttributes.HitLowerDefend = 30;
+            Hue = 1154;
+            WeaponAttributes.HitFatigue = 30;
+            WeaponAttributes.HitLightning = 50;
+            WeaponAttributes.HitLowerDefend = 50;
             Attributes.WeaponSpeed = 20;
             Attributes.WeaponDamage = 45;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Fire = 100;
         }
 
         public DeathsHead(Serial serial)

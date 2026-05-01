@@ -260,11 +260,19 @@ namespace Server.Mobiles
                 }
             }
 
-            // Drop 2 guaranteed Legendary items into the corpse regardless of luck.
+            // Drop legendary items into the corpse, scaled to ~2 per player with looting rights.
             if (Core.HS && RandomItemGenerator.Enabled)
             {
-                for (int i = 0; i < 2; i++)
+                int playerCount = rights.Count(s => s.m_HasRight);
+                int target = Math.Max(2, playerCount * 2);
+                int dropped = 0;
+                int attempts = 0;
+                int maxAttempts = target * 4;
+
+                while (dropped < target && attempts < maxAttempts)
                 {
+                    attempts++;
+
                     Item legendary = Core.AOS
                         ? Loot.RandomArmorOrShieldOrWeaponOrJewelry()
                         : Loot.RandomArmorOrShieldOrWeapon();
@@ -273,9 +281,14 @@ namespace Server.Mobiles
                         continue;
 
                     if (RunicReforging.GenerateRandomArtifactItem(legendary, 0, Utility.RandomMinMax(1250, 1300)))
+                    {
                         c.DropItem(legendary);
+                        dropped++;
+                    }
                     else
+                    {
                         legendary.Delete();
+                    }
                 }
             }
 

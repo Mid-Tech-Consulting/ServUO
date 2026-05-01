@@ -26,6 +26,22 @@ namespace Server.Engines.VvV
         public VvVRobe(int hue)
             : base(0x2684, hue)
         {
+            if (hue == ViceVsVirtueSystem.VirtueHue)
+            {
+                SkillBonuses.SetValues(0, SkillName.Magery, 10.0);
+                Attributes.DefendChance = 15;
+                Attributes.BonusInt = 5;
+                Attributes.BonusMana = 8;
+                Attributes.CastSpeed = 1;
+            }
+            else if (hue == ViceVsVirtueSystem.ViceHue)
+            {
+                SkillBonuses.SetValues(0, SkillName.Anatomy, 10.0);
+                Attributes.DefendChance = 15;
+                Attributes.BonusDex = 5;
+                Attributes.BonusStam = 8;
+                Attributes.CastSpeed = 1;
+            }
         }
 
         public VvVRobe(Serial serial)

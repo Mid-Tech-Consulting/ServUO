@@ -15,7 +15,9 @@ namespace Server.Items
             WeaponAttributes.BattleLust = 1;
             Attributes.BonusStr = 5;
             WeaponAttributes.HitLightning = 40;
-            WeaponAttributes.HitLowerDefend = 30;			
+            WeaponAttributes.HitLowerDefend = 30;
+            WeaponAttributes.HitEnergyArea = 80;
+            WeaponAttributes.HitLeechMana = 60;
             Attributes.WeaponSpeed = 30;
             Attributes.WeaponDamage = 40;
             AosElementDamages.Physical = 20;

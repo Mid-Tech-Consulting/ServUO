@@ -290,6 +290,13 @@ namespace Server.Items
                     {
                         MessageHelper.SendLocalizedMessageTo(m_Bag, from, 1054108, 0x59); // The bag of sending rejects the cursed item.
                     }
+                    else if (item.Nontransferable)
+                    {
+                        // Nontransferable items (Healing Stone, Arcane Focus, etc.) can't move outside
+                        // the player's backpack; otherwise BankBox.TryDropItem would bypass the
+                        // OnDroppedInto Nontransferable check and let players stockpile them.
+                        MessageHelper.SendLocalizedMessageTo(m_Bag, from, 1054109, 0x59); // The bag of sending rejects that item.
+                    }
                     else if (!item.VerifyMove(from) || item is Server.Engines.Quests.QuestItem || item.QuestItem)
                     {
                         MessageHelper.SendLocalizedMessageTo(m_Bag, from, 1054109, 0x59); // The bag of sending rejects that item.

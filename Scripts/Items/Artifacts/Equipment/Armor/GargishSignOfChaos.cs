@@ -9,11 +9,14 @@ namespace Server.Items
         public GargishSignOfChaos()
             : base()
         {
-			Hue = 2075;	
-            ArmorAttributes.SoulCharge = 20;
-            Attributes.AttackChance = 5;
+			Hue = 2075;
+            ArmorAttributes.SoulCharge = 30;
+            AbsorptionAttributes.EaterFire = 20;
+            Attributes.AttackChance = 10;
             Attributes.DefendChance = 10;
             Attributes.CastSpeed = 1;
+            Attributes.RegenHits = 6;
+            Attributes.WeaponSpeed = 5;
         }
 
         public GargishSignOfChaos(Serial serial)

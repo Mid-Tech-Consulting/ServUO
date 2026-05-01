@@ -10,14 +10,14 @@ namespace Server.Items
         [Constructable]
         public StandardOfChaos()
         {
-            Hue = 2209;		
-            WeaponAttributes.HitHarm = 30;	
-            WeaponAttributes.HitFireball = 20;	
-            WeaponAttributes.HitLightning = 10;
+            Hue = 2209;
+            WeaponAttributes.HitLightning = 60;
             WeaponAttributes.HitLowerDefend = 40;
             Attributes.WeaponSpeed = 30;
-            Attributes.WeaponDamage = -40;
+            Attributes.WeaponDamage = 40;
             Attributes.CastSpeed = 1;
+            Attributes.BonusDex = 10;
+            Attributes.BalancedWeapon = 1;
             AosElementDamages.Chaos = 100;		
         }
 

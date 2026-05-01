@@ -18,10 +18,16 @@ namespace Server.Items
             Attributes.BonusHits = 6;
             Attributes.DefendChance = 20;
 
-            _ElfOnly = true;
+            _ElfOnly = false;
 
             ArmorAttributes.MageArmor = 1;
             SkillBonuses.SetValues(0, SkillName.Fishing, 20.0);
+            SkillBonuses.SetValues(1, SkillName.MagicResist, 10.0);
+
+            Attributes.LowerManaCost = 5;
+            Attributes.BonusDex = 5;
+            Attributes.BonusStam = 8;
+            Attributes.RegenHits = 2;
         }
 
         public FeyLeggings(Serial serial)

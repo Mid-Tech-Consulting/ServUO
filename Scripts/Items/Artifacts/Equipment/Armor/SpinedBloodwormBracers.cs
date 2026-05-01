@@ -10,12 +10,16 @@ namespace Server.Items
         [Constructable]
         public SpinedBloodwormBracers()
         {
-            Hue = 1642;		
+            Hue = 1642;
             Attributes.RegenHits = 2;
             Attributes.RegenStam = 2;
-            Attributes.WeaponDamage = 10;	
+            Attributes.WeaponDamage = 10;
             Attributes.ReflectPhysical = 30;
+            Attributes.BonusDex = 5;
+            Attributes.BonusStam = 8;
+            Attributes.LowerManaCost = 8;
             SAAbsorptionAttributes.EaterKinetic = 10;
+            SkillBonuses.SetValues(0, SkillName.Healing, 20.0);
         }
 
         public SpinedBloodwormBracers(Serial serial)

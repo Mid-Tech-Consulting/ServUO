@@ -10,9 +10,10 @@ namespace Server.Items
         {
             Hue = 590;
             Attributes.SpellChanneling = 1;
-            Attributes.DefendChance = 10;
-            Attributes.CastRecovery = 1;
+            Attributes.DefendChance = 25;
+            Attributes.CastRecovery = 2;
             ArmorAttributes.SoulCharge = 30;
+            AbsorptionAttributes.EaterFire = 15;
             Attributes.Luck = 150;
             Attributes.LowerRegCost = 15;
             //Random Resonance:
@@ -74,7 +75,7 @@ namespace Server.Items
         {
             get
             {
-                return 1;
+                return 10;
             }
         }
         public override int BaseColdResistance

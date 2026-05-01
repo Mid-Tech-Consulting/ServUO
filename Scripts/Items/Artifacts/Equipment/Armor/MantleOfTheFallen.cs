@@ -10,13 +10,15 @@ namespace Server.Items
         [Constructable]
         public MantleOfTheFallen() 
         {
-            Hue = 1512;			
+            Hue = 1512;
             Attributes.LowerRegCost = 25;
             Attributes.BonusInt = 8;
             Attributes.BonusMana = 8;
             Attributes.RegenMana = 1;
-            SAAbsorptionAttributes.CastingFocus = 3;
-            Attributes.SpellDamage = 5;
+            Attributes.SpellDamage = 30;
+            Attributes.LowerManaCost = 8;
+            SAAbsorptionAttributes.CastingFocus = 5;
+            SkillBonuses.SetValues(0, SkillName.Magery, 15.0);
         }
 
         public MantleOfTheFallen(Serial serial)
@@ -28,35 +30,35 @@ namespace Server.Items
         {
             get
             {
-                return 5;
+                return 15;
             }
         }
         public override int BaseFireResistance
         {
             get
             {
-                return 8;
+                return 15;
             }
         }
         public override int BaseColdResistance
         {
             get
             {
-                return 11;
+                return 15;
             }
         }
         public override int BasePoisonResistance
         {
             get
             {
-                return 12;
+                return 15;
             }
         }
         public override int BaseEnergyResistance
         {
             get
             {
-                return 8;
+                return 15;
             }
         }
         public override int InitMinHits

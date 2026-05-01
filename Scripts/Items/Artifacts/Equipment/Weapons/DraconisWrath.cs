@@ -10,14 +10,17 @@ namespace Server.Items
         [Constructable]
         public DraconisWrath() 
         {	
-            Hue = 1177;	
+            Hue = 1177;
             AbsorptionAttributes.EaterFire = 20;
-            WeaponAttributes.HitFireball = 60;	
+            WeaponAttributes.HitFireball = 60;
+            WeaponAttributes.HitFireArea = 80;
+            WeaponAttributes.HitLeechMana = 80;
+            WeaponAttributes.UseBestSkill = 1;
             Attributes.AttackChance = 15;
             Attributes.WeaponDamage = 50;
-            WeaponAttributes.UseBestSkill = 1;
             Attributes.SpellChanneling = 1;
-            Attributes.Luck = 250;	
+            Attributes.Luck = 250;
+            Slayer = SlayerName.Silver;	
         }
 
         public DraconisWrath(Serial serial)

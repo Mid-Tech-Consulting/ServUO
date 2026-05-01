@@ -10,7 +10,12 @@ namespace Server.Items
         {    
             Hue = 554;
             Attributes.ReflectPhysical = 10;
+            Attributes.SpellChanneling = 1;
+            Attributes.DefendChance = 30;
+            Attributes.BonusStr = 15;
             ArmorAttributes.ReactiveParalyze = 1;
+            ArmorAttributes.SoulCharge = 30;
+            AbsorptionAttributes.EaterDamage = 30;
         }
 
         public BouraTailShield(Serial serial)

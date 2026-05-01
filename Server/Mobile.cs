@@ -11061,10 +11061,29 @@ namespace Server
 				return false;
 			}
 
+			// Auto-swap conflicting hand weapon to backpack before equipping.
+			// Restores it if the equip ultimately fails for another reason.
+			Item swappedOut = null;
+
+			if (item is IWeapon)
+			{
+				Layer conflictLayer = item.Layer == Layer.OneHanded ? Layer.TwoHanded : Layer.OneHanded;
+				Item conflict = FindItemOnLayer(conflictLayer);
+
+				if (conflict is IWeapon)
+				{
+					swappedOut = conflict;
+					AddToBackpack(conflict);
+				}
+			}
+
 			if (CheckEquip(item) && OnEquip(item) && item.OnEquip(this))
 			{
 				if (m_Spell != null && !m_Spell.OnCasterEquiping(item))
 				{
+					if (swappedOut != null && swappedOut.IsChildOf(Backpack))
+						EquipItem(swappedOut);
+
 					return false;
 				}
 
@@ -11074,6 +11093,9 @@ namespace Server
 				AddItem(item);
 				return true;
 			}
+
+			if (swappedOut != null && swappedOut.IsChildOf(Backpack))
+				EquipItem(swappedOut);
 
 			return false;
 		}

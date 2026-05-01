@@ -22,6 +22,7 @@ namespace Server.Items
             Attributes.RegenMana = 2;
             Resistances.Cold = 5;
             Resistances.Poison = 5;
+            SkillBonuses.SetValues(0, SkillName.Chivalry, 15.0);
         }
 
         public TokenOfHolyFavor(Serial serial)

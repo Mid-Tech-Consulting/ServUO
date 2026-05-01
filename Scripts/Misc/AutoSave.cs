@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 using Server.Commands;
 
@@ -18,6 +19,12 @@ namespace Server.Misc
         private static readonly TimeSpan m_Warning;
 		
         private static readonly Timer m_Timer;
+
+        // Backup is filesystem-only (directory rotation). When a save is
+        // scheduled with a warning window we kick off the backup on a
+        // background thread during the warning so the game thread isn't
+        // frozen for it. Save() joins this before calling World.Save().
+        private static Task m_BackupTask;
 
         public static bool SavesEnabled { get; set; }
 
@@ -65,6 +72,22 @@ namespace Server.Misc
 
             World.WaitForWriteCompletion();
 
+            if (m_BackupTask != null)
+            {
+                try { m_BackupTask.Wait(); }
+                catch { }
+                m_BackupTask = null;
+            }
+            else
+            {
+                RunBackup();
+            }
+
+            World.Save(false, permitBackgroundWrite);
+        }
+
+        private static void RunBackup()
+        {
             try
             {
                 if (!Backup())
@@ -74,8 +97,6 @@ namespace Server.Misc
             {
                 Console.WriteLine("WARNING: Automatic backup FAILED:\n{0}", e);
             }
-
-            World.Save(false, permitBackgroundWrite);
         }
 
         private static void Tick()
@@ -97,6 +118,8 @@ namespace Server.Misc
                     World.Broadcast(0x35, true, "The world will save in {0} minute{1}.", m, m != 1 ? "s" : "");
                 else
                     World.Broadcast(0x35, true, "The world will save in {0} second{1}.", s, s != 1 ? "s" : "");
+
+                m_BackupTask = Task.Run(RunBackup);
 
                 Timer.DelayCall(m_Warning, Save);
             }

@@ -7,20 +7,23 @@ namespace Server.Items
 		public override bool IsArtifact { get { return true; } }
 		public override int LabelNumber { get { return 1113820; } } // Obsidian Earrings
 
-        public override int BasePhysicalResistance { get { return 4; } }
-        public override int BaseFireResistance { get { return 10; } }
-        public override int BaseColdResistance { get { return 10; } }
-        public override int BasePoisonResistance { get { return 3; } }
-        public override int BaseEnergyResistance { get { return 13; } }
+        public override int BasePhysicalResistance { get { return 15; } }
+        public override int BaseFireResistance { get { return 15; } }
+        public override int BaseColdResistance { get { return 15; } }
+        public override int BasePoisonResistance { get { return 15; } }
+        public override int BaseEnergyResistance { get { return 15; } }
 
         [Constructable]
         public ObsidianEarrings()
-        {	
+        {
             Attributes.BonusMana = 8;
             Attributes.RegenMana = 2;
             Attributes.RegenStam = 2;
             Attributes.SpellDamage = 8;
+            Attributes.LowerRegCost = 20;
+            Attributes.Luck = 150;
             AbsorptionAttributes.CastingFocus = 4;
+            SkillBonuses.SetValues(0, SkillName.Magery, 20.0);
         }
 
         public ObsidianEarrings(Serial serial)
