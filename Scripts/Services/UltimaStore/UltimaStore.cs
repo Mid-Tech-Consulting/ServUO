@@ -40,9 +40,9 @@ namespace Server.Engines.UOStore
         public static readonly string FilePath = Path.Combine("Saves/Misc", "UltimaStore.bin");
 
         // Rotate this each month to recolor all monthly-themed store items
-        // (mount statues and the monthly hair dye). 0 = no tint.
-        // Current: 0x0ABB Sapphire Blue.
-        public const int ColorOfTheMonthHue = 0x0ABB;
+        // (mount statues, monthly hair/beard dye, monthly soulstone). 0 = no tint.
+        // Current: 0x000B (Sigil Dye Tub hue).
+        public const int ColorOfTheMonthHue = 0x000B;
 
         public static bool Enabled { get { return Configuration.Enabled; } set { Configuration.Enabled = value; } }
 
@@ -95,6 +95,7 @@ namespace Server.Engines.UOStore
             Register<PublicSoulstone>("Public Soulstone", 1158405, 0x2A93, 0, 88, 1500, cat);
             Register<MonthlyHairDye>("Monthly Hair Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyHairDye);
             Register<MonthlyBeardDye>("Monthly Beard Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyBeardDye);
+            Register<MonthlySoulstone>("Monthly Soulstone", 1158405, 0x2A93, 0, ColorOfTheMonthHue, 1000, cat, ConstructMonthlySoulstone);
             Register<CursedRemovalDeed>("Cursed Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
             Register<NegativeAttributeRemovalDeed>("Attribute Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
             Register<TransmogrificationPotion>("Transmogrification Potion", 0, 0xF0E, 0, 1161, 500, cat);
@@ -584,6 +585,11 @@ namespace Server.Engines.UOStore
         public static Item ConstructMonthlyBeardDye(Mobile m, StoreEntry entry)
         {
             return new MonthlyBeardDye(entry.Hue);
+        }
+
+        public static Item ConstructMonthlySoulstone(Mobile m, StoreEntry entry)
+        {
+            return new MonthlySoulstone(entry.Hue);
         }
 
         public static Item ConstructHuedMount(Mobile m, StoreEntry entry)
