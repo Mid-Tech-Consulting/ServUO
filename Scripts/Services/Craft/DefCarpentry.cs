@@ -464,13 +464,14 @@ namespace Server.Engines.Craft
 
             AddCraft(typeof(Club), 1044566, 1025043, 65.0, 90.0, typeof(Board), 1044041, 9, 1044351);
             AddCraft(typeof(BlackStaff), 1044566, 1023568, 81.5, 106.5, typeof(Board), 1044041, 9, 1044351);
-            AddCraft(typeof(Escrima), 1044566, "Escrima", 65.0, 90.0, typeof(Board), 1044041, 9, 1044351);
-            AddCraft(typeof(Tanto), 1044566, "Tanto", 65.0, 90.0, typeof(Board), 1044041, 8, 1044351);
-            AddCraft(typeof(Tachi), 1044566, "Tachi", 78.9, 103.9, typeof(Board), 1044041, 12, 1044351);
-            AddCraft(typeof(BoStaff), 1044566, "Bo Staff", 78.9, 103.9, typeof(Board), 1044041, 8, 1044351);
-            AddCraft(typeof(GargishOtsuchi), 1044566, "Gargish Otsuchi", 65.0, 90.0, typeof(Board), 1044041, 14, 1044351);
-            AddCraft(typeof(GargishTanto), 1044566, "Gargish Tanto", 65.0, 90.0, typeof(Board), 1044041, 8, 1044351);
-            AddCraft(typeof(GargishBokuto), 1044566, "Gargish Bokuto", 65.0, 90.0, typeof(Board), 1044041, 6, 1044351);
+            // Hidden until properties / damage are finalised — re-enable when ready to ship.
+            //AddCraft(typeof(Escrima), 1044566, "Escrima", 65.0, 90.0, typeof(Board), 1044041, 9, 1044351);
+            //AddCraft(typeof(Tanto), 1044566, "Tanto", 65.0, 90.0, typeof(Board), 1044041, 8, 1044351);
+            //AddCraft(typeof(Tachi), 1044566, "Tachi", 78.9, 103.9, typeof(Board), 1044041, 12, 1044351);
+            //AddCraft(typeof(BoStaff), 1044566, "Bo Staff", 78.9, 103.9, typeof(Board), 1044041, 8, 1044351);
+            //AddCraft(typeof(GargishOtsuchi), 1044566, "Gargish Otsuchi", 65.0, 90.0, typeof(Board), 1044041, 14, 1044351);
+            //AddCraft(typeof(GargishTanto), 1044566, "Gargish Tanto", 65.0, 90.0, typeof(Board), 1044041, 8, 1044351);
+            //AddCraft(typeof(GargishBokuto), 1044566, "Gargish Bokuto", 65.0, 90.0, typeof(Board), 1044041, 6, 1044351);
 
             if (Core.TOL)
             {
