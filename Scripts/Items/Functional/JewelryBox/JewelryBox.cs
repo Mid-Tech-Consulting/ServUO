@@ -104,7 +104,7 @@ namespace Server.Items
 
         private Type[] _AcceptList =
         {
-            typeof(BaseRing), typeof(BaseBracelet), typeof(BaseNecklace), typeof(BaseEarrings), typeof(BaseTalisman)
+            typeof(BaseRing), typeof(BaseBracelet), typeof(BaseNecklace), typeof(BaseEarrings), typeof(GargishEarrings), typeof(BaseTalisman)
         };
 
         public override bool OnDragDrop(Mobile from, Item dropped)
