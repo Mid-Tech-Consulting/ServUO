@@ -4505,18 +4505,13 @@ namespace Server.Mobiles
 
             OrderType ct = m_ControlOrder;
 
+            // Pets always retaliate when attacked. The previous ML-only early return
+            // here ("master told me not to fight") skipped the Combatant-setting
+            // fallback at the bottom of this method, leaving pets on Follow/Stop/Stay
+            // standing idle while monsters wailed on them.
             if (m_AI != null)
             {
-                if (!Core.ML || (ct != OrderType.Follow && ct != OrderType.Stop && ct != OrderType.Stay))
-                {
-                    m_AI.OnAggressiveAction(aggressor);
-                }
-                else
-                {
-                    DebugSay("I'm being attacked but my master told me not to fight.");
-                    Warmode = false;
-                    return;
-                }
+                m_AI.OnAggressiveAction(aggressor);
             }
 
             StopFlee();
