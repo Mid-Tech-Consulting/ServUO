@@ -95,7 +95,7 @@ namespace Server.Items
         public bool IsAccept(Item item)
         {
             foreach (Type type in _AcceptList)
-                if (item.GetType().IsSubclassOf(type))
+                if (type.IsAssignableFrom(item.GetType()))
                     return true;
 
             return false;
