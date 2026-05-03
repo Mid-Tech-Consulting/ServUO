@@ -11,9 +11,11 @@ namespace Server.Items
             Hue = Utility.RandomBool() ? 0x4F2 : 0x4EF;
             WeaponAttributes.MageWeapon = 15;
             Attributes.SpellChanneling = 1;
-            Attributes.SpellDamage = 5;
+            Attributes.SpellDamage = 30;
             Attributes.CastRecovery = 2;
             Attributes.LowerManaCost = 5;
+            Attributes.BonusStr = 15;
+            Attributes.RegenMana = 10;
         }
 
         public StaffOfPower(Serial serial)

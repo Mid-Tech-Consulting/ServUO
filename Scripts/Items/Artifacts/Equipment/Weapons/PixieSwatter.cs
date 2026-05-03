@@ -10,10 +10,12 @@ namespace Server.Items
         {
             Hue = 0x8A;
             WeaponAttributes.HitPoisonArea = 75;
-            Attributes.WeaponSpeed = 30;         
+            WeaponAttributes.HitLeechMana = 80;
             WeaponAttributes.UseBestSkill = 1;
             WeaponAttributes.ResistFireBonus = 12;
             WeaponAttributes.ResistEnergyBonus = 12;
+            Attributes.WeaponSpeed = 30;
+            Attributes.WeaponDamage = 50;
             Slayer = SlayerName.Fey;
         }
 

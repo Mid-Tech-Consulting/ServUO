@@ -9,11 +9,12 @@ namespace Server.Items
         public ArcticDeathDealer()
         {
             Hue = 0x480;
-            WeaponAttributes.HitHarm = 33;
+            WeaponAttributes.HitHarm = 50;
             WeaponAttributes.HitLowerAttack = 40;
+            WeaponAttributes.HitLowerDefend = 40;
+            WeaponAttributes.ResistColdBonus = 10;
             Attributes.WeaponSpeed = 20;
             Attributes.WeaponDamage = 40;
-            WeaponAttributes.ResistColdBonus = 10;
         }
 
         public ArcticDeathDealer(Serial serial)
@@ -44,10 +45,9 @@ namespace Server.Items
         }
         public override void GetDamageTypes(Mobile wielder, out int phys, out int fire, out int cold, out int pois, out int nrgy, out int chaos, out int direct)
         {
-            cold = 50;
-            phys = 50;
+            cold = 100;
 
-            pois = fire = nrgy = chaos = direct = 0;
+            phys = pois = fire = nrgy = chaos = direct = 0;
         }
 
         public override void Serialize(GenericWriter writer)

@@ -12,6 +12,10 @@ namespace Server.Items
             ArmorAttributes.SelfRepair = 3;
             Attributes.BonusStr = 10;
             Attributes.BonusStam = 5;
+            Attributes.LowerManaCost = 8;
+            Attributes.RegenHits = 3;
+            AbsorptionAttributes.EaterKinetic = 10;
+            SkillBonuses.SetValues(0, SkillName.Lumberjacking, 20.0);
         }
 
         public OrcishVisage(Serial serial)
@@ -30,35 +34,35 @@ namespace Server.Items
         {
             get
             {
-                return 8;
+                return 10;
             }
         }
         public override int BaseFireResistance
         {
             get
             {
-                return 5;
+                return 10;
             }
         }
         public override int BaseColdResistance
         {
             get
             {
-                return 3;
+                return 10;
             }
         }
         public override int BasePoisonResistance
         {
             get
             {
-                return 3;
+                return 10;
             }
         }
         public override int BaseEnergyResistance
         {
             get
             {
-                return 5;
+                return 10;
             }
         }
         public override int InitMinHits

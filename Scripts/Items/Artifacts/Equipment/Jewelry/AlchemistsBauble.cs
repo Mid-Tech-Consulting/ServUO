@@ -9,9 +9,12 @@ namespace Server.Items
         public AlchemistsBauble()
         {
             Hue = 0x290;
-            SkillBonuses.SetValues(0, SkillName.Magery, 10.0);
-            Attributes.EnhancePotions = 30;
+            SkillBonuses.SetValues(0, SkillName.Alchemy, 20.0);
+            Attributes.EnhancePotions = 35;
             Attributes.LowerRegCost = 20;
+            Attributes.DefendChance = 15;
+            Attributes.CastRecovery = 3;
+            Attributes.RegenMana = 2;
             Resistances.Poison = 10;
         }
 

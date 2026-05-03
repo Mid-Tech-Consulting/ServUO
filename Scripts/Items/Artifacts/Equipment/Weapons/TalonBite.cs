@@ -13,7 +13,9 @@ namespace Server.Items
             Attributes.BonusDex = 8;
             Attributes.WeaponSpeed = 20;
             Attributes.WeaponDamage = 35;
-            WeaponAttributes.HitHarm = 33;
+            WeaponAttributes.HitHarm = 50;
+            WeaponAttributes.HitLowerDefend = 35;
+            WeaponAttributes.HitLowerAttack = 40;
             WeaponAttributes.UseBestSkill = 1;
         }
 

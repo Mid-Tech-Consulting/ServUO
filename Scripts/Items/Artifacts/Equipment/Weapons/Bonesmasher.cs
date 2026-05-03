@@ -12,6 +12,10 @@ namespace Server.Items
             SkillBonuses.SetValues(0, SkillName.Macing, 10.0);
             WeaponAttributes.HitLeechMana = 40;
             WeaponAttributes.SelfRepair = 2;
+            WeaponAttributes.HitLightning = 45;
+            WeaponAttributes.HitLowerDefend = 30;
+            ExtendedWeaponAttributes.AssassinHoned = 1;
+            Attributes.WeaponDamage = 35;
         }
 
         public Bonesmasher(Serial serial)

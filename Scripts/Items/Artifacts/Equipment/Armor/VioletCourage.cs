@@ -5,14 +5,29 @@ namespace Server.Items
     public class VioletCourage : FemalePlateChest
 	{
 		public override bool IsArtifact { get { return true; } }
+
+        // +20 to a random combat skill (Swords / Macing / Fencing / Archery).
+        private static readonly SkillName[] m_RandomSkills =
+        {
+            SkillName.Swords,
+            SkillName.Macing,
+            SkillName.Fencing,
+            SkillName.Archery,
+        };
+
         [Constructable]
         public VioletCourage()
         {
             Hue = Utility.RandomBool() ? 0x486 : 0x490;
             Attributes.Luck = 95;
             Attributes.DefendChance = 15;
+            Attributes.BonusStam = 8;
+            Attributes.RegenMana = 2;
+            Attributes.WeaponSpeed = 5;
+            Attributes.LowerManaCost = 5;
             ArmorAttributes.LowerStatReq = 100;
             ArmorAttributes.MageArmor = 1;
+            SkillBonuses.SetValues(0, m_RandomSkills[Utility.Random(m_RandomSkills.Length)], 20.0);
         }
 
         public VioletCourage(Serial serial)

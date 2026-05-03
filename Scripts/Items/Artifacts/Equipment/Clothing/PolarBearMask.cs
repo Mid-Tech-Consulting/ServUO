@@ -12,6 +12,9 @@ namespace Server.Items
             ClothingAttributes.SelfRepair = 3;
             Attributes.RegenHits = 2;
             Attributes.NightSight = 1;
+            Attributes.AttackChance = 10;
+            Attributes.RegenStam = 6;
+            Attributes.BonusStam = 8;
         }
 
         public PolarBearMask(Serial serial)

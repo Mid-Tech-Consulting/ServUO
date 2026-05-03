@@ -9,10 +9,14 @@ namespace Server.Items
         public BowOfTheJukaKing()
         {
             Hue = 0x460;
-            WeaponAttributes.HitMagicArrow = 25;
+            WeaponAttributes.HitMagicArrow = 50;
+            WeaponAttributes.HitColdArea = 80;
             Slayer = SlayerName.ReptilianDeath;
             Attributes.AttackChance = 15;
             Attributes.WeaponDamage = 40;
+            Attributes.WeaponSpeed = 30;
+            AosElementDamages.Physical = 0;
+            AosElementDamages.Cold = 100;
         }
 
         public BowOfTheJukaKing(Serial serial)
