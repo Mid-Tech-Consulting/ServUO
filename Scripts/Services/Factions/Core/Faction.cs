@@ -1067,6 +1067,8 @@ namespace Server.Factions
             }
 
             context.m_Timer = Timer.DelayCall(SkillLossPeriod, new TimerStateCallback(ClearSkillLoss_Callback), mob);
+
+            BuffInfo.AddBuff(mob, new BuffInfo(BuffIcon.FactionStatLoss, 1070839, 1070840, SkillLossPeriod, mob));
         }
 
         private static void ClearSkillLoss_Callback(object state)
@@ -1089,6 +1091,8 @@ namespace Server.Factions
                 mob.RemoveSkillMod(mods[i]);
 
             context.m_Timer.Stop();
+
+            BuffInfo.RemoveBuff(mob, BuffIcon.FactionStatLoss);
 
             return true;
         }
