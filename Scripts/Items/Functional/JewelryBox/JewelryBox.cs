@@ -95,7 +95,7 @@ namespace Server.Items
         public bool IsAccept(Item item)
         {
             foreach (Type type in _AcceptList)
-                if (item.GetType().IsSubclassOf(type))
+                if (type.IsAssignableFrom(item.GetType()))
                     return true;
 
             return false;
@@ -104,7 +104,7 @@ namespace Server.Items
 
         private Type[] _AcceptList =
         {
-            typeof(BaseRing), typeof(BaseBracelet), typeof(BaseNecklace), typeof(BaseEarrings), typeof(BaseTalisman)
+            typeof(BaseRing), typeof(BaseBracelet), typeof(BaseNecklace), typeof(BaseEarrings), typeof(GargishEarrings), typeof(BaseTalisman)
         };
 
         public override bool OnDragDrop(Mobile from, Item dropped)
