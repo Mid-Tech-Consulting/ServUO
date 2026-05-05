@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 
 using Server.Commands;
+using Server.Engines.VvV;
 using Server.Mobiles;
 #endregion
 
