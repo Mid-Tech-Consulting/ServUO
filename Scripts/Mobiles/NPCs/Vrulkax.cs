@@ -12,6 +12,9 @@ namespace Server.Engines.Quests
 
         public override bool IsActiveVendor { get { return false; } }
         public override bool IsInvulnerable { get { return true; } }
+        // Without this, OnAfterSpawn -> CheckMorph -> CheckTerMur -> TurnToGargRace
+        // would overwrite Name with a random gargoyle name when placed in Ter Mur.
+        public override bool ChangeRace { get { return false; } }
 
         public override void InitSBInfo()
         {
@@ -24,12 +27,11 @@ namespace Server.Engines.Quests
             Name = "Vrulkax";
         }
 
-        private Type[][] _Table = 
+        private Type[][] _Table =
         {
             new Type[] { typeof(BritchesOfWarding), typeof(GargishBritchesOfWarding) },
             new Type[] { typeof(GlovesOfFeudalGrip), typeof(GargishKiltOfFeudalVise) },
             new Type[] { typeof(CuffsOfTheArchmage), typeof(GargishCuffsOfTheArchmage) },
-            new Type[] { typeof(BritchesOfWarding), typeof(GargishBritchesOfWarding) },
             new Type[] { typeof(BowOfTheInfiniteSwarm), typeof(GlaiveOfTheInfiniteSwarm) }
         };
 
