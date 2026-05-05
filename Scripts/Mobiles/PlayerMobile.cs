@@ -4442,6 +4442,9 @@ namespace Server.Mobiles
                 return false;
             }
 
+            if (ViceVsVirtueSystem.IsEnemy(this, damageable))
+                return false;
+
 			return base.IsHarmfulCriminal(damageable);
 		}
 
