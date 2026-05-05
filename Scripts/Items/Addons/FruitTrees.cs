@@ -5,11 +5,14 @@ namespace Server.Items
 {
     public abstract class BaseFruitTreeAddon : BaseAddon
     {
+        private const int MaxFruits = 10;
         private int m_Fruits;
+
         public BaseFruitTreeAddon()
             : base()
         {
-            Timer.DelayCall(TimeSpan.FromMinutes(5), new TimerCallback(Respawn));
+            m_Fruits = 1;
+            Timer.DelayCall(TimeSpan.FromDays(1), new TimerCallback(GrowFruit));
         }
 
         public BaseFruitTreeAddon(Serial serial)
@@ -19,28 +22,21 @@ namespace Server.Items
 
         public override abstract BaseAddonDeed Deed { get; }
         public abstract Item Fruit { get; }
+
         [CommandProperty(AccessLevel.GameMaster)]
         public int Fruits
         {
-            get
-            {
-                return this.m_Fruits;
-            }
-            set
-            {
-                if (value < 0)
-                    this.m_Fruits = 0;
-                else
-                    this.m_Fruits = value;
-            }
+            get { return m_Fruits; }
+            set { m_Fruits = value < 0 ? 0 : value > MaxFruits ? MaxFruits : value; }
         }
+
         public override void OnComponentUsed(AddonComponent c, Mobile from)
         {
             if (from.InRange(c.Location, 2))
             {
-                if (this.m_Fruits > 0)
+                if (m_Fruits > 0)
                 {
-                    Item fruit = this.Fruit;
+                    Item fruit = Fruit;
 
                     if (fruit == null)
                         return;
@@ -48,13 +44,11 @@ namespace Server.Items
                     if (!from.PlaceInBackpack(fruit))
                     {
                         fruit.Delete();
-                        from.SendLocalizedMessage(501015); // There is no room in your backpack for the fruit.					
+                        from.SendLocalizedMessage(501015); // There is no room in your backpack for the fruit.
                     }
                     else
                     {
-                        if (--this.m_Fruits == 0)
-                            Timer.DelayCall(TimeSpan.FromMinutes(30), new TimerCallback(Respawn));
-
+                        --m_Fruits;
                         from.SendLocalizedMessage(501016); // You pick some fruit and put it in your backpack.
                     }
                 }
@@ -71,7 +65,7 @@ namespace Server.Items
 
             writer.WriteEncodedInt(0); // version
 
-            writer.Write((int)this.m_Fruits);
+            writer.Write((int)m_Fruits);
         }
 
         public override void Deserialize(GenericReader reader)
@@ -80,15 +74,20 @@ namespace Server.Items
 
             int version = reader.ReadEncodedInt();
 
-            this.m_Fruits = reader.ReadInt();
+            m_Fruits = reader.ReadInt();
 
-            if (this.m_Fruits == 0)
-                this.Respawn();
+            Timer.DelayCall(TimeSpan.FromDays(1), new TimerCallback(GrowFruit));
         }
 
-        private void Respawn()
+        private void GrowFruit()
         {
-            this.m_Fruits = Utility.RandomMinMax(1, 4);
+            if (Deleted)
+                return;
+
+            if (m_Fruits < MaxFruits)
+                m_Fruits++;
+
+            Timer.DelayCall(TimeSpan.FromDays(1), new TimerCallback(GrowFruit));
         }
     }
 
