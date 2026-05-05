@@ -280,7 +280,7 @@ namespace Server.Items
         {
         }
 
-        public override BaseAddonDeed Deed { get { return new PlumTreeAddonDeed(); } }
+        public override BaseAddonDeed Deed { get { return new PlumTreeDeed(); } }
         public override Item Fruit { get { return new Plum(); } }
 
         public override void Serialize(GenericWriter writer)
@@ -298,15 +298,15 @@ namespace Server.Items
         }
     }
 
-    public class PlumTreeAddonDeed : BaseAddonDeed
+    public class PlumTreeDeed : BaseAddonDeed
     {
         [Constructable]
-        public PlumTreeAddonDeed()
+        public PlumTreeDeed()
             : base()
         {
         }
 
-        public PlumTreeAddonDeed(Serial serial)
+        public PlumTreeDeed(Serial serial)
             : base(serial)
         {
         }
