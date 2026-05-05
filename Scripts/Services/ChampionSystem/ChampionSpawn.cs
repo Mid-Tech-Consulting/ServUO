@@ -395,17 +395,7 @@ namespace Server.Engines.CannedEvil
 
             if (!serverLoad)
             {
-                double chance = Utility.RandomDouble();
-
-                if (chance < 0.1)
-                    Level = 4;
-                else if (chance < 0.25)
-                    Level = 3;
-                else if (chance < 0.5)
-                    Level = 2;
-                else if (Utility.RandomBool())
-                    Level = 1;
-
+                Level = Utility.RandomMinMax(2, 4);
                 StartLevel = Level;
 
                 if (Level > 0 && m_Altar != null)
