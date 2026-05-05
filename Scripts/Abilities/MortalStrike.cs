@@ -35,6 +35,9 @@ namespace Server.Items
             if (m_Table.ContainsKey(m))
                 EndWound(m, true);
 
+            if (IsImmune(m))
+                return;
+
             Timer t = new InternalTimer(m, duration);
             m_Table[m] = t;
             t.Start();
@@ -60,7 +63,7 @@ namespace Server.Items
             m.YellowHealthbar = false;
             m.SendLocalizedMessage(1060208); // You are no longer mortally wounded.
 
-            if (!m_Immune.Contains(m))
+            if (!natural && !m_Immune.Contains(m))
             {
                 m_Immune.Add(m);
 

@@ -32,7 +32,9 @@ namespace Server.Engines.Quests
             new Type[] { typeof(BritchesOfWarding), typeof(GargishBritchesOfWarding) },
             new Type[] { typeof(GlovesOfFeudalGrip), typeof(GargishKiltOfFeudalVise) },
             new Type[] { typeof(CuffsOfTheArchmage), typeof(GargishCuffsOfTheArchmage) },
-            new Type[] { typeof(BowOfTheInfiniteSwarm), typeof(GlaiveOfTheInfiniteSwarm) }
+            new Type[] { typeof(BritchesOfWarding), typeof(GargishBritchesOfWarding) },
+            new Type[] { typeof(BowOfTheInfiniteSwarm), typeof(GlaiveOfTheInfiniteSwarm) },
+            new Type[] { typeof(Glenda), typeof(GargishGlenda) }
         };
 
         public override bool OnDragDrop(Mobile from, Item dropped)

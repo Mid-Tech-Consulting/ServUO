@@ -194,7 +194,8 @@ namespace Server.Regions
 		{
 			base.OnAggressed(aggressor, aggressed, criminal);
 
-            if (!IsDisabled() && aggressor != aggressed && criminal && Utility.InRange(aggressor.Location, aggressed.Location, 12))
+            if (!IsDisabled() && aggressor != aggressed && criminal && Utility.InRange(aggressor.Location, aggressed.Location, 12) &&
+                !ViceVsVirtueSystem.IsEnemy(aggressor, aggressed))
 			{
 				CheckGuardCandidate(aggressor, aggressor is BaseCreature && ((BaseCreature)aggressor).IsAggressiveMonster);
 			}
