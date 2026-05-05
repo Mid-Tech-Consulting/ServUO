@@ -66,6 +66,8 @@ namespace Server.Items
 
             this.WeaponAttributes.HitLeechMana = 50;
             this.WeaponAttributes.HitLeechStam = 50;
+            this.WeaponAttributes.HitLightning = 70;
+            this.WeaponAttributes.HitLowerDefend = 50;
             this.Attributes.BonusStam = 8;
             this.Attributes.RegenStam = 3;
             this.Attributes.WeaponSpeed = 30;

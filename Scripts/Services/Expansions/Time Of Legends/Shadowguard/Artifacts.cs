@@ -204,11 +204,11 @@ namespace Server.Items
 			int version = reader.ReadInt();
 		}
 	}
-	
+
 	public class EnchantressCameo : BaseTalisman
 	{
 		public override int LabelNumber { get { return 1156301; } }
-		
+
 		public override bool IsArtifact { get { return true; } }
 
         public override int InitMinHits{ get{ return 255; } }
@@ -226,7 +226,7 @@ namespace Server.Items
 			Attributes.WeaponSpeed = 10;
 			Attributes.WeaponDamage = 20;
 
-            Slayer = (TalismanSlayerName)Utility.RandomList(11, 13, 14, 15, 16, 17);
+            Slayer = (TalismanSlayerName)Utility.RandomList(11, 13, 14, 15, 16, 17, 18);
 
             SkillName[] fightSkills = new SkillName[] { SkillName.Swords, SkillName.Macing, SkillName.Fencing, SkillName.Archery, SkillName.Wrestling, SkillName.Tactics, SkillName.Anatomy, SkillName.Throwing };
             SkillName[] mageSkills = new SkillName[] { SkillName.Magery, SkillName.Necromancy, SkillName.Mysticism, SkillName.Chivalry, SkillName.Bushido, SkillName.Ninjitsu, SkillName.Spellweaving };
