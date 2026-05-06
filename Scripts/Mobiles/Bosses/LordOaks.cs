@@ -6,6 +6,8 @@ namespace Server.Mobiles
 {
     public class LordOaks : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Fey; } }
+
         private Mobile m_Queen;
         private bool m_SpawnedQueen;
         [Constructable]

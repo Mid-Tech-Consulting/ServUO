@@ -6,6 +6,8 @@ namespace Server.Mobiles
 {
     public class Neira : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Undead; } }
+
         private const double SpeedBoostScalar = 1.2;
         private bool m_SpeedBoost;
         [Constructable]

@@ -6,6 +6,18 @@ using Server.Services.Virtues;
 
 namespace Server.Mobiles
 {
+    public enum ChampionTheme
+    {
+        None = 0,
+        Undead,
+        Demon,
+        Reptile,
+        Fey,
+        Repond,
+        Arachnid,
+        Elemental,
+    }
+
     public abstract class BaseChampion : BaseCreature
     {
         public BaseChampion(AIType aiType)
@@ -251,173 +263,188 @@ namespace Server.Mobiles
             return base.OnBeforeDeath();
         }
 
-        #region Custom Artifact Drops
-        private static readonly Type[] m_CustomArmor = new Type[]
-        {
-            typeof(GlovesOfTheHolyWarrior), typeof(GargishKiltOfTheHolyWarrior),
-            typeof(SentinelsMempo), typeof(SentinelsNecklace),
-            typeof(ShugenjasRaiment), typeof(GargishShugenjasRaiment),
-            typeof(HexweaversVisage), typeof(GargishHexweaversVisage),
-            typeof(UmbrascaleChampionsAegis), typeof(GargishUmbrascaleChampionsAegis),
-            typeof(CorruptedPaladinVambraces), typeof(GargishCorruptedPaladinVambraces),
-            typeof(GlovesOfTheArchlich), typeof(GargishKiltOfTheArchlich),
-            typeof(BalronBoneArmor), typeof(GargishBalronBoneArmor),
-            typeof(MaskOfKhalAnkur),
-            typeof(DeathwardensGreaves), typeof(GargishDeathwardensGreaves),
-            typeof(AzaroksLegplates), typeof(GargishAzaroksLegplates),
-        };
+        #region Themed Artifact Drops
+        // Each champion declares a Theme; the artifact pool is then themed to match.
+        // Pool sizes are kept within 22-24 items so chase-pool odds are roughly
+        // equal across themes (~4-5% per specific item per kill).
 
-        private static readonly Type[] m_CustomClothing = new Type[]
+        private static readonly Type[] _UndeadPool = new Type[]
         {
-            typeof(ScabbardOfJuonar), typeof(GargishScabbardOfJuonar),
-            typeof(GeneralLethesEpaulettes), typeof(GargishGeneralLethesEpaulettes),
-            typeof(LordMorphiusEpaulettes), typeof(GargishLordMorphiusEpaulettes),
-            typeof(ShadowbaneEpaulettes), typeof(GargishShadowbaneEpaulettes),
-            typeof(MantleOfTheArchlich),
-            typeof(FeudalCloakOfElements), typeof(WingArmorOfElements),
-            typeof(FeudalGhostwalkers), typeof(GargishFeudalGhostwalkers),
-            typeof(MushroomApron), typeof(GargishMushroomApron),
-            typeof(SerpentSkinQuiver), typeof(GargishSerpentSkinWingArmor),
-            typeof(RangersCloakOfAugmentation), typeof(WardensArmorOfAugmentation),
-            typeof(KaelvoksCincture), typeof(GargishKaelvoksCincture),
-        };
-
-        private static readonly Type[] m_CustomWeapons = new Type[]
-        {
-            // Unique
-            typeof(ExporMalasFlamus), typeof(GargishExporMalasFlamus),
-            typeof(ShugenjasWand),
-            // Reptile
-            typeof(ReptileLeafblade), typeof(ReptileWarAxe), typeof(ReptileBroadsword),
-            typeof(ReptileDoubleAxe), typeof(ReptileWarHammer), typeof(ReptileMagicalShortbow),
-            typeof(ReptileCompositeBow), typeof(ReptileSoulGlaive), typeof(ReptileBoomerang),
-            typeof(ReptileGargishTalwar), typeof(ReptileGargishKatana), typeof(ReptileLajatang),
-            // Repond
-            typeof(RepondLeafblade), typeof(RepondWarAxe), typeof(RepondBroadsword),
-            typeof(RepondDoubleAxe), typeof(RepondWarHammer), typeof(RepondMagicalShortbow),
-            typeof(RepondCompositeBow), typeof(RepondSoulGlaive), typeof(RepondBoomerang),
-            typeof(RepondGargishTalwar), typeof(RepondGargishKatana), typeof(RepondLajatang),
-            // Arachnid
-            typeof(ArachnidLeafblade), typeof(ArachnidWarAxe), typeof(ArachnidBroadsword),
-            typeof(ArachnidDoubleAxe), typeof(ArachnidWarHammer), typeof(ArachnidMagicalShortbow),
-            typeof(ArachnidCompositeBow), typeof(ArachnidSoulGlaive), typeof(ArachnidBoomerang),
-            typeof(ArachnidGargishTalwar), typeof(ArachnidGargishKatana), typeof(ArachnidLajatang),
-            // Undead
+            // Themed weapons (12)
             typeof(UndeadLeafblade), typeof(UndeadWarAxe), typeof(UndeadBroadsword),
             typeof(UndeadDoubleAxe), typeof(UndeadWarHammer), typeof(UndeadMagicalShortbow),
             typeof(UndeadCompositeBow), typeof(UndeadSoulGlaive), typeof(UndeadBoomerang),
             typeof(UndeadGargishTalwar), typeof(UndeadGargishKatana), typeof(UndeadLajatang),
-            // Demon
+            // Spellbook
+            typeof(UndeadSpellbook),
+            // Themed armor/clothing/jewelry
+            typeof(GlovesOfTheArchlich), typeof(GargishKiltOfTheArchlich),
+            typeof(MantleOfTheArchlich),
+            typeof(MaskOfKhalAnkur),
+            typeof(PendantOfKhalAnkur),
+            typeof(ScabbardOfJuonar), typeof(GargishScabbardOfJuonar),
+            // Themed talismans
+            typeof(TalismanOfTheNecromancer),
+            typeof(TalismanOfTheDeathKnight),
+            typeof(TalismanOfTheStealthMage),
+        };
+
+        private static readonly Type[] _DemonPool = new Type[]
+        {
             typeof(DemonLeafblade), typeof(DemonWarAxe), typeof(DemonBroadsword),
             typeof(DemonDoubleAxe), typeof(DemonWarHammer), typeof(DemonMagicalShortbow),
             typeof(DemonCompositeBow), typeof(DemonSoulGlaive), typeof(DemonBoomerang),
             typeof(DemonGargishTalwar), typeof(DemonGargishKatana), typeof(DemonLajatang),
-            // Fey
+            typeof(DemonSpellbook),
+            typeof(BalronBoneArmor), typeof(GargishBalronBoneArmor),
+            typeof(CorruptedPaladinVambraces), typeof(GargishCorruptedPaladinVambraces),
+            typeof(ExporMalasFlamus), typeof(GargishExporMalasFlamus),
+            typeof(ShadowMastersTalisman),
+            typeof(TalismanOfTheCrusader),
+            typeof(TalismanOfTheFencer),
+            typeof(TalismanOfTheBrute),
+        };
+
+        private static readonly Type[] _ReptilePool = new Type[]
+        {
+            typeof(ReptileLeafblade), typeof(ReptileWarAxe), typeof(ReptileBroadsword),
+            typeof(ReptileDoubleAxe), typeof(ReptileWarHammer), typeof(ReptileMagicalShortbow),
+            typeof(ReptileCompositeBow), typeof(ReptileSoulGlaive), typeof(ReptileBoomerang),
+            typeof(ReptileGargishTalwar), typeof(ReptileGargishKatana), typeof(ReptileLajatang),
+            typeof(ReptilianDeathSpellbook),
+            typeof(SerpentSkinQuiver), typeof(GargishSerpentSkinWingArmor),
+            typeof(HexweaversVisage), typeof(GargishHexweaversVisage),
+            typeof(UmbrascaleChampionsAegis), typeof(GargishUmbrascaleChampionsAegis),
+            typeof(ShugenjasWand),
+            typeof(TalismanOfTheMarksman),
+            typeof(TalismanOfTheSkirmisher),
+            typeof(TalismanOfTheBokutoMage),
+        };
+
+        private static readonly Type[] _FeyPool = new Type[]
+        {
             typeof(FeyLeafblade), typeof(FeyWarAxe), typeof(FeyBroadsword),
             typeof(FeyDoubleAxe), typeof(FeyWarHammer), typeof(FeyMagicalShortbow),
             typeof(FeyCompositeBow), typeof(FeySoulGlaive), typeof(FeyBoomerang),
             typeof(FeyGargishTalwar), typeof(FeyGargishKatana), typeof(FeyLajatang),
-            // Elemental
+            typeof(FeySpellbook),
+            typeof(MushroomApron), typeof(GargishMushroomApron),
+            typeof(RangersCloakOfAugmentation), typeof(WardensArmorOfAugmentation),
+            typeof(KaelvoksCincture), typeof(GargishKaelvoksCincture),
+            typeof(ShugenjasRaiment), typeof(GargishShugenjasRaiment),
+            typeof(TalismanOfTheSpellweaver),
+            typeof(TalismanOfTheMysticWarrior),
+            // Bogling Hide Mukluks slot — race-picked at drop time, see GiveCustomArtifact.
+            // Sentinel value below distinguishes the slot in the pool array.
+            typeof(BoglingHideMukluks),
+        };
+
+        private static readonly Type[] _RepondPool = new Type[]
+        {
+            typeof(RepondLeafblade), typeof(RepondWarAxe), typeof(RepondBroadsword),
+            typeof(RepondDoubleAxe), typeof(RepondWarHammer), typeof(RepondMagicalShortbow),
+            typeof(RepondCompositeBow), typeof(RepondSoulGlaive), typeof(RepondBoomerang),
+            typeof(RepondGargishTalwar), typeof(RepondGargishKatana), typeof(RepondLajatang),
+            typeof(RepondSpellbook),
+            typeof(GlovesOfTheHolyWarrior), typeof(GargishKiltOfTheHolyWarrior),
+            typeof(SentinelsMempo), typeof(SentinelsNecklace),
+            typeof(DeathwardensGreaves), typeof(GargishDeathwardensGreaves),
+            typeof(TalismanOfTheWarrior),
+            typeof(TalismanOfTheSamurai),
+            typeof(TalismanOfTheTamerMage),
+        };
+
+        private static readonly Type[] _ArachnidPool = new Type[]
+        {
+            typeof(ArachnidLeafblade), typeof(ArachnidWarAxe), typeof(ArachnidBroadsword),
+            typeof(ArachnidDoubleAxe), typeof(ArachnidWarHammer), typeof(ArachnidMagicalShortbow),
+            typeof(ArachnidCompositeBow), typeof(ArachnidSoulGlaive), typeof(ArachnidBoomerang),
+            typeof(ArachnidGargishTalwar), typeof(ArachnidGargishKatana), typeof(ArachnidLajatang),
+            typeof(ArachnidDoomSpellbook),
+            typeof(SolariasSecretPoisons), typeof(GargishSolariasSecretPoisons),
+            typeof(LordMorphiusEpaulettes), typeof(GargishLordMorphiusEpaulettes),
+            typeof(CarvedBoneRelicFromHolmes),
+            typeof(ShadowbaneEpaulettes), typeof(GargishShadowbaneEpaulettes),
+            typeof(TalismanOfTheNinja),
+            typeof(TalismanOfTheMystic),
+        };
+
+        private static readonly Type[] _ElementalPool = new Type[]
+        {
             typeof(ElementalLeafblade), typeof(ElementalWarAxe), typeof(ElementalBroadsword),
             typeof(ElementalDoubleAxe), typeof(ElementalWarHammer), typeof(ElementalMagicalShortbow),
             typeof(ElementalCompositeBow), typeof(ElementalSoulGlaive), typeof(ElementalBoomerang),
             typeof(ElementalGargishTalwar), typeof(ElementalGargishKatana), typeof(ElementalLajatang),
-        };
-
-        private static readonly Type[] m_CustomSpellbooks = new Type[]
-        {
-            typeof(ReptilianDeathSpellbook), typeof(RepondSpellbook),
-            typeof(UndeadSpellbook), typeof(DemonSpellbook),
-            typeof(FeySpellbook), typeof(ArachnidDoomSpellbook),
             typeof(ElementalBanSpellbook),
+            typeof(AzaroksLegplates), typeof(GargishAzaroksLegplates),
+            typeof(FeudalCloakOfElements), typeof(WingArmorOfElements),
+            typeof(FeudalGhostwalkers), typeof(GargishFeudalGhostwalkers),
+            typeof(GeneralLethesEpaulettes), typeof(GargishGeneralLethesEpaulettes),
+            typeof(TalismanOfThePureMage),
+            typeof(TalismanOfTheSpellsword),
         };
 
-        private static readonly Type[] m_CustomTalismans = new Type[]
-        {
-            typeof(CarvedBoneRelicFromHolmes),
-            typeof(ShadowMastersTalisman),
-        };
+        private static readonly Dictionary<ChampionTheme, Type[]> _ThemedPools =
+            new Dictionary<ChampionTheme, Type[]>
+            {
+                { ChampionTheme.Undead,    _UndeadPool    },
+                { ChampionTheme.Demon,     _DemonPool     },
+                { ChampionTheme.Reptile,   _ReptilePool   },
+                { ChampionTheme.Fey,       _FeyPool       },
+                { ChampionTheme.Repond,    _RepondPool    },
+                { ChampionTheme.Arachnid,  _ArachnidPool  },
+                { ChampionTheme.Elemental, _ElementalPool },
+            };
 
-        private static readonly Type[] m_CustomJewelry = new Type[]
-        {
-            typeof(SolariasSecretPoisons), typeof(GargishSolariasSecretPoisons),
-            typeof(PendantOfKhalAnkur),
-        };
+        // Each champion subclass overrides this to indicate which themed pool it draws
+        // from. Theme.None falls back to a random theme so unthemed champs still get
+        // sensible loot until they're explicitly themed.
+        public virtual ChampionTheme Theme { get { return ChampionTheme.None; } }
 
-        private static readonly Type[][] m_CustomArtifactCategories = new Type[][]
-        {
-            m_CustomArmor,
-            m_CustomClothing,
-            m_CustomWeapons,
-            m_CustomSpellbooks,
-            m_CustomTalismans,
-            m_CustomJewelry,
-        };
+        // Sea champions (Corgul, Charybdis, Osiredon) have their own dedicated artifact
+        // sets and are excluded from the standard land-champ themed drop pool — they
+        // override this to false so they don't dilute what players are chasing.
+        public virtual bool DropsThemedArtifacts { get { return true; } }
 
-        public static void GiveCustomArtifact(Mobile m)
+        public static void GiveCustomArtifact(Mobile m, ChampionTheme theme)
         {
-            Type[] category = m_CustomArtifactCategories[Utility.Random(m_CustomArtifactCategories.Length)];
-            Type type = category[Utility.Random(category.Length)];
-            Item artifact = Loot.Construct(type);
+            // Resolve None to a randomly-picked theme so future champions still get
+            // a real pool until they override Theme explicitly.
+            if (theme == ChampionTheme.None)
+            {
+                ChampionTheme[] themes = new ChampionTheme[]
+                {
+                    ChampionTheme.Undead, ChampionTheme.Demon, ChampionTheme.Reptile,
+                    ChampionTheme.Fey, ChampionTheme.Repond, ChampionTheme.Arachnid,
+                    ChampionTheme.Elemental
+                };
+                theme = themes[Utility.Random(themes.Length)];
+            }
+
+            Type[] pool;
+            if (!_ThemedPools.TryGetValue(theme, out pool))
+                return;
+
+            Type type = pool[Utility.Random(pool.Length)];
+
+            Item artifact;
+
+            if (type == typeof(BoglingHideMukluks))
+            {
+                // Fey-pool sentinel — race-pick the gargoyle vs. human variant.
+                artifact = m.Race == Race.Gargoyle
+                    ? (Item)new GargishBoglingHideMukluks()
+                    : new BoglingHideMukluks();
+            }
+            else
+            {
+                artifact = Loot.Construct(type);
+            }
 
             if (artifact != null)
             {
                 m.AddToBackpack(artifact);
-                m.SendMessage(0x22, "You have received a custom artifact!");
-            }
-        }
-
-        // Facet-exclusive — only drops on Ilshenar / Tokuno / Malas champ kills, so players
-        // have to leave Felucca to chase these. Felucca champs continue to drop the custom
-        // artifact pool above and never roll on this list.
-        private static readonly Type[] m_MagicalTalismans = new Type[]
-        {
-            // Mage pool (7)
-            typeof(TalismanOfTheMystic),
-            typeof(TalismanOfTheNecromancer),
-            typeof(TalismanOfTheSpellweaver),
-            typeof(TalismanOfThePureMage),
-            typeof(TalismanOfTheBokutoMage),
-            typeof(TalismanOfTheStealthMage),
-            typeof(TalismanOfTheTamerMage),
-            // Dexer pool (11)
-            typeof(TalismanOfTheWarrior),
-            typeof(TalismanOfTheBrute),
-            typeof(TalismanOfTheFencer),
-            typeof(TalismanOfTheMarksman),
-            typeof(TalismanOfTheSkirmisher),
-            typeof(TalismanOfTheSamurai),
-            typeof(TalismanOfTheNinja),
-            typeof(TalismanOfTheCrusader),
-            typeof(TalismanOfTheDeathKnight),
-            typeof(TalismanOfTheMysticWarrior),
-            typeof(TalismanOfTheSpellsword),
-        };
-
-        public static void GiveMagicalTalisman(Mobile m)
-        {
-            // Same drop pool as the talismans, but with a Bogling Hide Mukluks slot too —
-            // race-picks the correct gargoyle vs. human variant when boots come up.
-            int roll = Utility.Random(m_MagicalTalismans.Length + 1);
-
-            if (roll < m_MagicalTalismans.Length)
-            {
-                Item talisman = Loot.Construct(m_MagicalTalismans[roll]);
-
-                if (talisman != null)
-                {
-                    m.AddToBackpack(talisman);
-                    m.SendMessage(0x22, "You have received a magical talisman!");
-                }
-            }
-            else
-            {
-                Item boots = m.Race == Race.Gargoyle
-                    ? (Item)new GargishBoglingHideMukluks()
-                    : (Item)new BoglingHideMukluks();
-
-                m.AddToBackpack(boots);
-                m.SendMessage(0x22, "You have received Bogling Hide Mukluks!");
+                m.SendMessage(0x22, "You have received a champion artifact!");
             }
         }
         #endregion
@@ -439,6 +466,8 @@ namespace Server.Mobiles
                         toGive.Add(ds.m_Mobile);
                 }
 
+                // Felucca-exclusive drops (skull, refinement) stay tied to canonical
+                // power-scroll mechanics. The themed-artifact roll runs everywhere.
                 if (map == Map.Felucca)
                 {
                     if (SkullType != ChampionSkullType.None)
@@ -451,24 +480,18 @@ namespace Server.Mobiles
 
                     if (Core.SA)
                         RefinementComponent.Roll(c, 3, 0.10);
+                }
 
-                    // Custom artifact drops - 25% chance per eligible player (Felucca only)
+                // Themed artifact drops — 25% per eligible player on every champ facet.
+                // Sea champions opt out via DropsThemedArtifacts (they have their own
+                // dedicated High Seas artifact loot).
+                if (DropsThemedArtifacts)
+                {
                     foreach (Mobile m in toGive)
                     {
                         if (m is PlayerMobile && 0.25 > Utility.RandomDouble())
                         {
-                            GiveCustomArtifact(m);
-                        }
-                    }
-                }
-                else // Ilshenar / Tokuno / Malas — facet-exclusive talisman pool
-                {
-                    // Magical talisman drops - 25% chance per eligible player
-                    foreach (Mobile m in toGive)
-                    {
-                        if (m is PlayerMobile && 0.20 > Utility.RandomDouble())
-                        {
-                            GiveMagicalTalisman(m);
+                            GiveCustomArtifact(m, Theme);
                         }
                     }
                 }

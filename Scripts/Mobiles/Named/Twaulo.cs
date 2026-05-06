@@ -7,6 +7,8 @@ namespace Server.Mobiles
     [CorpseName("a corpse of Twaulo")]
     public class Twaulo : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Fey; } }
+
         [Constructable]
         public Twaulo()
             : base(AIType.AI_Melee)

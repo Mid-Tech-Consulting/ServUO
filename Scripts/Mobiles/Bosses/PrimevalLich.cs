@@ -11,6 +11,8 @@ namespace Server.Mobiles
     [CorpseName("a Primeval Lich corpse")]
     public class PrimevalLich : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Undead; } }
+
         private DateTime m_NextDiscordTime;
         private DateTime m_NextAbilityTime;
         private Timer m_Timer;

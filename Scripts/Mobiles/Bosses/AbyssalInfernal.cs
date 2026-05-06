@@ -10,6 +10,8 @@ namespace Server.Mobiles
     [CorpseName("an abyssal infernal corpse")]
     public class AbyssalInfernal : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Demon; } }
+
         private static Dictionary<Mobile, Point3D> m_Table = new Dictionary<Mobile, Point3D>();
 
         private DateTime m_NextAbility;

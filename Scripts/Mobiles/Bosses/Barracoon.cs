@@ -8,6 +8,8 @@ namespace Server.Mobiles
 {
     public class Barracoon : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Repond; } }
+
         [Constructable]
         public Barracoon()
             : base(AIType.AI_Melee)

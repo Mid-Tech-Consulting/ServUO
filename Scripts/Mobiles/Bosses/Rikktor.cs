@@ -7,6 +7,8 @@ namespace Server.Mobiles
 {
     public class Rikktor : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Reptile; } }
+
         [Constructable]
         public Rikktor()
             : base(AIType.AI_Melee)

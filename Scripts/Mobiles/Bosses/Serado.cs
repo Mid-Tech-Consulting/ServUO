@@ -7,6 +7,8 @@ namespace Server.Mobiles
 {
     public class Serado : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Reptile; } }
+
         [Constructable]
         public Serado()
             : base(AIType.AI_Melee)

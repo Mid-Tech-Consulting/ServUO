@@ -7,6 +7,8 @@ namespace Server.Mobiles
 {
     public class Mephitis : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Arachnid; } }
+
         [Constructable]
         public Mephitis()
             : base(AIType.AI_Melee)

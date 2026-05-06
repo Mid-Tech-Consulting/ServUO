@@ -10,6 +10,8 @@ namespace Server.Mobiles
     [CorpseName("a dragon turtle corpse")]
 	public class DragonTurtle : BaseChampion
 	{
+		public override ChampionTheme Theme { get { return ChampionTheme.Reptile; } }
+
 		public override Type[] UniqueList{ get { return new Type[] { }; }}
 		public override Type[] SharedList{ get { return new Type[] { }; }}
 		public override Type[] DecorativeList{ get { return new Type[] { }; }}

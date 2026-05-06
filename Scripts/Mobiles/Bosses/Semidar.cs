@@ -7,6 +7,8 @@ namespace Server.Mobiles
 {
     public class Semidar : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Demon; } }
+
         [Constructable]
         public Semidar()
             : base(AIType.AI_Mage)

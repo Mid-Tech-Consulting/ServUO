@@ -9,6 +9,10 @@ namespace Server.Mobiles
 {
     public class BaseSeaChampion : BaseChampion
     {
+        // High Seas sea champs have their own dedicated artifact sets (Corgul Hat,
+        // Charybdis loot, etc.) and are not part of the land-champ themed drop pool.
+        public override bool DropsThemedArtifacts { get { return false; } }
+
         public override Type[] UniqueList { get { return new Type[] { }; } }
         public override Type[] SharedList { get { return new Type[] { }; } }
         public override Type[] DecorativeList { get { return new Type[] { }; } }

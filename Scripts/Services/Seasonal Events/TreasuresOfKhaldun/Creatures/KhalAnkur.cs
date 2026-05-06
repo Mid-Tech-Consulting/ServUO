@@ -11,6 +11,8 @@ namespace Server.Mobiles
     [CorpseName("a Khal Ankur corpse")]
     public class KhalAnkur : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Undead; } }
+
         public ChampionSpawn Spawn { get; set; }
         private DateTime m_NextSpawn;
         private DateTime m_NextSay;

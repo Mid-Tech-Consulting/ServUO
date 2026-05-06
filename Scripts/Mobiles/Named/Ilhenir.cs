@@ -10,6 +10,8 @@ namespace Server.Mobiles
     [CorpseName("a corpse of Ilhenir")]
     public class Ilhenir : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Elemental; } }
+
         private readonly DateTime m_NextDrop = DateTime.UtcNow;
 
         [Constructable]

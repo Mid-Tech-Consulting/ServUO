@@ -8,6 +8,8 @@ namespace Server.Mobiles
     [CorpseName("the remains of Meraktus")]
     public class Meraktus : BaseChampion
     {
+        public override ChampionTheme Theme { get { return ChampionTheme.Repond; } }
+
         public override ChampionSkullType SkullType
         {
             get
