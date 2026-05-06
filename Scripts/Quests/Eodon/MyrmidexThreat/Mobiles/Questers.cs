@@ -247,11 +247,11 @@ namespace Server.Mobiles
 			{
 				public InternalBuyInfo(BaseVendor owner)
 				{  
-					Add( new GenericBuyInfo( "Stasis Chamber Power Core", typeof( StasisChamberPowerCore ), 101250, 500, 40155, 0 ) );
+					Add( new GenericBuyInfo( "Stasis Chamber Power Core", typeof( StasisChamberPowerCore ), 33750, 500, 40155, 0 ) );
 
-                    Add(new GenericBuyInfo("1159014", typeof(CircuitTrapTrainingKit), 99375, 500, 41875, 0));
-                    Add(new GenericBuyInfo("1159015", typeof(CylinderTrapTrainingKit), 99375, 500, 41875, 0));
-                    Add(new GenericBuyInfo("1159016", typeof(SliderTrapTrainingKit), 99375, 500, 41875, 0));
+                    Add(new GenericBuyInfo("1159014", typeof(CircuitTrapTrainingKit), 33125, 500, 41875, 0));
+                    Add(new GenericBuyInfo("1159015", typeof(CylinderTrapTrainingKit), 33125, 500, 41875, 0));
+                    Add(new GenericBuyInfo("1159016", typeof(SliderTrapTrainingKit), 33125, 500, 41875, 0));
                 }
 			}
 
