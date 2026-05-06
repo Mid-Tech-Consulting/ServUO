@@ -1035,6 +1035,7 @@ namespace Server.Factions
         {
             public Timer m_Timer;
             public List<SkillMod> m_Mods;
+            public DateTime m_ExpireTime;
         }
 
         public static bool InSkillLoss(Mobile mob)
@@ -1066,9 +1067,21 @@ namespace Server.Factions
                 }
             }
 
+            context.m_ExpireTime = DateTime.UtcNow + SkillLossPeriod;
             context.m_Timer = Timer.DelayCall(SkillLossPeriod, new TimerStateCallback(ClearSkillLoss_Callback), mob);
+        }
 
-            BuffInfo.AddBuff(mob, new BuffInfo(BuffIcon.FactionStatLoss, 1070839, 1070840, SkillLossPeriod, mob));
+        public static void ApplyStatLossBuffIcon(Mobile mob)
+        {
+            SkillLossContext context;
+
+            if (!m_SkillLoss.TryGetValue(mob, out context))
+                return;
+
+            TimeSpan remaining = context.m_ExpireTime - DateTime.UtcNow;
+
+            if (remaining > TimeSpan.Zero)
+                BuffInfo.AddBuff(mob, new BuffInfo(BuffIcon.FactionStatLoss, 1070839, 1070840, remaining, mob));
         }
 
         private static void ClearSkillLoss_Callback(object state)

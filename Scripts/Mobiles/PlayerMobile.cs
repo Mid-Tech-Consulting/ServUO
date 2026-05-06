@@ -3886,6 +3886,14 @@ namespace Server.Mobiles
 			return res;
 		}
 
+		public override void OnAfterResurrect()
+		{
+			base.OnAfterResurrect();
+
+			if (Faction.InSkillLoss(this))
+				Faction.ApplyStatLossBuffIcon(this);
+		}
+
 		public override void OnDeath(Container c)
 		{
             if (NetState != null /*&& NetState.IsEnhancedClient*/)
