@@ -1,52 +1,128 @@
+using System;
+
+using Server;
+using Server.Items;
+using Server.Mobiles;
+using Server.Network;
+
 namespace Server.Gumps
 {
 	public class CorruptedCrystalPortalGump : Gump
 	{
-        public override int GetTypeID()
-        {
-            return 0x237B;
-        }
+		private const int EntriesPerPage = 12;
 
-		public CorruptedCrystalPortalGump(Mobile from)
-			: base(25, 25)
+		private readonly Mobile m_From;
+		private readonly CorruptedCrystalPortal m_Portal;
+		private readonly int m_PageIndex;
+
+		public CorruptedCrystalPortalGump(Mobile from, CorruptedCrystalPortal portal)
+			: this(from, portal, 0) { }
+
+		public CorruptedCrystalPortalGump(Mobile from, CorruptedCrystalPortal portal, int pageIndex)
+			: base(50, 50)
 		{
-            from.CloseGump(typeof(CorruptedCrystalPortalGump));
+			m_From = from;
+			m_Portal = portal;
+			m_PageIndex = pageIndex;
 
-            AddImage(0, 0, 0x1FE);
-            AddPage(1);
-            AddHtmlLocalized(40, 30, 150, 48, 1150074, 0, false, false); // Corrupted Crystal Portal
-            AddHtmlLocalized(40, 160, 150, 16, 1113300, 0, false, false); // by
-            AddHtmlLocalized(40, 180, 150, 32, 1113299, 0, false, false); // <center>(unknown)</center>
-            AddHtmlLocalized(230, 30, 145, 160, 1150076, 0, false, false); // This corrupted portal allows you to teleport directly to a dungeon.<br><br>For
-            // Trammel ruleset, say "dungeon" followed by the name of the dungeon (e.g. "dungeon shame"). 
+			from.CloseGump(typeof(CorruptedCrystalPortalGump));
 
-            AddLabel(250, 200, 0, "1"); // todo: get
+			Closable = true;
+			Disposable = true;
+			Dragable = true;
+			Resizable = false;
 
-            AddButton(356, 0, 0x200, 0x200, 0, GumpButtonType.Page, 2);
+			AddBackground(0, 0, 380, 460, 9270);
 
-            AddPage(2);
+			AddHtml(0, 12, 380, 22, "<center><basefont color=#FFFFFF>Corrupted Crystal Portal</basefont></center>", false, false);
+			AddHtml(0, 38, 380, 18, "<center><basefont color=#CCCCCC>Select a dungeon</basefont></center>", false, false);
+			AddHtml(0, 56, 380, 18, "<center><basefont color=#999999>(or SAY the destination name)</basefont></center>", false, false);
 
-            AddHtmlLocalized(40, 35, 150, 160, 1150077, 0, false, false); // For Felucca, say "fel" then same rules as above. So "fel dungeon shame".
+			CorruptedCrystalPortal.Destination[] dests = CorruptedCrystalPortal.AllDestinations;
+			int totalPages = Math.Max(1, (dests.Length + EntriesPerPage - 1) / EntriesPerPage);
+			int page = Math.Max(0, Math.Min(pageIndex, totalPages - 1));
 
-            AddHtmlLocalized(230, 30, 145, 160, 1150075, 0, false, false); // DUNGEON NAMES:<br>covetous, deceit, despise, destard, ice, fire, hythloth, 
-            // orc, shame, wrong, wind, doom, citadel, fandancer, mines, bedlam, labyrinth,
-            //underworld, abyss, grove, caves, palace, prism,
+			int start = page * EntriesPerPage;
+			int end = Math.Min(start + EntriesPerPage, dests.Length);
 
-            AddLabel(90, 200, 0, "2"); // toto: get
-            AddLabel(250, 200, 0, "3"); // todo : get
+			int y = 86;
+			for (int i = start; i < end; i++)
+			{
+				CorruptedCrystalPortal.Destination d = dests[i];
+				AddButton(40, y + 1, 0x4B9, 0x4BA, 1000 + i, GumpButtonType.Reply, 0);
+				AddHtml(70, y, 280, 22, "<basefont color=#FFFFFF>" + FormatLabel(d) + "</basefont>", false, false);
+				y += 26;
+			}
 
-            AddButton(0, 0, 0x1FF, 0x1FF, 0, GumpButtonType.Page, 1);
-            AddButton(356, 0, 0x200, 0x200, 0, GumpButtonType.Page, 3);
+			// Footer
+			AddHtml(40, 420, 100, 22, String.Format("<basefont color=#FFFFFF>Page {0} / {1}</basefont>", page + 1, totalPages), false, false);
 
-            AddPage(3);
+			AddButton(150, 420, 0xFB1, 0xFB3, 0, GumpButtonType.Reply, 0); // Close
+			AddHtml(185, 420, 60, 22, "<basefont color=#FFFFFF>Close</basefont>", false, false);
 
-            AddHtmlLocalized(40, 35, 150, 160, 1155586, 0, false, false); // sanctuary, blackthorn.
-            AddHtmlLocalized(230, 30, 145, 160, 1150078, 0, false, false); // The same teleportation rules apply regarding criminal flagging, weight, etc.
+			if (page > 0)
+				AddButton(240, 420, 0x15E3, 0x15E7, 1, GumpButtonType.Reply, 0); // Prev
 
-            AddLabel(90, 200, 0, "4"); // todo: get
-            AddLabel(250, 200, 0, "5"); // todo: get
+			if (page + 1 < totalPages)
+				AddButton(340, 420, 0x15E1, 0x15E5, 2, GumpButtonType.Reply, 0); // Next
+		}
 
-            AddButton(0, 0, 0x1FF, 0x1FF, 0, GumpButtonType.Page, 2);
+		private static string FormatLabel(CorruptedCrystalPortal.Destination d)
+		{
+			// Tag the facet so duplicates between Tram/Fel are distinguishable.
+			return String.Format("{0} ({1})", d.Label, d.Map.Name);
+		}
+
+		public override void OnResponse(NetState sender, RelayInfo info)
+		{
+			if (m_From == null || m_From.Deleted || sender.Mobile != m_From)
+				return;
+
+			if (m_Portal == null || m_Portal.Deleted)
+				return;
+
+			int id = info.ButtonID;
+
+			if (id == 0)
+				return;
+
+			if (id == 1)
+			{
+				m_From.SendGump(new CorruptedCrystalPortalGump(m_From, m_Portal, m_PageIndex - 1));
+				return;
+			}
+
+			if (id == 2)
+			{
+				m_From.SendGump(new CorruptedCrystalPortalGump(m_From, m_Portal, m_PageIndex + 1));
+				return;
+			}
+
+			int destIndex = id - 1000;
+			CorruptedCrystalPortal.Destination[] dests = CorruptedCrystalPortal.AllDestinations;
+
+			if (destIndex < 0 || destIndex >= dests.Length)
+				return;
+
+			if (!m_From.InRange(m_Portal.Location, 3))
+			{
+				m_From.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1019045); // I can't reach that.
+				return;
+			}
+
+			CorruptedCrystalPortal.Destination d = dests[destIndex];
+
+			if (d.RequireAbyssEntry)
+			{
+				PlayerMobile pm = m_From as PlayerMobile;
+				if (pm == null || !pm.AbyssEntry)
+				{
+					m_From.SendLocalizedMessage(1112226);
+					return;
+				}
+			}
+
+			m_Portal.TryTeleport(m_From, d.Location, d.Map);
 		}
 	}
 }

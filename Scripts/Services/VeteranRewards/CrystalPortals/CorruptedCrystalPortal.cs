@@ -19,14 +19,14 @@ namespace Server.Items
         public override int LabelNumber { get { return 1150074; } } // Corrupted Crystal Portal
 
         private SecureLevel m_Level;
-		
+
 		[CommandProperty(AccessLevel.GameMaster)]
-		public SecureLevel Level 
+		public SecureLevel Level
 		{
 			get { return m_Level; }
 			set { m_Level = value; }
 		}
-		
+
 		public override bool HandlesOnSpeech { get { return true; } }
 
 		[Constructable]
@@ -147,7 +147,7 @@ namespace Server.Items
 
 			if (ValidateUse(m, true))
 			{
-				m.SendGump(new CorruptedCrystalPortalGump(m));
+				m.SendGump(new CorruptedCrystalPortalGump(m, this));
 			}
 		}
 
@@ -156,7 +156,7 @@ namespace Server.Items
 			if (m == null || loc == Point3D.Zero || map == null || map == Map.Internal)
 			{
 				return;
-			}		
+			}
 
 			Effects.SendLocationEffect(m.Location, m.Map, 0x3728, 10, 10);
 			Effects.PlaySound(m.Location, m.Map, 0x1FE);
@@ -166,6 +166,27 @@ namespace Server.Items
 
 			Effects.SendLocationEffect(m.Location, m.Map, 0x3728, 10, 10);
 			Effects.PlaySound(m.Location, m.Map, 0x1FE);
+		}
+
+		// Routes a destination selection (from speech or gump) through validation,
+		// travel restrictions, and then triggers the teleport.
+		public void TryTeleport(Mobile m, Point3D loc, Map map)
+		{
+			if (loc == Point3D.Zero || map == null || map == Map.Internal || (Siege.SiegeShard && map == Map.Trammel))
+			{
+				return;
+			}
+
+			if (SpellHelper.RestrictRedTravel && !Siege.SiegeShard && m.Murderer && map != Map.Felucca)
+			{
+				m.SendLocalizedMessage(1019004); // You are not allowed to travel there.
+				return;
+			}
+
+			if (ValidateUse(m, true))
+			{
+				OnTeleport(m, loc, map);
+			}
 		}
 
 		public override void OnSpeech(SpeechEventArgs e)
@@ -180,30 +201,20 @@ namespace Server.Items
 
 			ResolveDest(e.Mobile, e.Speech.Trim(), ref loc, ref map);
 
-            if (loc == Point3D.Zero || map == null || map == Map.Internal || (Siege.SiegeShard && map == Map.Trammel))
+			if (loc == Point3D.Zero || map == null)
 			{
-				return;
-			}
-
-            if (SpellHelper.RestrictRedTravel && !Siege.SiegeShard && e.Mobile.Murderer && map != Map.Felucca)
-			{
-				e.Mobile.SendLocalizedMessage(1019004); // You are not allowed to travel there.
 				return;
 			}
 
 			e.Handled = true;
-
-			if (ValidateUse(e.Mobile, true))
-			{
-				OnTeleport(e.Mobile, loc, map);
-			}
+			TryTeleport(e.Mobile, loc, map);
 		}
 
 		public override void Serialize(GenericWriter writer)
 		{
 			base.Serialize(writer);
 			writer.Write(1); // version
-			
+
 			writer.WriteEncodedInt((int)m_Level);
 		}
 
@@ -221,283 +232,91 @@ namespace Server.Items
             }
 		}
 
+		#region Destination Tables
+
+		public class Destination
+		{
+			public string SpeechKey { get; }
+			public string Label { get; }
+			public Point3D Location { get; }
+			public Map Map { get; }
+			public bool RequireAbyssEntry { get; }
+
+			public Destination(string speechKey, string label, Point3D location, Map map, bool requireAbyssEntry = false)
+			{
+				SpeechKey = speechKey;
+				Label = label;
+				Location = location;
+				Map = map;
+				RequireAbyssEntry = requireAbyssEntry;
+			}
+		}
+
+		// Speech keys preserved verbatim from the legacy switch.
+		// Trammel destinations intentionally omitted — this shard does not support Trammel.
+		public static readonly Destination[] AllDestinations = new[]
+		{
+			// Felucca ruleset
+			new Destination("fel dungeon covetous", "Covetous", new Point3D(2498, 921, 0), Map.Felucca),
+			new Destination("fel dungeon deceit", "Deceit", new Point3D(4111, 434, 5), Map.Felucca),
+			new Destination("fel dungeon despise", "Despise", new Point3D(1301, 1080, 0), Map.Felucca),
+			new Destination("fel dungeon destard", "Destard", new Point3D(1176, 2640, 2), Map.Felucca),
+			new Destination("fel dungeon fire", "Fire", new Point3D(2923, 3409, 8), Map.Felucca),
+			new Destination("fel dungeon hythloth", "Hythloth", new Point3D(4721, 3824, 0), Map.Felucca),
+			new Destination("fel dungeon ice", "Ice", new Point3D(1999, 81, 4), Map.Felucca),
+			new Destination("fel dungeon orc", "Orc Cave", new Point3D(1017, 1429, 0), Map.Felucca),
+			new Destination("fel dungeon shame", "Shame", new Point3D(511, 1565, 0), Map.Felucca),
+			new Destination("fel dungeon wrong", "Wrong", new Point3D(2043, 238, 10), Map.Felucca),
+			new Destination("fel dungeon wind", "Wind", new Point3D(1361, 895, 0), Map.Felucca),
+			new Destination("fel dungeon prism", "Prism of Light", new Point3D(3786, 1095, 18), Map.Felucca),
+			new Destination("fel dungeon sanctuary", "Sanctuary", new Point3D(761, 1644, 0), Map.Felucca),
+			new Destination("fel dungeon palace", "Palace of Paroxysmus", new Point3D(5624, 3040, 13), Map.Felucca),
+			new Destination("fel dungeon grove", "Twisted Weald", new Point3D(580, 1655, 0), Map.Felucca),
+			new Destination("fel dungeon caves", "Painted Caves", new Point3D(1717, 2991, 0), Map.Felucca),
+			new Destination("fel dungeon blackthorn", "Blackthorn's Castle", new Point3D(1520, 1418, 15), Map.Felucca),
+
+			// Malas
+			new Destination("dungeon doom", "Doom", new Point3D(2368, 1267, -85), Map.Malas),
+			new Destination("dungeon bedlam", "Bedlam", new Point3D(2068, 1372, -75), Map.Malas),
+			new Destination("dungeon labyrinth", "Labyrinth", new Point3D(1732, 975, -75), Map.Malas),
+
+			// Tokuno
+			new Destination("dungeon citadel", "Citadel", new Point3D(1345, 769, 19), Map.Tokuno),
+			new Destination("dungeon fandancer", "Fan Dancer Dojo", new Point3D(970, 222, 23), Map.Tokuno),
+			new Destination("dungeon mines", "Yomotsu Mines", new Point3D(257, 786, 63), Map.Tokuno),
+
+			// TerMur
+			new Destination("dungeon underworld", "Underworld", new Point3D(1128, 1207, -2), Map.TerMur),
+			new Destination("dungeon abyss", "Stygian Abyss", new Point3D(946, 71, 72), Map.TerMur, requireAbyssEntry: true),
+		};
+
+		#endregion
+
 		public static void ResolveDest(Mobile m, string name, ref Point3D loc, ref Map map)
 		{
 			if (String.IsNullOrWhiteSpace(name))
-			{
 				return;
-			}
 
-			switch (name.Trim().ToLower())
+			string key = name.Trim().ToLower();
+
+			foreach (Destination d in AllDestinations)
 			{
-				case "dungeon covetous":
-					{
-						loc = new Point3D( 2498, 921, 0 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon deceit":
-					{
-						loc = new Point3D( 4111, 434, 5 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon despise":
-					{
-						loc = new Point3D( 1301, 1080, 0 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon destard":
-					{
-						loc = new Point3D( 1176, 2640, 2 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon ice":
-					{
-						loc = new Point3D( 1999, 81, 4 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon fire":
-					{
-						loc = new Point3D( 2923, 3409, 8 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon hythloth":
-					{
-						loc = new Point3D( 4721, 3824, 0 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon orc":
-					{
-						loc = new Point3D( 1017, 1429, 0 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon shame":
-					{
-						loc = new Point3D( 511, 1565, 0 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon wrong":
-					{
-						loc = new Point3D( 2043, 238, 10 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon wind":
-					{
-						loc = new Point3D( 1361, 895, 0 );
-						map = Map.Trammel;
-					}
-					break;
-					case "dungeon doom":
-					{
-						loc = new Point3D( 2368, 1267, -85 );
-						map = Map.Malas;
-					}
-					break;
-					
-					// is this the right citadel? uoguide.com says it is
-					case "dungeon citadel":
-					{
-						loc = new Point3D( 1345, 769, 19 );
-						map = Map.Tokuno;
-					}
-					break;
-					case "dungeon fandancer":
-					{
-						loc = new Point3D( 970, 222, 23 );
-						map = Map.Tokuno;
-					}
-					break;
-					case "dungeon mines":
-					{
-						loc = new Point3D( 257, 786, 63 );
-						map = Map.Tokuno;
-					}
-					break;
-					case "dungeon bedlam":
-					{
-						loc = new Point3D( 2068, 1372, -75 );
-						map = Map.Malas;
-					}
-					break;
-					case "dungeon labyrinth":
-					{
-						loc = new Point3D( 1732, 975, -75 );
-						map = Map.Malas;
-					}
-                    break;
-                    case "dungeon prism":
-                    {
-                        loc = new Point3D(3786, 1095, 18);
-                        map = Map.Trammel;
-                    }
-                    break;
-                    case "dungeon sanctuary":
-                    {
-                        loc = new Point3D(761, 1644, 0);
-                        map = Map.Trammel;
-                    }
-                    break;
-                    case "dungeon palace":
-                    {
-                        loc = new Point3D(5624, 3040, 13);
-                        map = Map.Trammel;
-                    }
-                    break;
-                    case "dungeon grove":
-                    {
-                        loc = new Point3D(580, 1655, 0);
-                        map = Map.Trammel;
-                    }
-                    break;
-                    case "dungeon caves":
-                    {
-                        loc = new Point3D(1717, 2991, 0);
-                        map = Map.Trammel;
-                    }
-                    break;
-                    case "dungeon blackthorn":
-                    {
-                        loc = new Point3D(1482, 1474, 0);
-                        map = Map.Trammel;
-                    }
-                    break;
-					//case "dungeon underworld":
-					//{
-					//	loc = new Point3D( 4195, 3263, 5 );
-					//	map = Map.Trammel;
-					//}
-					case "dungeon underworld":
-					{
-						loc = new Point3D(1128, 1207, -2);
-						map = Map.TerMur;
-					}
-					break;
-					case "dungeon abyss":
+				if (d.SpeechKey == key)
+				{
+					if (d.RequireAbyssEntry)
 					{
 						PlayerMobile pm = m as PlayerMobile;
-
-						if (!pm.AbyssEntry)
+						if (pm == null || !pm.AbyssEntry)
 						{
 							m.SendLocalizedMessage(1112226);
-							break;
+							return;
 						}
-						
-						loc = new Point3D( 946, 71, 72 );
-						map = Map.TerMur;
 					}
-					break;
-					// fel
-					case "fel dungeon covetous":
-					{
-						loc = new Point3D( 2498, 921, 0 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon deceit":
-					{
-						loc = new Point3D( 4111, 434, 5 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon despise":
-					{
-						loc = new Point3D( 1301, 1080, 0 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon destard":
-					{
-						loc = new Point3D( 1176, 2640, 2 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon fire":
-					{
-						loc = new Point3D( 2923, 3409, 8 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon hythloth":
-					{
-						loc = new Point3D( 4721, 3824, 0 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon ice":
-					{
-						loc = new Point3D( 1999, 81, 4 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon orc":
-					{
-						loc = new Point3D( 1017, 1429, 0 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon shame":
-					{
-						loc = new Point3D( 511, 1565, 0 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon wrong":
-					{
-						loc = new Point3D( 2043, 238, 10 );
-						map = Map.Felucca;
-					}
-					break;
-					case "fel dungeon wind":
-					{
-						loc = new Point3D( 1361, 895, 0 );
-						map = Map.Felucca;
-					}
-                    break;
-                    case "fel dungeon prism":
-                    {
-                        loc = new Point3D(3786, 1095, 18);
-                        map = Map.Felucca;
-                    }
-                    break;
-                    case "fel dungeon sanctuary":
-                    {
-                        loc = new Point3D(761, 1644, 0);
-                        map = Map.Felucca;
-                    }
-                    break;
-                    case "fel dungeon palace":
-                    {
-                        loc = new Point3D(5624, 3040, 13);
-                        map = Map.Felucca;
-                    }
-                    break;
-                    case "fel dungeon grove":
-                    {
-                        loc = new Point3D(580, 1655, 0);
-                        map = Map.Felucca;
-                    }
-                    break;
-                    case "fel dungeon caves":
-                    {
-                        loc = new Point3D(1717, 2991, 0);
-                        map = Map.Felucca;
-                    }
-                    break;
-                    case "fel dungeon blackthorn":
-                    {
-                        loc = new Point3D(1520, 1418, 15);
-                        map = Map.Felucca;
-                    }
-                    break;
+
+					loc = d.Location;
+					map = d.Map;
+					return;
+				}
 			}
 		}
 	}
