@@ -6964,6 +6964,8 @@ namespace Server.Mobiles
 
             if (Core.SA && amount > 0 && from != null && from != this)
             {
+                Mobile master = GetMaster();
+
                 for (int i = Aggressed.Count - 1; i >= 0; i--)
                 {
                     var info = Aggressed[i];
@@ -6972,6 +6974,9 @@ namespace Server.Mobiles
                     {
                         info.Defender.RegisterDamage(amount, from);
                     }
+
+                    if (info.Defender == master)
+                        continue;
 
                     if (info.Defender.Player && from.CanBeHarmful(info.Defender))
                     {
@@ -6987,6 +6992,9 @@ namespace Server.Mobiles
                     {
                         info.Attacker.RegisterDamage(amount, from);
                     }
+
+                    if (info.Attacker == master)
+                        continue;
 
                     if (info.Attacker.Player && from.CanBeHarmful(info.Attacker))
                     {
