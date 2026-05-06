@@ -885,6 +885,11 @@ namespace Server.Engines.CannedEvil
 				//if ((cx - x) * (cx - x) + (cy - y) * (cy - y) > range * range)
 				//	continue;
 
+                // Reject water tiles so champ mobs don't spawn unreachable in pools/lakes.
+                LandTile lt = map.Tiles.GetLandTile(x, y);
+                if ((TileData.LandTable[lt.ID & TileData.MaxLandValue].Flags & TileFlag.Wet) != 0)
+                    continue;
+
                 int z = Map.GetAverageZ(x, y);
 
                 if (Map.CanSpawnMobile(new Point2D(x, y), z))
