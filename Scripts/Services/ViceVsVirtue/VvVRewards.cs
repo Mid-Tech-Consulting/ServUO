@@ -30,12 +30,14 @@ namespace Server.Engines.VvV
             Rewards.Add(new CollectionItem(typeof(VvVPotionKeg), 6870, 1155541, 2500, 500)); // Stat Loss Removal
             Rewards.Add(new CollectionItem(typeof(VvVPotionKeg), 6870, 1155543, 2543, 500)); // ANti Paralysis
 
-            Rewards.Add(new CollectionItem(typeof(EssenceOfCourage), 3838, 1155554, 2718, 250)); // Essence of Courage
-
             Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8484, 1155545, ViceVsVirtueSystem.VirtueHue, 500)); // Virtue War Horse
             Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8484, 1155545, ViceVsVirtueSystem.ViceHue, 500));   // Vice War Horse
             Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8501, 1155546, ViceVsVirtueSystem.VirtueHue, 500)); // Virtue War Ostard
             Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8501, 1155546, ViceVsVirtueSystem.ViceHue, 500));   // Vice War Ostard
+            Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8484, 1155545, 1157, 500)); // Minax War Horse (deep red)
+            Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8484, 1155545, 2211, 500)); // Shadowlords War Horse (green)
+            Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8484, 1155545, 88, 500)); // Council of Mages War Horse (light blue)
+            Rewards.Add(new CollectionItem(typeof(VvVSteedStatuette), 8484, 1155545, 1254, 500)); // True Britannians War Horse (dark purple)
 
             Rewards.Add(new CollectionItem(typeof(VvVHairDye), 3838, 1155538, ViceVsVirtueSystem.VirtueHue, 2500)); // Virtue Hair Dye
             Rewards.Add(new CollectionItem(typeof(VvVHairDye), 3838, 1155539, ViceVsVirtueSystem.ViceHue, 2500));   // Vice Hair DYe

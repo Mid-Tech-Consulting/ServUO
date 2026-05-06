@@ -1553,7 +1553,7 @@ namespace Server.Engines.BulkOrders
             switch (type)
             {
                 case 0: return new MasterChefsApron();
-                case 1: return new PlumTreeAddonDeed();
+                case 1: return new PlumTreeDeed();
                 case 2: return new FermentationBarrel();
             }
 

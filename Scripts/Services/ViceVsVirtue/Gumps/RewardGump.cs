@@ -43,7 +43,23 @@ namespace Server.Engines.VvV
             }
             else if (citem.Type == typeof(VvVSteedStatuette))
             {
-                SteedType type = index == 5 || index == 6 ? SteedType.WarHorse : SteedType.Ostard;
+                SteedType type;
+
+                if (citem.ItemID == 8501)
+                {
+                    type = SteedType.Ostard;
+                }
+                else
+                {
+                    switch (citem.Hue)
+                    {
+                        case 1157: type = SteedType.MinaxWarHorse; break;
+                        case 2211: type = SteedType.ShadowlordsWarHorse; break;
+                        case 88: type = SteedType.CouncilOfMagesWarHorse; break;
+                        case 1254: type = SteedType.TrueBritanniansWarHorse; break;
+                        default: type = SteedType.WarHorse; break;
+                    }
+                }
 
                 item = new VvVSteedStatuette(type, citem.Hue);
             }
@@ -51,7 +67,7 @@ namespace Server.Engines.VvV
             {
                 VvVTrapType type;
 
-                switch (index - 11)
+                switch (index - 14)
                 {
                     default:
                     case 0: type = VvVTrapType.Poison; break;
