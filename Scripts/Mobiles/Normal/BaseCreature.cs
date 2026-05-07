@@ -6690,6 +6690,28 @@ namespace Server.Mobiles
             {
                 AnimalTaming.ScaleStats(this, 0.5);
             }
+
+            // Wipe wild-state combat history. A taming helper who damaged this
+            // creature down for the tamer would otherwise stay in the pet's
+            // Aggressors list -- causing OnHeal to flag the new owner as that
+            // helper's aggressor when the pet is healed (and guard-whacking
+            // the helper if they're in town).
+            var oldAggressors = new List<AggressorInfo>(Aggressors);
+            foreach (var info in oldAggressors)
+            {
+                if (info.Attacker != null)
+                    info.Attacker.RemoveAggressed(this);
+            }
+
+            var oldAggressed = new List<AggressorInfo>(Aggressed);
+            foreach (var info in oldAggressed)
+            {
+                if (info.Defender != null)
+                    info.Defender.RemoveAggressor(this);
+            }
+
+            Aggressors.Clear();
+            Aggressed.Clear();
         }
 
         public override void OnRegionChange(Region Old, Region New)
