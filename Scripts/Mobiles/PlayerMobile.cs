@@ -2201,6 +2201,16 @@ namespace Server.Mobiles
                     {
                         info.Defender.RegisterDamage(amount, from);
                     }
+
+                    // Healing a player who's in active PvP -> the healer becomes
+                    // an aggressor of that player's combatants (orange to them).
+                    // Mirrors the pet healer-flag in BaseCreature.OnHeal so guards
+                    // don't whack the original attackers when a third party heals
+                    // their target. Self-heal (from == this) is excluded above.
+                    if (info.Defender.Player && from.CanBeHarmful(info.Defender))
+                    {
+                        from.DoHarmful(info.Defender, true);
+                    }
                 }
 
                 for (int i = Aggressors.Count - 1; i >= 0; i--)
@@ -2210,6 +2220,11 @@ namespace Server.Mobiles
                     if (info.Attacker.InRange(Location, Core.GlobalMaxUpdateRange) && info.Attacker.DamageEntries.Any(de => de.Damager == this))
                     {
                         info.Attacker.RegisterDamage(amount, from);
+                    }
+
+                    if (info.Attacker.Player && from.CanBeHarmful(info.Attacker))
+                    {
+                        from.DoHarmful(info.Attacker, true);
                     }
                 }
             }
