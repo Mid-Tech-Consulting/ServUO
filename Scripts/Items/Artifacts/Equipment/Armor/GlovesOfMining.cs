@@ -518,6 +518,22 @@ namespace Server.Items
             this.m_Bonus = bonus;
 
             this.Hue = CraftResources.GetHue((CraftResource)Utility.RandomMinMax((int)CraftResource.DullCopper, (int)CraftResource.Valorite));
+
+            // Buffed mining-glove kit -- solid utility piece that fits into a
+            // miner's suit without outclassing dedicated PvP/PvM endgame gloves
+            // (which typically stack DCI/HCI, higher LMC, Dex bonuses, etc.).
+            Attributes.LowerRegCost = 20;
+            Attributes.LowerManaCost = 8;
+            SkillBonuses.SetValues(0, SkillName.MagicResist, 10.0);
+
+            // Flat 20 on every resist regardless of variant -- compensates for
+            // each subclass's base armor resists so leather/studded/ringmail/
+            // gargish all read 20/20/20/20/20.
+            PhysicalBonus = Math.Max(0, 20 - BasePhysicalResistance);
+            FireBonus = Math.Max(0, 20 - BaseFireResistance);
+            ColdBonus = Math.Max(0, 20 - BaseColdResistance);
+            PoisonBonus = Math.Max(0, 20 - BasePoisonResistance);
+            EnergyBonus = Math.Max(0, 20 - BaseEnergyResistance);
         }
 
         public BaseGlovesOfMining(Serial serial)
