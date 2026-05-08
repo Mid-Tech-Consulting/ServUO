@@ -10,7 +10,9 @@ namespace Server.Misc
     public class ClientVerification
     {
         private static readonly bool m_DetectClientRequirement = true;
-        private static readonly OldClientResponse m_OldClientResponse = OldClientResponse.LenientKick;
+        // Don't kick or harass players for outdated classic clients -- accept
+        // any version and let them connect.
+        private static readonly OldClientResponse m_OldClientResponse = OldClientResponse.Ignore;
         private static readonly TimeSpan m_AgeLeniency = TimeSpan.FromDays(10);
         private static readonly TimeSpan m_GameTimeLeniency = TimeSpan.FromHours(25);
 
