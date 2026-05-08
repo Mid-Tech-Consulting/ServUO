@@ -2399,6 +2399,8 @@ namespace Server.Mobiles
                     m_Quest.GetContextMenuEntries(list);
                 }
 
+                Server.Engines.Gathering.GatheringModeSystem.AddContextMenuEntry(this, from, list);
+
 				if (house != null)
                 {
                     if (Alive && house.InternalizedVendors.Count > 0 && house.IsOwner(this))
