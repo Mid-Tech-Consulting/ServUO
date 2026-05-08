@@ -316,6 +316,7 @@ namespace Server.Engines.UOStore
 
             // misc
             cat = StoreCategory.Misc;
+            Register<EnchantedSoulstoneVessel>("Enchanted Soulstone Vessel", 0, 0xA73F, 0, 0, 1000, cat);
             Register<SoulstoneToken>(1158404, 1158405, 0x2A93, 0, 2598, 1000, cat, ConstructSoulstone);
             Register<BagOfBulkOrderCovers>(1071116, 1157603, 0, 0x9CC6, 0, 200, cat, ConstructBOBCoverOne);
 
@@ -334,6 +335,8 @@ namespace Server.Engines.UOStore
 
             Register<SoulstoneToken>(1078835, 1158405, 0x2ADC, 0, 0, 1000, cat, ConstructSoulstone);
             Register<SoulstoneToken>(1078834, 1158405, 0x2A93, 0, 0, 1000, cat, ConstructSoulstone);
+
+            
 
             Register<MerchantsTrinket>(new TextDefinition[] { 1156827, 1156681 }, 1156666, 0, 0x9C67, 0, 300, cat, ConstructMerchantsTrinket);
             Register<MerchantsTrinket>(new TextDefinition[] { 1156828, 1156682 }, 1156667, 0, 0x9C67, 0, 500, cat, ConstructMerchantsTrinket);
