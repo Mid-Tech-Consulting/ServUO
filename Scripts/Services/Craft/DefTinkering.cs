@@ -893,7 +893,9 @@ namespace Server.Engines.Craft
                 Mobile from = m_TrapCraft.From;
                 ITool tool = m_TrapCraft.Tool;
 
-                if (Siege.SiegeShard)
+                // On Siege, canceling targeting injures the player.
+                // Container validation failures (message != 0) show their real error so the player knows what to fix.
+                if (Siege.SiegeShard && message == 0)
                 {
                     AOS.Damage(from, Utility.RandomMinMax(80, 120), 50, 50, 0, 0, 0);
                     message = 502902; // You fail to set the trap, and inadvertantly hurt yourself in the process.
