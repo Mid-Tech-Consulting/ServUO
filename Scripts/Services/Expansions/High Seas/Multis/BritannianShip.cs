@@ -115,11 +115,15 @@ namespace Server.Multis
         public override int[][] WheelItemIDs { get { return m_WheelItemIDs; } }
         private int[][] m_WheelItemIDs = new int[][]
         {
-            
-            new int[] { 23618 },
-            new int[] { 23618 },
-            new int[] { 23618 },
-            new int[] { 23618 },
+            // Upstream ServUO ships all four facings with the same ID, which
+            // makes the wheel tile fall through to AddFillerItem on three of
+            // the four directions and behave like an inert deck tile. Mirror
+            // the +54 / -54 / -108 facing offset the cannon / hold / filler
+            // arrays use so the engine recognises the wheel on every facing.
+            new int[] { 23618 },  // SOUTH
+            new int[] { 23672 },  // WEST   (23618 + 54)
+            new int[] { 23564 },  // NORTH  (23618 - 54)
+            new int[] { 23510 },  // EAST   (23618 - 108)
         };
 
         public override ShipPosition GetCannonPosition(Point3D pnt)
