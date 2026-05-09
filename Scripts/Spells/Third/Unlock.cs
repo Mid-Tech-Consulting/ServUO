@@ -104,6 +104,9 @@ namespace Server.Spells.Third
                             {
                                 cont.Locked = false;
 
+                                if (cont.TrapOnLockpick && cont.ExecuteTrap(from))
+                                    cont.TrapOnLockpick = false;
+
                                 if (cont.LockLevel == -255)
                                     cont.LockLevel = cont.RequiredSkill - 10;
                             }
