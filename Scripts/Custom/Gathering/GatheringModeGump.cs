@@ -18,52 +18,61 @@ namespace Server.Engines.Gathering
             Dragable = true;
             Resizable = false;
 
-            AddBackground(0, 0, 280, 350, 9270);
+            AddBackground(0, 0, 290, 420, 9270);
 
-            AddHtml(0, 14, 280, 22, "<center><basefont color=#FFFFFF>Gathering Mode</basefont></center>", false, false);
+            AddHtml(0, 14, 290, 22, "<center><basefont color=#FFFFFF>Gathering Mode</basefont></center>", false, false);
 
             GatheringMode current = GatheringModeSystem.GetMode(owner);
             string status = current == GatheringMode.None
                 ? "<basefont color=#888888>Currently disabled</basefont>"
                 : "<basefont color=#80FF80>Currently active: " + current + "</basefont>";
 
-            AddHtml(0, 38, 280, 18, "<center>" + status + "</center>", false, false);
+            AddHtml(0, 38, 290, 18, "<center>" + status + "</center>", false, false);
 
-            AddHtml(0, 64, 280, 18, "<center><basefont color=#CCCCCC>Stand near and gather automatically.</basefont></center>", false, false);
-            AddHtml(0, 82, 280, 18, "<center><basefont color=#999999>(Tools must be in your backpack.)</basefont></center>", false, false);
+            AddHtml(0, 62, 290, 18, "<center><basefont color=#CCCCCC>Stand near and gather automatically.</basefont></center>", false, false);
+            AddHtml(0, 80, 290, 18, "<center><basefont color=#999999>(Tools must be in your backpack.)</basefont></center>", false, false);
 
+            // ----- Mode buttons -----
             // Mining
-            AddButton(40, 110, 0x4B9, 0x4BA, 1, GumpButtonType.Reply, 0);
-            AddHtml(70, 109, 200, 22, "<basefont color=#FFFFFF>Mining</basefont>", false, false);
+            AddButton(40, 108, 0x4B9, 0x4BA, 1, GumpButtonType.Reply, 0);
+            AddHtml(70, 107, 200, 22, "<basefont color=#FFFFFF>Mining</basefont>", false, false);
 
             // Lumberjacking
-            AddButton(40, 138, 0x4B9, 0x4BA, 2, GumpButtonType.Reply, 0);
-            AddHtml(70, 137, 200, 22, "<basefont color=#FFFFFF>Lumberjacking</basefont>", false, false);
+            AddButton(40, 134, 0x4B9, 0x4BA, 2, GumpButtonType.Reply, 0);
+            AddHtml(70, 133, 200, 22, "<basefont color=#FFFFFF>Lumberjacking</basefont>", false, false);
+
+            // Fishing
+            AddButton(40, 160, 0x4B9, 0x4BA, 4, GumpButtonType.Reply, 0);
+            AddHtml(70, 159, 200, 22, "<basefont color=#FFFFFF>Fishing</basefont>", false, false);
 
             // Off
-            AddButton(40, 166, 0x4B9, 0x4BA, 3, GumpButtonType.Reply, 0);
-            AddHtml(70, 165, 200, 22, "<basefont color=#FF8080>Off</basefont>", false, false);
+            AddButton(40, 186, 0x4B9, 0x4BA, 3, GumpButtonType.Reply, 0);
+            AddHtml(70, 185, 200, 22, "<basefont color=#FF8080>Off</basefont>", false, false);
 
-            // Auto-cut logs to boards toggle (lumberjacking-only feature)
-            bool autoCut = GatheringModeSystem.IsAutoCutLogs(owner);
-            AddCheck(40, 200, 0xD2, 0xD3, autoCut, 100);
-            AddHtml(70, 199, 200, 22, "<basefont color=#FFFFFF>Auto-cut logs to boards</basefont>", false, false);
+            // ----- Toggles -----
+            // Auto-cut logs to boards (lumberjacking)
+            bool autoCutLogs = GatheringModeSystem.IsAutoCutLogs(owner);
+            AddCheck(40, 220, 0xD2, 0xD3, autoCutLogs, 100);
+            AddHtml(70, 219, 220, 22, "<basefont color=#FFFFFF>Auto-cut logs to boards</basefont>", false, false);
+            AddHtml(40, 240, 240, 18, "<basefont color=#999999>(applies while lumberjacking)</basefont>", false, false);
 
-            AddHtml(40, 222, 220, 18, "<basefont color=#999999>(applies while lumberjacking)</basefont>", false, false);
-
-            // Auto-create tools toggle (uses player's Tinkering skill + iron ingots)
+            // Auto-create tools (mining + lumberjacking)
             bool autoCreate = GatheringModeSystem.IsAutoCreateTools(owner);
-            AddCheck(40, 246, 0xD2, 0xD3, autoCreate, 101);
-            AddHtml(70, 245, 200, 22, "<basefont color=#FFFFFF>Auto-create tools</basefont>", false, false);
+            AddCheck(40, 262, 0xD2, 0xD3, autoCreate, 101);
+            AddHtml(70, 261, 220, 22, "<basefont color=#FFFFFF>Auto-create tools</basefont>", false, false);
+            AddHtml(40, 282, 240, 18, "<basefont color=#999999>(needs Tinkering + iron ingots)</basefont>", false, false);
 
-            AddHtml(40, 268, 220, 18, "<basefont color=#999999>(needs Tinkering + iron ingots)</basefont>", false, false);
-
-            // Auto-smelt ores toggle (mining-only feature; needs forge or fire beetle)
+            // Auto-smelt ores (mining)
             bool autoSmelt = GatheringModeSystem.IsAutoSmelt(owner);
-            AddCheck(40, 290, 0xD2, 0xD3, autoSmelt, 102);
-            AddHtml(70, 289, 200, 22, "<basefont color=#FFFFFF>Auto-smelt ores</basefont>", false, false);
+            AddCheck(40, 304, 0xD2, 0xD3, autoSmelt, 102);
+            AddHtml(70, 303, 220, 22, "<basefont color=#FFFFFF>Auto-smelt ores</basefont>", false, false);
+            AddHtml(40, 324, 240, 18, "<basefont color=#999999>(needs forge or fire beetle nearby)</basefont>", false, false);
 
-            AddHtml(40, 312, 220, 18, "<basefont color=#999999>(needs forge or fire beetle nearby)</basefont>", false, false);
+            // Auto-cut fish to steaks (fishing)
+            bool autoCutFish = GatheringModeSystem.IsAutoCutFish(owner);
+            AddCheck(40, 346, 0xD2, 0xD3, autoCutFish, 103);
+            AddHtml(70, 345, 220, 22, "<basefont color=#FFFFFF>Auto-cut fish to steaks</basefont>", false, false);
+            AddHtml(40, 366, 240, 18, "<basefont color=#999999>(toggle off to keep quest fish)</basefont>", false, false);
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -71,23 +80,23 @@ namespace Server.Engines.Gathering
             if (m_Owner == null || m_Owner.Deleted || sender.Mobile != m_Owner)
                 return;
 
-            // Persist the toggle states on every response (closing the gump,
-            // clicking a mode button, etc.) so the checkboxes always stick.
-            bool autoCut = false;
+            // Persist the toggle states on every response so the checkboxes
+            // always stick regardless of which button (mode or close) is used.
+            bool autoCutLogs = false;
             bool autoCreate = false;
             bool autoSmelt = false;
+            bool autoCutFish = false;
             for (int i = 0; i < info.Switches.Length; i++)
             {
-                if (info.Switches[i] == 100)
-                    autoCut = true;
-                else if (info.Switches[i] == 101)
-                    autoCreate = true;
-                else if (info.Switches[i] == 102)
-                    autoSmelt = true;
+                if (info.Switches[i] == 100) autoCutLogs = true;
+                else if (info.Switches[i] == 101) autoCreate = true;
+                else if (info.Switches[i] == 102) autoSmelt = true;
+                else if (info.Switches[i] == 103) autoCutFish = true;
             }
-            GatheringModeSystem.SetAutoCutLogs(m_Owner, autoCut);
+            GatheringModeSystem.SetAutoCutLogs(m_Owner, autoCutLogs);
             GatheringModeSystem.SetAutoCreateTools(m_Owner, autoCreate);
             GatheringModeSystem.SetAutoSmelt(m_Owner, autoSmelt);
+            GatheringModeSystem.SetAutoCutFish(m_Owner, autoCutFish);
 
             switch (info.ButtonID)
             {
@@ -99,6 +108,9 @@ namespace Server.Engines.Gathering
                     break;
                 case 3:
                     GatheringModeSystem.SetMode(m_Owner, GatheringMode.None);
+                    break;
+                case 4:
+                    GatheringModeSystem.SetMode(m_Owner, GatheringMode.Fishing);
                     break;
             }
         }
