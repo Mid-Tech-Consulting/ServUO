@@ -74,7 +74,17 @@ namespace Server.Items
 
                         return true;
                     }
-                    else if (Core.SA)
+
+                    bool hasAnyCurse = GetTotalCurses(from) > 0 || MortalStrike.IsWounded(from);
+
+                    if (!hasAnyCurse)
+                    {
+                        from.SendLocalizedMessage(1150174); // The apple was not strong enough to purify you.
+                        Consume();
+                        return false;
+                    }
+
+                    if (Core.SA)
                     {
                         int totalCurses = GetTotalCurses(from);
 
