@@ -2066,6 +2066,15 @@ namespace Server.Items
                         neg.Antique = 1;
                 }
 
+                // Legendary resist floor: a Legendary Artifact should never have a
+                // single-digit elemental resist. Any non-zero resist below 10 is
+                // raised to 10. Resists that didn't roll at all (still 0) are left
+                // alone -- this only fixes ugly low rolls, not budget allocation.
+                if (finalPower == ItemPower.LegendaryArtifact || finalPower == ItemPower.ReforgedLegendary)
+                {
+                    EnforceLegendaryResistFloor(item);
+                }
+
                 // hues
                 if (power == ItemPower.LegendaryArtifact && (item is BaseArmor || item is BaseClothing))
                 {
@@ -2088,6 +2097,43 @@ namespace Server.Items
         private static bool IsPowerful(int budget)
         {
             return budget >= 550;
+        }
+
+        private const int LegendaryResistFloor = 10;
+
+        // Force every elemental resist bonus up to the floor on Legendary
+        // Artifact tier armor / clothing. Unlike the rolled-property pipeline,
+        // this overrides the budget -- a legendary should always feel like
+        // one, with no single-digit resist holes regardless of which props
+        // happened to roll.
+        private static void EnforceLegendaryResistFloor(Item item)
+        {
+            if (item is BaseArmor armor)
+            {
+                if (armor.PhysicalBonus < LegendaryResistFloor)
+                    armor.PhysicalBonus = LegendaryResistFloor;
+                if (armor.FireBonus < LegendaryResistFloor)
+                    armor.FireBonus = LegendaryResistFloor;
+                if (armor.ColdBonus < LegendaryResistFloor)
+                    armor.ColdBonus = LegendaryResistFloor;
+                if (armor.PoisonBonus < LegendaryResistFloor)
+                    armor.PoisonBonus = LegendaryResistFloor;
+                if (armor.EnergyBonus < LegendaryResistFloor)
+                    armor.EnergyBonus = LegendaryResistFloor;
+            }
+            else if (item is BaseClothing clothing)
+            {
+                if (clothing.Resistances.Physical < LegendaryResistFloor)
+                    clothing.Resistances.Physical = LegendaryResistFloor;
+                if (clothing.Resistances.Fire < LegendaryResistFloor)
+                    clothing.Resistances.Fire = LegendaryResistFloor;
+                if (clothing.Resistances.Cold < LegendaryResistFloor)
+                    clothing.Resistances.Cold = LegendaryResistFloor;
+                if (clothing.Resistances.Poison < LegendaryResistFloor)
+                    clothing.Resistances.Poison = LegendaryResistFloor;
+                if (clothing.Resistances.Energy < LegendaryResistFloor)
+                    clothing.Resistances.Energy = LegendaryResistFloor;
+            }
         }
 
         public static int GetProperties(int max)
