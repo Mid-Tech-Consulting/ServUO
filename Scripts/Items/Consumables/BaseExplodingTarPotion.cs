@@ -113,7 +113,7 @@ namespace Server.Items
 
             Mobile victim = target;
 
-            _ActiveEffects[target] = Timer.DelayCall(TimeSpan.FromSeconds(8.0), () =>
+            _ActiveEffects[target] = Timer.DelayCall(TimeSpan.FromSeconds(3.5), () =>
             {
                 EndTarEffect(victim);
             });
