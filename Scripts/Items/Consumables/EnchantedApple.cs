@@ -65,6 +65,14 @@ namespace Server.Items
                     if (Core.TOL)
                     {
                         int power = CleansingWindsSpell.RemoveCurses(from);
+
+                        if (power == 0)
+                        {
+                            from.SendLocalizedMessage(1150174); // The apple was not strong enough to purify you.
+                            Consume();
+                            return false;
+                        }
+
                         power = Math.Min(power, 15);
 
                         from.SendLocalizedMessage(EatMessage);
