@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using Server;
+using Server.ContextMenus;
 using Server.Factions;
 using Server.Gumps;
 using Server.Misc;
@@ -16,10 +17,21 @@ namespace Server.Items
     /// Devotion-themed teleport ankh: double-click to open a destination
     /// picker and warp to a Felucca virtue shrine or one of the three Tokuno
     /// island shrines. Same travel-validation flow as the Crystal Portal
-    /// (criminal / encumber / combat / spell / trade-order checks).
+    /// (criminal / encumber / combat / spell / trade-order checks). Must be
+    /// locked down in a house and respects the standard SecureLevel access
+    /// gate (Owner / Co-Owner / Friend / Anyone).
     /// </summary>
-    public class AnkhOfDevotion : Item
+    public class AnkhOfDevotion : Item, ISecurable
     {
+        private SecureLevel m_Level;
+
+        [CommandProperty(AccessLevel.GameMaster)]
+        public SecureLevel Level
+        {
+            get { return m_Level; }
+            set { m_Level = value; }
+        }
+
         [Constructable]
         public AnkhOfDevotion()
             : base(0x99C7)
@@ -29,11 +41,19 @@ namespace Server.Items
             Weight = 10.0;
             LootType = LootType.Blessed;
             Movable = true;
+            m_Level = SecureLevel.CoOwners;
         }
 
         public AnkhOfDevotion(Serial serial)
             : base(serial)
         {
+        }
+
+        public override void GetContextMenuEntries(Mobile from, List<ContextMenuEntry> list)
+        {
+            base.GetContextMenuEntries(from, list);
+
+            SetSecureLevelEntry.AddTo(from, this, list);
         }
 
         public override void OnDoubleClick(Mobile m)
@@ -56,6 +76,22 @@ namespace Server.Items
 
         public virtual bool ValidateUse(Mobile m, bool message)
         {
+            BaseHouse house = BaseHouse.FindHouseAt(this);
+
+            if (house == null || !IsLockedDown)
+            {
+                if (message)
+                    m.SendMessage("This must be locked down in a house to use!");
+                return false;
+            }
+
+            if (!house.HasSecureAccess(m, m_Level))
+            {
+                if (message)
+                    m.SendLocalizedMessage(503301, "", 0x22); // You don't have permission to do that.
+                return false;
+            }
+
             if (Sigil.ExistsOn(m))
             {
                 if (message)
@@ -181,13 +217,19 @@ namespace Server.Items
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(0); // version
+            writer.Write(1); // version
+            writer.WriteEncodedInt((int)m_Level);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
             int version = reader.ReadInt();
+
+            if (version >= 1)
+                m_Level = (SecureLevel)reader.ReadEncodedInt();
+            else
+                m_Level = SecureLevel.CoOwners;
         }
     }
 }
