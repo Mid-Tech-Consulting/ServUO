@@ -370,9 +370,6 @@ namespace Server.Misc
 
 				if (Core.ML && master != null && !bc.ForceNotoriety)
 				{
-					if (source == master && CheckAggressor(target.Aggressors, source))
-						return Notoriety.CanBeAttacked;
-
 					if (CheckAggressor(source.Aggressors, bc))
 						return Notoriety.CanBeAttacked;
 
