@@ -263,7 +263,7 @@ namespace Server.Items
                         valid = false;
                 }
 
-                if (valid)
+                if (valid && !Region.Find(new Point3D(x, y, 0), map).IsPartOf(typeof(Regions.GuardedRegion)))
                     return new Point3D(x, y, 0);
             }
 
