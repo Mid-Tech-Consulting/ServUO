@@ -40,14 +40,26 @@ namespace Server.Items
 
         public override void OnHit(Mobile attacker, Mobile defender, int damage)
         {
+            // Without these clears, a player who activates Dismount on foot
+            // then mounts up keeps the swirly visually armed forever -- every
+            // swing calls OnHit, the guards bail, and the ability stays
+            // queued. Looks to the player like Dismount is "always proccing"
+            // even though no dismount actually lands.
             if (!this.Validate(attacker))
+            {
+                ClearCurrentAbility(attacker);
                 return;
+            }
 
             if (defender is ChaosDragoon || defender is ChaosDragoonElite)
                 return;
 
-            if (CheckMountedNoLance(attacker, defender)) // TODO: Should there be a message here?
+            if (CheckMountedNoLance(attacker, defender))
+            {
+                attacker.SendLocalizedMessage(1061283); // You cannot perform that attack while mounted or flying!
+                ClearCurrentAbility(attacker);
                 return;
+            }
 
             ClearCurrentAbility(attacker);
 
