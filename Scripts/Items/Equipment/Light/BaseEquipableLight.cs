@@ -16,9 +16,11 @@ namespace Server.Items
         {
         }
 
+        protected virtual bool RequiresEquipToIgnite => true;
+
         public override void Ignite()
         {
-            if (!(Parent is Mobile) && RootParent is Mobile)
+            if (!(Parent is Mobile) && RootParent is Mobile && RequiresEquipToIgnite)
             {
                 Mobile holder = (Mobile)RootParent;
 
@@ -44,7 +46,7 @@ namespace Server.Items
 
         public override void OnAdded(object parent)
         {
-            if (Burning && parent is Container)
+            if (Burning && parent is Container && !(RootParent is Mobile))
                 Douse();
 
             base.OnAdded(parent);
