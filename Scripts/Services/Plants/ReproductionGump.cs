@@ -174,8 +174,12 @@ namespace Server.Engines.Plants
                 case 8: // Gather seeds
                 {
                     PlantSystem system = m_Plant.PlantSystem;
- 
-                    if ( !m_Plant.IsCrossable )
+
+                    // Bugfix: gate on Reproduces, not IsCrossable. A Flax / Cocoa /
+                    // Sugar Cane / etc. plant is crossable=false but reproduces=true,
+                    // so it banks seeds and they should be gatherable. Only a plant
+                    // that genuinely can't reproduce gets the "mutated" message.
+                    if ( !m_Plant.Reproduces )
                     {
                         m_Plant.LabelTo( from, 1053060 ); // Mutated plants do not produce seeds!
                     }
@@ -276,7 +280,11 @@ namespace Server.Engines.Plants
             PlantSystem system = m_Plant.PlantSystem;
             int totalSeeds = system.AvailableSeeds + system.LeftSeeds;
 
-            if (!m_Plant.IsCrossable || totalSeeds == 0)
+            // Bugfix: gate on Reproduces, not IsCrossable. "Peculiar" resource
+            // plants (Flax, Foxglove, Cocoa, Sugar Cane, Vanilla, Cypress,
+            // Hops, Hedges, ...) are crossable=false but reproduces=true -- they
+            // DO bank seeds, the gump just used to hide them behind a bare "X".
+            if (!m_Plant.Reproduces || totalSeeds == 0)
             {
                 AddLabel(x + 5, y, 0x21, "X");
             }
