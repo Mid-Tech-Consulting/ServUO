@@ -16,9 +16,11 @@ namespace Server.Items
         {
         }
 
+        protected virtual bool RequiresEquipToIgnite => true;
+
         public override void Ignite()
         {
-            if (!(Parent is Mobile) && RootParent is Mobile)
+            if (!(Parent is Mobile) && RootParent is Mobile && RequiresEquipToIgnite)
             {
                 Mobile holder = (Mobile)RootParent;
 

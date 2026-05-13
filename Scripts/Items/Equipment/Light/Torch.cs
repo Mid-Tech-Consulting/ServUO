@@ -7,6 +7,8 @@ namespace Server.Items
         public override int LitItemID { get { return 0xA12; } }
         public override int UnlitItemID { get { return 0xF6B; } }
 
+        protected override bool RequiresEquipToIgnite => false;
+
         public override int LitSound { get { return 0x54; } }
         public override int UnlitSound { get { return 0x4BB; } }
 
