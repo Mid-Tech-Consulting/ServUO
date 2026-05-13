@@ -389,12 +389,18 @@ namespace Server.Items
                         {
                             LockableContainer cont = (LockableContainer)item;
 
-                            if (cont.TrapType != TrapType.None && cont.TrapOnLockpick)
+                            if (cont.TrapType != TrapType.None)
                             {
                                 if (o.Locked)
+                                {
+                                    cont.TrapArmed = true;
                                     item.SendLocalizedMessageTo(from, 501673); // You re-enable the trap.
+                                }
                                 else
+                                {
+                                    cont.TrapArmed = false;
                                     item.SendLocalizedMessageTo(from, 501672); // You disable the trap temporarily.  Lock it again to re-enable it.
+                                }
                             }
                         }
                     }
