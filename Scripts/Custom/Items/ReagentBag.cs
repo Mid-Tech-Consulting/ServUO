@@ -16,7 +16,16 @@ namespace Server.Items
         public const int MaxPerReagent = 60000;
 
         public override int DefaultMaxItems { get { return 125; } }
-        public override int DefaultMaxWeight { get { return 1000000; } } // never the limiting factor; weight is zeroed below
+        public override int DefaultMaxWeight { get { return 1000000; } } // never the limiting factor; weight is hidden via IsVirtualItem
+
+        // Weightless to the carrier and to any container we live in. This is
+        // the same trick BankBox uses: IsVirtualItem=true makes both
+        // Item.UpdateTotal stop propagating weight to the parent AND
+        // Container.UpdateTotals skip us in the full recompute, so the two
+        // weight-tracking paths can never disagree. (The earlier
+        // GetTotal(Weight)=>0 override only fixed one path and caused the
+        // cached parent totals to drift when reagents were moved in/out.)
+        public override bool IsVirtualItem { get { return true; } }
 
         // The 17 reagent types this bag accepts -- same set the Reagent
         // Stockpile chest uses (8 Magery, 5 Necromancy, 4 Mysticism, with
@@ -46,16 +55,6 @@ namespace Server.Items
         public ReagentBag(Serial serial)
             : base(serial)
         {
-        }
-
-        // Weightless to the carrier. Individual reagent stacks keep their own
-        // weight, but it never propagates up past this container.
-        public override int GetTotal(TotalType type)
-        {
-            if (type == TotalType.Weight)
-                return 0;
-
-            return base.GetTotal(type);
         }
 
         private static bool IsAllowed(Item item)
