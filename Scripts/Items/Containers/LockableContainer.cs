@@ -143,6 +143,7 @@ namespace Server.Items
         }
 
         protected override bool ClearTrapOnExecute => !TrapArmed;
+        protected override bool OpenAfterExecuteTrap => TrapArmed;
 
         [CommandProperty(AccessLevel.GameMaster)]
         public ItemQuality Quality

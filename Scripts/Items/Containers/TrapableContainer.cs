@@ -206,9 +206,11 @@ namespace Server.Items
             }
         }
 
+        protected virtual bool OpenAfterExecuteTrap => false;
+
         public override void Open(Mobile from)
         {
-            if (from.AccessLevel > AccessLevel.Player || !TrapOnOpen || !ExecuteTrap(from))
+            if (from.AccessLevel > AccessLevel.Player || !TrapOnOpen || !ExecuteTrap(from) || OpenAfterExecuteTrap)
                 base.Open(from);
         }
 
