@@ -102,7 +102,24 @@ namespace Server.Items
                 return false;
             }
 
-            return base.CheckHold(m, item, message, checkItems, plusItems, plusWeight);
+            // Item-count guard against pathological state; with stack merging the
+            // bag never realistically holds more than the 17 reagent types.
+            if (!m.IsStaff() && checkItems && MaxItems != 0 &&
+                (TotalItems + plusItems + item.TotalItems + (item.IsVirtualItem ? 0 : 1)) > MaxItems)
+            {
+                if (message)
+                    SendFullItemsMessage(m, item);
+                return false;
+            }
+
+            // Deliberately NOT calling base.CheckHold -- the base walks up the
+            // parent chain to ask the carrier (backpack) whether it can hold
+            // the new weight, which rejects 60k bloodmoss every time even
+            // though the bag is virtual and that weight will never actually
+            // land on the pack. The bag's own weight cap is meaningless
+            // (DefaultMaxWeight is artificially huge) so there's nothing more
+            // to check at the bag level either.
+            return true;
         }
 
         public override bool OnDragDrop(Mobile from, Item dropped)
