@@ -12,7 +12,7 @@ namespace Server.Items
         public static class Config
         {
             public static bool Enabled = true;
-            public static int MinutesPerCoin = 10;          // +1 coin every 10 minutes
+            public static int MinutesPerCoin = 30;          // +1 coin every 30 minutes
             public static bool DropToBank = true;           // true = bank, false = backpack
             public static AccessLevel MaxAccessLevel = AccessLevel.Player;
         }
