@@ -69,6 +69,8 @@ namespace Server.Items
                 return true;
             }
         }
+        protected virtual bool ClearTrapOnExecute => true;
+
         public virtual bool ExecuteTrap(Mobile from)
         {
             if (m_TrapType != TrapType.None)
@@ -180,9 +182,13 @@ namespace Server.Items
                         }
                 }
 
-                m_TrapType = TrapType.None;
-                m_TrapPower = 0;
-                m_TrapLevel = 0;
+                if (ClearTrapOnExecute)
+                {
+                    m_TrapType = TrapType.None;
+                    m_TrapPower = 0;
+                    m_TrapLevel = 0;
+                }
+
                 return true;
             }
 
@@ -200,9 +206,11 @@ namespace Server.Items
             }
         }
 
+        protected virtual bool OpenAfterExecuteTrap => false;
+
         public override void Open(Mobile from)
         {
-            if (from.AccessLevel > AccessLevel.Player || !TrapOnOpen || !ExecuteTrap(from))
+            if (from.AccessLevel > AccessLevel.Player || !TrapOnOpen || !ExecuteTrap(from) || OpenAfterExecuteTrap)
                 base.Open(from);
         }
 

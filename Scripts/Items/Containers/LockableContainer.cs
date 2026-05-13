@@ -12,6 +12,7 @@ namespace Server.Items
         private Mobile m_Picker;
 		private Mobile m_Crafter;
         private bool m_TrapOnLockpick;
+        private bool m_TrapArmed;
 
         private ItemQuality m_Quality;
         private CraftResource m_Resource;
@@ -115,7 +116,7 @@ namespace Server.Items
         {
             get
             {
-                return !m_TrapOnLockpick;
+                return TrapArmed || !m_TrapOnLockpick;
             }
         }
 
@@ -131,6 +132,18 @@ namespace Server.Items
                 m_TrapOnLockpick = value;
             }
         }
+
+        // True when the container was locked with its key while trapped, arming the trap.
+        // Armed traps persist after firing and are only removed by Remove Trap.
+        [CommandProperty(AccessLevel.GameMaster)]
+        public bool TrapArmed
+        {
+            get { return m_TrapArmed && TrapType != TrapType.None; }
+            set { m_TrapArmed = value; }
+        }
+
+        protected override bool ClearTrapOnExecute => !TrapArmed;
+        protected override bool OpenAfterExecuteTrap => TrapArmed;
 
         [CommandProperty(AccessLevel.GameMaster)]
         public ItemQuality Quality
@@ -166,7 +179,9 @@ namespace Server.Items
         {
             base.Serialize(writer);
 
-            writer.Write((int)8); // version
+            writer.Write((int)9); // version
+
+            writer.Write(m_TrapArmed);
 
             writer.Write(m_PlayerConstructed);
             writer.Write((int)m_Resource);
@@ -195,6 +210,11 @@ namespace Server.Items
 
             switch ( version )
             {
+                case 9:
+                    {
+                        m_TrapArmed = reader.ReadBool();
+                        goto case 8;
+                    }
                 case 8:
                     {
                         m_PlayerConstructed = reader.ReadBool();
