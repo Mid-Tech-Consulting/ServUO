@@ -44,7 +44,7 @@ namespace Server.Items
 
         public override void OnAdded(object parent)
         {
-            if (Burning && parent is Container)
+            if (Burning && parent is Container && !(RootParent is Mobile))
                 Douse();
 
             base.OnAdded(parent);
