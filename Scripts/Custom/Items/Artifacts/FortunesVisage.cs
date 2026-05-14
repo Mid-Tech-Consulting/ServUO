@@ -4,9 +4,10 @@ using Server;
 
 namespace Server.Items
 {
-    // Mage-armor wizard hat. Resists are Mage Armor + balanced 15% across
-    // all five elements; +5 hits / +4 hp regen / +250 luck / 8 LMC.
-    public class FortunesVisage : WizardsHat
+    // Bone-helm-style mage helm (graphic 0x1F0B = OrcHelm in ServUO art).
+    // Mage Armor + balanced 15% across all five elements; +5 hits, +4 hp
+    // regen, +250 luck, 8 LMC.
+    public class FortunesVisage : OrcHelm
     {
         public override bool IsArtifact { get { return true; } }
 
@@ -23,13 +24,15 @@ namespace Server.Items
             Attributes.Luck = 250;
             Attributes.LowerManaCost = 8;
 
-            ClothingAttributes.MageArmor = 1;
+            ArmorAttributes.MageArmor = 1;
 
-            Resistances.Physical = Math.Max(0, 15 - BasePhysicalResistance);
-            Resistances.Fire = Math.Max(0, 15 - BaseFireResistance);
-            Resistances.Cold = Math.Max(0, 15 - BaseColdResistance);
-            Resistances.Poison = Math.Max(0, 15 - BasePoisonResistance);
-            Resistances.Energy = Math.Max(0, 15 - BaseEnergyResistance);
+            // Compensate for OrcHelm's base resists so the displayed total
+            // lands at exactly 15 each.
+            PhysicalBonus = Math.Max(0, 15 - BasePhysicalResistance);
+            FireBonus = Math.Max(0, 15 - BaseFireResistance);
+            ColdBonus = Math.Max(0, 15 - BaseColdResistance);
+            PoisonBonus = Math.Max(0, 15 - BasePoisonResistance);
+            EnergyBonus = Math.Max(0, 15 - BaseEnergyResistance);
 
             StrRequirement = 30;
 
