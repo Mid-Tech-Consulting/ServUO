@@ -19,20 +19,28 @@ namespace Server.Items
         {
             get
             {
-                return new Type[] 
-                { 
+                // Concrete leaf types only -- intentionally NOT the BaseLog /
+                // BaseWoodBoard parents. Those parent classes are themselves
+                // constructable in stock ServUO ([add BaseWoodBoard) but the
+                // crafting system keys on the leaf types via exact-typeof
+                // match, so accepting parents here would let players stash
+                // boards that can never be crafted with. Listing leaves
+                // doubles as a validator -- a "broken" parent-class board
+                // gets rejected at the chest and the player notices.
+                return new Type[]
+                {
                     // Standard and Special Logs
-                    typeof(Log), typeof(OakLog), typeof(AshLog), 
-                    typeof(YewLog), typeof(HeartwoodLog), typeof(BloodwoodLog), 
+                    typeof(Log), typeof(OakLog), typeof(AshLog),
+                    typeof(YewLog), typeof(HeartwoodLog), typeof(BloodwoodLog),
                     typeof(FrostwoodLog),
-                    
+
                     // Standard and Special Boards
-                    typeof(Board), typeof(OakBoard), typeof(AshBoard), 
-                    typeof(YewBoard), typeof(HeartwoodBoard), typeof(BloodwoodBoard), 
+                    typeof(Board), typeof(OakBoard), typeof(AshBoard),
+                    typeof(YewBoard), typeof(HeartwoodBoard), typeof(BloodwoodBoard),
                     typeof(FrostwoodBoard),
 
                     // Fletching and Crafting Items
-                    typeof(Bolt), typeof(Arrow), typeof(Shaft), 
+                    typeof(Bolt), typeof(Arrow), typeof(Shaft),
                     typeof(Feather), typeof(BlankScroll)
                 };
             }
