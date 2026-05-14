@@ -22,7 +22,10 @@ namespace Server.Items
             : base(0x099F)
         {
             Weight = 1.0;
-            m_TargetMap = map;
+            // Boats only sail on Felucca / Trammel / Tokuno -- if a sea boss
+            // dropped this MIB on an unsupported facet, clamp now so the SOS
+            // generated from it later is solvable.
+            m_TargetMap = SOS.SanitizeBoatableMap(map);
             m_Level = level;
         }
 
@@ -102,7 +105,7 @@ namespace Server.Items
                     }
                 case 0:
                     {
-                        m_TargetMap = Map.Trammel;
+                        m_TargetMap = Map.Felucca;
                         break;
                     }
             }
@@ -110,8 +113,11 @@ namespace Server.Items
             if (version < 2)
                 m_Level = GetRandomLevel();
 
-            if (version < 3 && m_TargetMap == Map.Tokuno)
-                m_TargetMap = Map.Trammel;
+            // Shard runs Felucca + Tokuno only. Anything else (Trammel from
+            // upstream defaults, Malas / Ilshenar / TerMur from sea-boss drops
+            // on those facets) gets remapped to Felucca so the resulting SOS
+            // is solvable. Tokuno is preserved -- boats sail there.
+            m_TargetMap = SOS.SanitizeBoatableMap(m_TargetMap);
         }
 
         public override void OnDoubleClick(Mobile from)

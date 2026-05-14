@@ -489,9 +489,37 @@ namespace Server.Engines.Harvest
                         sos.OnSOSComplete(chest);
 
                         if (sos.IsAncient)
+                        {
                             chest.DropItem(new FabledFishingNet());
+
+                            // Ancient SOS chests now guarantee 2 Legendary Artifact
+                            // armor / clothing drops on top of whatever TreasureMapChest.Fill
+                            // rolled -- shard tuning, the tier is supposed to feel
+                            // exceptional.
+                            for (int n = 0; n < 2; n++)
+                            {
+                                Item legendary = Server.Custom.Loot.LegendaryRoller.TryRollLegendary();
+                                if (legendary != null)
+                                    chest.DropItem(legendary);
+                            }
+                        }
                         else
                             chest.DropItem(new SpecialFishingNet());
+
+                        // Guaranteed gem stash for every SOS chest tier -- one
+                        // pre-stacked stack of 25 per gem type instead of the
+                        // many loose singletons TreasureMapChest.Fill tends to
+                        // sprinkle in. Players get 9 tidy stacks they can
+                        // dump into Mondain's Stockpile.
+                        chest.DropItem(new Amber(25));
+                        chest.DropItem(new Amethyst(25));
+                        chest.DropItem(new Citrine(25));
+                        chest.DropItem(new Diamond(25));
+                        chest.DropItem(new Emerald(25));
+                        chest.DropItem(new Ruby(25));
+                        chest.DropItem(new Sapphire(25));
+                        chest.DropItem(new StarSapphire(25));
+                        chest.DropItem(new Tourmaline(25));
 
                         chest.Movable = true;
                         chest.Locked = false;

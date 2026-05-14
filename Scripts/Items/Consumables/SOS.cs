@@ -113,10 +113,23 @@ namespace Server.Items
 
             m_Level = level;
             m_MessageIndex = Utility.Random(MessageEntry.Entries.Length);
-            m_TargetMap = map;
+            m_TargetMap = SanitizeBoatableMap(map);
             m_TargetLocation = FindLocation(m_TargetMap);
 
             UpdateHue();
+        }
+
+        // This shard runs Felucca + Tokuno; Trammel is disabled. BaseBoat
+        // only sails on Felucca / Trammel / Tokuno upstream, so on our
+        // configuration the boat-capable facets are Felucca and Tokuno.
+        // Anything else (Trammel, Malas, Ilshenar, TerMur) is unsolvable
+        // and gets clamped to Felucca.
+        public static Map SanitizeBoatableMap(Map map)
+        {
+            if (map == Map.Felucca || map == Map.Tokuno)
+                return map;
+
+            return Map.Felucca;
         }
 
         public SOS(Serial serial)
@@ -165,7 +178,7 @@ namespace Server.Items
                         m_TargetMap = Map;
 
                         if (m_TargetMap == null || m_TargetMap == Map.Internal)
-                            m_TargetMap = Map.Trammel;
+                            m_TargetMap = Map.Felucca;
 
                         m_TargetLocation = FindLocation(m_TargetMap);
                         m_MessageIndex = Utility.Random(MessageEntry.Entries.Length);
@@ -180,8 +193,19 @@ namespace Server.Items
             if (version < 3)
                 UpdateHue();
 
-            if (version < 4 && m_TargetMap == Map.Tokuno)
-                m_TargetMap = Map.Trammel;
+            // Tokuno migration from older versions kept as-is (Tokuno is supported);
+            // the broader sanitize below catches any Trammel / Malas / Ilshenar /
+            // TerMur leftovers on this Felucca + Tokuno shard.
+
+            // One-shot self-fix for SOSes that were generated on a facet ships
+            // can't reach. Re-roll the in-water target on the new facet so
+            // the coords are actually valid.
+            Map cleanMap = SanitizeBoatableMap(m_TargetMap);
+            if (cleanMap != m_TargetMap)
+            {
+                m_TargetMap = cleanMap;
+                m_TargetLocation = FindLocation(m_TargetMap);
+            }
         }
 		
         public override void OnDoubleClick(Mobile from)
@@ -312,10 +336,14 @@ namespace Server.Items
                 bool xEast = false, ySouth = false;
                 string fmt;
 
+                // Append the facet name so a Malas / Tokuno / TerMur SOS isn't
+                // mistaken for a Felucca one -- the coords alone don't disambiguate.
+                string facet = map != null ? map.Name : "Unknown";
+
                 if (Sextant.Format(loc, map, ref xLong, ref yLat, ref xMins, ref yMins, ref xEast, ref ySouth))
-                    fmt = String.Format("{0}o {1}'{2}, {3}o {4}'{5}", yLat, yMins, ySouth ? "S" : "N", xLong, xMins, xEast ? "E" : "W");
+                    fmt = String.Format("{0}o {1}'{2}, {3}o {4}'{5} ({6})", yLat, yMins, ySouth ? "S" : "N", xLong, xMins, xEast ? "E" : "W", facet);
                 else
-                    fmt = "?????";
+                    fmt = String.Format("????? ({0})", facet);
 
                 AddPage(0);
 
