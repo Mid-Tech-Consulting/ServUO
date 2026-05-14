@@ -132,8 +132,11 @@ namespace Server.Items
             Disposable = true;
             Dragable = true;
 
-            AddBackground(0, 0, 440, 430, 5054);
-            AddBackground(10, 10, 420, 410, 3500);
+            // Bumped from 430 -> 470 height when the 6th statuette (Flame Of
+            // Abrahel) was added, so the close button at y=410 has breathing
+            // room and the trailing labels don't bump the frame.
+            AddBackground(0, 0, 440, 470, 5054);
+            AddBackground(10, 10, 420, 450, 3500);
 
             AddLabel(120, 22, 53, "Dragon Egg Redemption");
 
@@ -169,11 +172,15 @@ namespace Server.Items
             AddLabel(65, 300, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
                 "Ozymandias' Hiryu");
 
-            AddLabel(25, 335, 0x22, "Statuettes pop a pet when double-clicked.");
-            AddLabel(25, 355, 0x22, "Summoned pets have a small chance for a rare color.");
+            AddButton(30, 325, 4005, 4007, 6, GumpButtonType.Reply, 0);
+            AddLabel(65, 325, banked >= DragonEggRedemptionStone.EggCost ? (ushort)68 : (ushort)0x22,
+                "Flame Of Abrahel");
 
-            AddButton(360, 390, 4020, 4022, 0, GumpButtonType.Reply, 0);
-            AddLabel(320, 390, 0, "Close");
+            AddLabel(25, 360, 0x22, "Statuettes pop a pet when double-clicked.");
+            AddLabel(25, 380, 0x22, "Summoned pets have a small chance for a rare color.");
+
+            AddButton(360, 430, 4020, 4022, 0, GumpButtonType.Reply, 0);
+            AddLabel(320, 430, 0, "Close");
         }
 
         public override void OnResponse(NetState sender, RelayInfo info)
@@ -211,6 +218,7 @@ namespace Server.Items
                 case 3: reward = new WildfireOstardBondedStatuette(); break;
                 case 4: reward = new DragonHildebrandtBondedStatuette(); break;
                 case 5: reward = new OzymandiasHiryuBondedStatuette(); break;
+                case 6: reward = new FlameOfAbrahelBondedStatuette(); break;
             }
 
             if (reward == null)
