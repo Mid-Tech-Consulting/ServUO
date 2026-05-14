@@ -425,7 +425,9 @@ namespace Server.Engines.VeteranRewards
 
                     new RewardEntry(houseAddOns,    1006048, typeof(BannerDeed)),
                     new RewardEntry(houseAddOns,    1006049, typeof(FlamingHeadDeed)),
-                    new RewardEntry(houseAddOns,    1080409, typeof(MinotaurStatueDeed), Expansion.ML)
+                    new RewardEntry(houseAddOns,    1080409, typeof(MinotaurStatueDeed), Expansion.ML),
+
+                    new RewardEntry(miscellaneous,  "BG's Fishing Pole", typeof(BGFishingPole))
                 }),
                 new RewardList(RewardInterval, 3, new RewardEntry[]
                 {
