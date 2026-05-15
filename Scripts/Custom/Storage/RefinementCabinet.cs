@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Server.ContextMenus;
 using Server.Gumps;
 using Server.Network;
 using Server.Items;
@@ -42,6 +43,13 @@ namespace Server.Items
             m_Level = SecureLevel.CoOwners;
         }
 
+        public override void GetContextMenuEntries(Mobile from, List<ContextMenuEntry> list)
+        {
+            base.GetContextMenuEntries(from, list);
+
+            SetSecureLevelEntry.AddTo(from, this, list);
+        }
+
         public override void OnDoubleClick(Mobile from)
         {
             if (!from.InRange(GetWorldLocation(), 2))
@@ -56,6 +64,13 @@ namespace Server.Items
                 return;
             }
 
+            BaseHouse house = BaseHouse.FindHouseAt(this);
+            if (house != null && !house.HasSecureAccess(from, m_Level))
+            {
+                from.SendLocalizedMessage(1010563); // You are not allowed to access this.
+                return;
+            }
+
             from.SendGump(new RefinementCabinetGump(from, this));
         }
 
@@ -64,6 +79,13 @@ namespace Server.Items
             if (!IsLockedDown && !IsSecure)
             {
                 from.SendMessage("This must be secured in a house to function.");
+                return false;
+            }
+
+            BaseHouse house = BaseHouse.FindHouseAt(this);
+            if (house != null && !house.HasSecureAccess(from, m_Level))
+            {
+                from.SendLocalizedMessage(1010563); // You are not allowed to access this.
                 return false;
             }
 
