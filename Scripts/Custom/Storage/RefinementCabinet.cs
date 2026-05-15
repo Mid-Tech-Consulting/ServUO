@@ -12,6 +12,7 @@ using Server.Network;
 using Server.Items;
 using Server.Targeting;
 using System.Collections;
+using Server.Multis;
 
 namespace Server.Items
 {
@@ -21,16 +22,24 @@ namespace Server.Items
     // in-game after restart; if the rotated sprite looks wrong, swap to
     // 0xB2E6 instead.
     [Flipable(0xB2E7, 0xB2E8)]
-    public class RefinementCabinet : Item
+    public class RefinementCabinet : Item, ISecurable
     {
         private List<Item> m_Stored = new List<Item>();
         public List<Item> Stored => m_Stored;
+        private SecureLevel m_Level;
 
+        [CommandProperty(AccessLevel.GameMaster)]
+        public SecureLevel Level
+        {
+            get { return m_Level; }
+            set { m_Level = value; }
+        }
         [Constructable]
         public RefinementCabinet() : base(0xB2E7)
         {
             Name = "Refinement Cabinet";
             Weight = 25.0;
+            m_Level = SecureLevel.CoOwners;
         }
 
         public override void OnDoubleClick(Mobile from)
