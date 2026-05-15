@@ -506,20 +506,11 @@ namespace Server.Engines.Harvest
                         else
                             chest.DropItem(new SpecialFishingNet());
 
-                        // Guaranteed gem stash for every SOS chest tier -- one
-                        // pre-stacked stack of 25 per gem type instead of the
-                        // many loose singletons TreasureMapChest.Fill tends to
-                        // sprinkle in. Players get 9 tidy stacks they can
-                        // dump into Mondain's Stockpile.
-                        chest.DropItem(new Amber(25));
-                        chest.DropItem(new Amethyst(25));
-                        chest.DropItem(new Citrine(25));
-                        chest.DropItem(new Diamond(25));
-                        chest.DropItem(new Emerald(25));
-                        chest.DropItem(new Ruby(25));
-                        chest.DropItem(new Sapphire(25));
-                        chest.DropItem(new StarSapphire(25));
-                        chest.DropItem(new Tourmaline(25));
+                        // Guaranteed gem stash for every SOS chest tier -- 9
+                        // tidy stacks of 25 each that absorb whatever loose
+                        // singletons TreasureMapChest.Fill sprinkled in, so
+                        // players get clean stacks instead of a pile of dots.
+                        Server.Custom.Loot.SosChestGems.AddGuaranteedGemStacks(chest);
 
                         chest.Movable = true;
                         chest.Locked = false;

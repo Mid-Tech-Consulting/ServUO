@@ -34,17 +34,9 @@ namespace Server.Commands
                     chest.DropItem(legendary);
             }
 
-            // Same guaranteed gem stash every real SOS chest drops -- 9
-            // pre-stacked stacks of 25 each.
-            chest.DropItem(new Amber(25));
-            chest.DropItem(new Amethyst(25));
-            chest.DropItem(new Citrine(25));
-            chest.DropItem(new Diamond(25));
-            chest.DropItem(new Emerald(25));
-            chest.DropItem(new Ruby(25));
-            chest.DropItem(new Sapphire(25));
-            chest.DropItem(new StarSapphire(25));
-            chest.DropItem(new Tourmaline(25));
+            // Same guaranteed gem stash every real SOS chest drops -- absorbs
+            // whatever loose gem singletons TreasureMapChest.Fill produced.
+            Custom.Loot.SosChestGems.AddGuaranteedGemStacks(chest);
 
             chest.Movable = true;
             chest.Locked = false;
