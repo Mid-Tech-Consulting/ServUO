@@ -1552,14 +1552,7 @@ namespace Server.Mobiles
                         }
                         else
                         {
-                            if (TrainingPoint.Weight < 1.0)
-                            {
-                                Value -= (int)(TrainingPoint.Weight * 100);
-                            }
-                            else
-                            {
-                                Value--;
-                            }
+                            Value = Math.Max(TrainingPoint.Start, Value - 1);
                         }
                     }
                     Refresh();
@@ -1573,14 +1566,7 @@ namespace Server.Mobiles
                         }
                         else
                         {
-                            if (TrainingPoint.Weight < 1.0)
-                            {
-                                Value += (int)(TrainingPoint.Weight * 100);
-                            }
-                            else
-                            {
-                                Value++;
-                            }
+                            Value = Math.Min(TrainingPoint.GetMax(Creature), Value + 1);
                         }
                     }
                     Refresh();
