@@ -218,7 +218,9 @@ namespace Server.Items
                 InvasionLoot.NotifyActive(Theme, false);
         }
 
-        protected InvasionSpawner(Serial serial) : base(serial) { }
+        // Must be public so ServUO's serialization audit (which uses
+        // public-only reflection) can find it on this abstract base.
+        public InvasionSpawner(Serial serial) : base(serial) { }
 
         public override void Serialize(GenericWriter writer)
         {

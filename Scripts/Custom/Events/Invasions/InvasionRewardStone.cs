@@ -39,7 +39,9 @@ namespace Server.Items
             from.SendGump(new InvasionRewardStoneGump(from, Theme, 0));
         }
 
-        protected InvasionRewardStone(Serial serial) : base(serial) { }
+        // Must be public so ServUO's serialization audit (which uses
+        // public-only reflection) can find it on this abstract base.
+        public InvasionRewardStone(Serial serial) : base(serial) { }
         public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write(0); }
         public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
     }
