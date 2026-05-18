@@ -18,7 +18,13 @@ namespace Server.Items
             LootType = LootType.Regular;
 
             Capacity = 1000;
-            DamageIncrease = 25;       // Archery damage modifier
+            // Quiver DamageIncrease is applied AFTER the standard 100% DI
+            // cap as a post-formula multiplier (AOS.cs), so it stacks on top
+            // of capped gear DI. Held at 10 to match OSI artifact tier
+            // (Quiver of Infinity / Rage / Serpent Skin) -- higher values
+            // give archers a flat damage advantage no other weapon class
+            // can match.
+            DamageIncrease = 10;
             LowerAmmoCost = 30;
             WeightReduction = 30;
 
