@@ -14,11 +14,17 @@ namespace Server.Items
             Name = "Voidskipper Boots";
             Hue = 0x0AD7;
             Weight = 3.0;
-            LootType = LootType.Blessed;
+            LootType = LootType.Regular;
 
             Attributes.NightSight = 1;
-            Attributes.Luck = 200;
-            Attributes.LowerManaCost = 3;
+            Attributes.Luck = 300;
+            Attributes.LowerManaCost = 8;
+            Attributes.BonusDex = 5;
+            Attributes.BonusStam = 8;
+            Attributes.RegenStam = 2;
+            Attributes.AttackChance = 5;
+            Attributes.DefendChance = 5;
+            Attributes.WeaponDamage = 15;
 
             StrRequirement = 10;
 

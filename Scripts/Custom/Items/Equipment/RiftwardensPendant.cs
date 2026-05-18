@@ -15,13 +15,18 @@ namespace Server.Items
             Name = "Riftwarden's Pendant";
             Hue = 0x0AE1;
             Weight = 1.0;
-            LootType = LootType.Blessed;
+            LootType = LootType.Regular;
 
-            Attributes.BonusInt = 2;
-            Attributes.BonusMana = 8;
-            Attributes.SpellDamage = 8;
-            Attributes.LowerManaCost = 5;
-            Attributes.LowerRegCost = 10;
+            Attributes.BonusInt = 8;
+            Attributes.BonusMana = 12;
+            Attributes.RegenMana = 2;
+            Attributes.SpellDamage = 16;
+            Attributes.LowerManaCost = 12;
+            Attributes.LowerRegCost = 15;
+            Attributes.CastRecovery = 2;
+            Attributes.CastSpeed = 0;
+
+            SkillBonuses.SetValues(0, SkillName.MagicResist, 10.0);
 
             MaxHitPoints = 255;
             HitPoints = 255;

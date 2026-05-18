@@ -15,13 +15,17 @@ namespace Server.Items
             Name = "Umbrascale Battle Robe";
             Hue = 0x0ADD;
             Weight = 3.0;
-            LootType = LootType.Blessed;
+            LootType = LootType.Regular;
 
-            SAAbsorptionAttributes.EaterFire = 10;
+            SAAbsorptionAttributes.EaterFire = 15;
             Attributes.BonusStr = 5;
-            Attributes.BonusHits = 2;
-            Attributes.BonusStam = 5;
-            Attributes.WeaponSpeed = 5;
+            Attributes.BonusHits = 5;
+            Attributes.BonusStam = 8;
+            Attributes.AttackChance = 5;
+            Attributes.WeaponSpeed = 10;
+            Attributes.LowerManaCost = 5;
+
+            SkillBonuses.SetValues(0, LordMorphiusEpaulettes.GetRandomWarriorSkill(), 15.0);
 
             StrRequirement = 10;
 

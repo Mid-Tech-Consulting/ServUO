@@ -4,32 +4,30 @@ using Server;
 
 namespace Server.Items
 {
-    // Gargoyle counterpart to ArtiosVineWrap. Same stats, gargoyle sash slot.
-    public class GargishArtiosVineWrap : GargishSash
+    public class UmbrascaleGargishCeremonialRobe : BaseClothing
     {
         public override bool IsArtifact { get { return true; } }
         public override Race RequiredRace { get { return Race.Gargoyle; } }
         public override bool CanBeWornByGargoyles { get { return true; } }
 
         [Constructable]
-        public GargishArtiosVineWrap()
+        public UmbrascaleGargishCeremonialRobe()
+            : base(0xB2B8, Layer.OuterTorso)
         {
-            Name = "Artio's Vine Wrap";
-            Hue = 0x0497;
-            Weight = 1.0;
+            Name = "Umbrascale Gargish Ceremonial Robe";
+            Hue = 0x0ADD;
+            Weight = 3.0;
             LootType = LootType.Regular;
 
+            SAAbsorptionAttributes.EaterFire = 15;
             Attributes.BonusInt = 5;
-            Attributes.BonusMana = 10;
-            Attributes.RegenMana = 3;
-            Attributes.CastRecovery = 2;
-            Attributes.CastSpeed = 1;
-            Attributes.LowerManaCost = 8;
-            Attributes.LowerRegCost = 15;
+            Attributes.BonusMana = 8;
+            Attributes.RegenMana = 1;
             Attributes.SpellDamage = 8;
-            Attributes.NightSight = 1;
+            Attributes.LowerManaCost = 5;
+            Attributes.LowerRegCost = 10;
 
-            SkillBonuses.SetValues(0, SkillName.Magery, 5.0);
+            SkillBonuses.SetValues(0, SkillName.MagicResist, 15.0);
 
             StrRequirement = 10;
 
@@ -37,7 +35,7 @@ namespace Server.Items
             HitPoints = 255;
         }
 
-        public GargishArtiosVineWrap(Serial serial) : base(serial) { }
+        public UmbrascaleGargishCeremonialRobe(Serial serial) : base(serial) { }
         public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write(0); }
         public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
     }

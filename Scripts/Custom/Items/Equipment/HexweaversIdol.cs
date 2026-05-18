@@ -15,14 +15,22 @@ namespace Server.Items
             Name = "Hexweaver's Idol";
             Hue = 0x0AE1;
             Weight = 1.0;
-            LootType = LootType.Blessed;
+            LootType = LootType.Regular;
 
             Removal = TalismanRemoval.Ward;
 
-            Attributes.BonusHits = 3;
+            Attributes.BonusInt = 8;
+            Attributes.BonusHits = 5;
+            Attributes.BonusMana = 8;
+            Attributes.RegenMana = 3;
             Attributes.AttackChance = 5;
             Attributes.DefendChance = 10;
-            Attributes.SpellDamage = 8;
+            Attributes.SpellDamage = 16;
+            Attributes.CastRecovery = 1;
+            Attributes.LowerManaCost = 8;
+            Attributes.LowerRegCost = 15;
+
+            SkillBonuses.SetValues(0, SkillName.Necromancy, 10.0);
 
             MaxHitPoints = 255;
             HitPoints = 255;

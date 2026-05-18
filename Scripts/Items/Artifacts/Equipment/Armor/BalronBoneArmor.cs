@@ -12,13 +12,28 @@ namespace Server.Items
             return skills[Utility.Random(skills.Length)];
         }
 
+        // Race-specific skill rolls: humans can't use Throwing, gargoyles
+        // can't use Archery, so a "random combat skill" that ignores race
+        // ends up dead weight half the time.
+        public static SkillName GetRandomHumanCombatSkill()
+        {
+            SkillName[] skills = new SkillName[] { SkillName.Swords, SkillName.Macing, SkillName.Fencing, SkillName.Wrestling, SkillName.Archery };
+            return skills[Utility.Random(skills.Length)];
+        }
+
+        public static SkillName GetRandomGargoyleCombatSkill()
+        {
+            SkillName[] skills = new SkillName[] { SkillName.Swords, SkillName.Macing, SkillName.Fencing, SkillName.Wrestling, SkillName.Throwing };
+            return skills[Utility.Random(skills.Length)];
+        }
+
         [Constructable]
         public BalronBoneArmor()
         {
             Name = "Balron Bone Armor";
             Hue = 1109;
 
-            SkillBonuses.SetValues(0, GetRandomCombatSkill(), 20.0);
+            SkillBonuses.SetValues(0, GetRandomHumanCombatSkill(), 20.0);
             Attributes.BonusStr = 5;
             Attributes.BonusDex = 5;
             Attributes.BonusInt = 5;
@@ -68,7 +83,7 @@ namespace Server.Items
             Name = "Gargish Balron Bone Armor";
             Hue = 1109;
 
-            SkillBonuses.SetValues(0, BalronBoneArmor.GetRandomCombatSkill(), 20.0);
+            SkillBonuses.SetValues(0, BalronBoneArmor.GetRandomGargoyleCombatSkill(), 20.0);
             Attributes.BonusStr = 5;
             Attributes.BonusDex = 5;
             Attributes.BonusInt = 5;

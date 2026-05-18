@@ -2,23 +2,23 @@ using Server;
 
 namespace Server.Items
 {
-    // Endgame plate chest. Stats mirror Balron Bone Armor exactly so this
-    // sits in the same shard-tier band as the other top-end legendaries
-    // (Heart of the Lion, Umbrascale Champion's Aegis). Hue and theming are
-    // Void Invasion event flavor only.
-    public class VoidTouchedCuirass : PlateChest
+    // Gargoyle equivalent of VoidTouchedCuirass -- same stats, gargoyle
+    // plate-chest slot, race-locked.
+    public class GargishVoidTouchedCuirass : GargishPlateChest
     {
         public override bool IsArtifact { get { return true; } }
+        public override Race RequiredRace { get { return Race.Gargoyle; } }
+        public override bool CanBeWornByGargoyles { get { return true; } }
 
         [Constructable]
-        public VoidTouchedCuirass()
+        public GargishVoidTouchedCuirass()
         {
             Name = "Void-Touched Cuirass";
             Hue = 0x0AD7;
             Weight = 10.0;
             LootType = LootType.Regular;
 
-            SkillBonuses.SetValues(0, BalronBoneArmor.GetRandomHumanCombatSkill(), 20.0);
+            SkillBonuses.SetValues(0, BalronBoneArmor.GetRandomGargoyleCombatSkill(), 20.0);
             Attributes.BonusStr = 5;
             Attributes.BonusDex = 5;
             Attributes.BonusInt = 5;
@@ -43,7 +43,7 @@ namespace Server.Items
         public override int BasePoisonResistance { get { return 15; } }
         public override int BaseEnergyResistance { get { return 15; } }
 
-        public VoidTouchedCuirass(Serial serial) : base(serial) { }
+        public GargishVoidTouchedCuirass(Serial serial) : base(serial) { }
         public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write(0); }
         public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
     }

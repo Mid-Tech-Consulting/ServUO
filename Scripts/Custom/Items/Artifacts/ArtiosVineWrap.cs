@@ -17,9 +17,17 @@ namespace Server.Items
             Weight = 1.0;
             LootType = LootType.Regular;
 
-            Attributes.BonusMana = 5;
-            Attributes.RegenMana = 2;
-            Attributes.CastRecovery = 1;
+            Attributes.BonusInt = 5;
+            Attributes.BonusMana = 10;
+            Attributes.RegenMana = 3;
+            Attributes.CastRecovery = 2;
+            Attributes.CastSpeed = 1;
+            Attributes.LowerManaCost = 8;
+            Attributes.LowerRegCost = 15;
+            Attributes.SpellDamage = 8;
+            Attributes.NightSight = 1;
+
+            SkillBonuses.SetValues(0, SkillName.Magery, 5.0);
 
             StrRequirement = 10;
 

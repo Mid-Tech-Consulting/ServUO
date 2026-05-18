@@ -204,7 +204,11 @@ namespace Server.Misc
 
             for (int i = 0; i < amount; i++)
             {
-                var gc = GetGainChance(from, skill, (value - minSkill) / (maxSkill - minSkill), value) / 10;
+                // Batch-craft skill gain: was previously divided by 10, which
+                // made batching strictly worse than single-clicking the same
+                // recipe N times. Removed so batchers gain at the per-item
+                // rate and casual cooks aren't punished for using UseAllRes.
+                var gc = GetGainChance(from, skill, (value - minSkill) / (maxSkill - minSkill), value);
 
                 if (AllowGain(from, skill, new Point2D(from.Location.X / LocationSize, from.Location.Y / LocationSize)))
                 {

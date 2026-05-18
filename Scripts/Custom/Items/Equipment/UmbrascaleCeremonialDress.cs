@@ -15,13 +15,17 @@ namespace Server.Items
             Name = "Umbrascale Ceremonial Dress";
             Hue = 0x0ADD;
             Weight = 3.0;
-            LootType = LootType.Blessed;
+            LootType = LootType.Regular;
 
-            SAAbsorptionAttributes.EaterFire = 10;
-            Attributes.BonusInt = 4;
-            Attributes.BonusHits = 2;
-            Attributes.SpellDamage = 10;
+            SAAbsorptionAttributes.EaterFire = 15;
+            Attributes.BonusInt = 5;
+            Attributes.BonusMana = 8;
+            Attributes.RegenMana = 1;
+            Attributes.SpellDamage = 8;
             Attributes.LowerManaCost = 5;
+            Attributes.LowerRegCost = 10;
+
+            SkillBonuses.SetValues(0, SkillName.MagicResist, 15.0);
 
             StrRequirement = 10;
 

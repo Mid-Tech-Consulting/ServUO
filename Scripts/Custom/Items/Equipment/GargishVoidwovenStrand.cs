@@ -4,30 +4,35 @@ using Server;
 
 namespace Server.Items
 {
-    public class UmbrascaleGargishBattleRobe : BaseClothing
+    // Gargoyle counterpart to VoidwovenStrand. Same stats, gargoyle
+    // middle-torso slot, race-locked.
+    public class GargishVoidwovenStrand : GargishSash
     {
         public override bool IsArtifact { get { return true; } }
         public override Race RequiredRace { get { return Race.Gargoyle; } }
         public override bool CanBeWornByGargoyles { get { return true; } }
 
         [Constructable]
-        public UmbrascaleGargishBattleRobe()
-            : base(0xB2B8, Layer.OuterTorso)
+        public GargishVoidwovenStrand()
         {
-            Name = "Umbrascale Gargish Battle Robe";
-            Hue = 0x0ADD;
+            Name = "Voidwoven Strand";
+            Hue = 0x0AD7;
             Weight = 3.0;
             LootType = LootType.Regular;
 
-            SAAbsorptionAttributes.EaterFire = 15;
             Attributes.BonusStr = 5;
-            Attributes.BonusHits = 5;
+            Attributes.BonusDex = 5;
             Attributes.BonusStam = 8;
-            Attributes.AttackChance = 5;
+            Attributes.AttackChance = 15;
+            Attributes.DefendChance = 5;
+            Attributes.WeaponDamage = 25;
             Attributes.WeaponSpeed = 10;
-            Attributes.LowerManaCost = 5;
 
-            SkillBonuses.SetValues(0, LordMorphiusEpaulettes.GetRandomWarriorSkill(), 15.0);
+            SkillBonuses.SetValues(0, SkillName.Stealth, 5.0);
+            SkillBonuses.SetValues(1, SkillName.Hiding, 5.0);
+            SkillBonuses.SetValues(2, SkillName.Snooping, 5.0);
+            SkillBonuses.SetValues(3, SkillName.Stealing, 5.0);
+
 
             StrRequirement = 10;
 
@@ -35,7 +40,7 @@ namespace Server.Items
             HitPoints = 255;
         }
 
-        public UmbrascaleGargishBattleRobe(Serial serial) : base(serial) { }
+        public GargishVoidwovenStrand(Serial serial) : base(serial) { }
         public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write(0); }
         public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
     }

@@ -4,19 +4,22 @@ using Server;
 
 namespace Server.Items
 {
-    // Bone-helm-style mage helm (graphic 0x1F0B = OrcHelm in ServUO art).
-    // Mage Armor + balanced 15% across all five elements; +5 hits, +4 hp
-    // regen, +250 luck, 8 LMC.
-    public class FortunesVisage : OrcHelm
+    // Gargoyle counterpart to Fortune's Visage. Same stat block, but lives
+    // on the gargoyle eyewear slot (GargishGlasses / Layer.Earrings) instead
+    // of an OrcHelm. Resist bonuses compensate for the GargishGlasses base
+    // resists so the displayed total still lands at 15 each.
+    public class GargishFortunesVisage : GargishGlasses
     {
         public override bool IsArtifact { get { return true; } }
+        public override Race RequiredRace { get { return Race.Gargoyle; } }
+        public override bool CanBeWornByGargoyles { get { return true; } }
 
         [Constructable]
-        public FortunesVisage()
+        public GargishFortunesVisage()
         {
             Name = "Fortune's Visage";
             Hue = 0x0780;
-            Weight = 5.0;
+            Weight = 2.0;
             LootType = LootType.Regular;
 
             Attributes.BonusStr = 5;
@@ -32,12 +35,10 @@ namespace Server.Items
             Attributes.AttackChance = 5;
             Attributes.DefendChance = 5;
 
-            SkillBonuses.SetValues(0, BalronBoneArmor.GetRandomHumanCombatSkill(), 15.0);
+            SkillBonuses.SetValues(0, BalronBoneArmor.GetRandomGargoyleCombatSkill(), 15.0);
 
             ArmorAttributes.MageArmor = 1;
 
-            // Compensate for OrcHelm's base resists so the displayed total
-            // lands at exactly 15 each.
             PhysicalBonus = Math.Max(0, 15 - BasePhysicalResistance);
             FireBonus = Math.Max(0, 15 - BaseFireResistance);
             ColdBonus = Math.Max(0, 15 - BaseColdResistance);
@@ -50,7 +51,7 @@ namespace Server.Items
             HitPoints = 255;
         }
 
-        public FortunesVisage(Serial serial) : base(serial) { }
+        public GargishFortunesVisage(Serial serial) : base(serial) { }
         public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write(0); }
         public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
     }

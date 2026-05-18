@@ -26,6 +26,8 @@ namespace Server.Items
             WeaponAttributes.HitLightning = 70;
 
             Attributes.WeaponDamage = 50;
+            Attributes.WeaponSpeed = 30;
+            Attributes.LowerManaCost = 8;
 
             MinDamage = 13;
             MaxDamage = 17;

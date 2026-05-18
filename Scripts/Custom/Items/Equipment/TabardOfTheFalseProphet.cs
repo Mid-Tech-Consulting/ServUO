@@ -15,13 +15,21 @@ namespace Server.Items
             Name = "Tabard Of The False Prophet";
             Hue = 0x0AD4;
             Weight = 3.0;
-            LootType = LootType.Blessed;
+            LootType = LootType.Regular;
 
-            Attributes.BonusStr = 4;
-            Attributes.BonusDex = 4;
-            Attributes.BonusInt = 4;
-            Attributes.SpellDamage = 6;
-            Attributes.WeaponDamage = 15;
+            Attributes.BonusStr = 8;
+            Attributes.BonusDex = 8;
+            Attributes.BonusInt = 8;
+            Attributes.BonusHits = 8;
+            Attributes.RegenMana = 2;
+            Attributes.SpellDamage = 14;
+            Attributes.WeaponDamage = 25;
+            Attributes.AttackChance = 10;
+            Attributes.DefendChance = 10;
+            Attributes.LowerManaCost = 8;
+            Attributes.LowerRegCost = 10;
+
+            SkillBonuses.SetValues(0, SkillName.Chivalry, 10.0);
 
             StrRequirement = 10;
 

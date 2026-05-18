@@ -15,16 +15,21 @@ namespace Server.Items
             Name = "Riftbreaker Quiver";
             Hue = 0x0AD7;
             Weight = 8.0;
-            LootType = LootType.Blessed;
+            LootType = LootType.Regular;
 
             Capacity = 1000;
-            DamageIncrease = 10;       // Archery damage modifier
+            DamageIncrease = 25;       // Archery damage modifier
             LowerAmmoCost = 30;
             WeightReduction = 30;
 
-            Attributes.BonusDex = 3;
-            Attributes.BonusStam = 5;
-            Attributes.WeaponSpeed = 5;
+            Attributes.BonusDex = 8;
+            Attributes.BonusStam = 15;
+            Attributes.RegenStam = 2;
+            Attributes.WeaponSpeed = 10;
+            Attributes.AttackChance = 10;
+            Attributes.Luck = 150;
+
+            SkillBonuses.SetValues(0, SkillName.Archery, 5.0);
         }
 
         public RiftbreakerQuiver(Serial serial) : base(serial) { }
