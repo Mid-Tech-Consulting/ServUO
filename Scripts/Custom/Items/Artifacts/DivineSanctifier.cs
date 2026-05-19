@@ -31,7 +31,7 @@ namespace Server.Items
 
             MinDamage = 13;
             MaxDamage = 17;
-            Speed = 32; // 3.25s rounded; ServUO uses tenths-of-second convention
+            Speed = 3.25f; // ML weapons: Speed is the literal tooltip seconds
 
             StrRequirement = 45;
 

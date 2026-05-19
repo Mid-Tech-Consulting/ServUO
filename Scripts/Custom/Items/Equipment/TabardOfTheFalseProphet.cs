@@ -4,7 +4,7 @@ using Server;
 
 namespace Server.Items
 {
-    public class TabardOfTheFalseProphet : BaseMiddleTorso
+    public class TabardOfTheFalseProphet : BaseOuterTorso
     {
         public override bool IsArtifact { get { return true; } }
 
