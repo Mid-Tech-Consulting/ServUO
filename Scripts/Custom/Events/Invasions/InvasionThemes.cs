@@ -39,27 +39,31 @@ namespace Server.Custom.Events
             t.StoneItemID = 0xEDC; t.StoneHue = 0x47E;
             t.SpawnerItemID = 0x1F1C; t.SpawnerHue = 0x47E;
 
-            Add(t.Bounties, 1,  typeof(Skeleton), typeof(Zombie), typeof(Bogle), typeof(Ghoul));
-            Add(t.Bounties, 2,  typeof(BoneKnight), typeof(BoneMagi), typeof(SkeletalKnight), typeof(SkeletalMage),
-                                 typeof(Mummy), typeof(Wraith), typeof(Spectre), typeof(Shade), typeof(Spellbinder));
-            Add(t.Bounties, 5,  typeof(Lich), typeof(RottingCorpse), typeof(DreamWraith), typeof(ShadowDweller), typeof(GargoyleShade));
-            Add(t.Bounties, 15, typeof(LichLord), typeof(AncientLich), typeof(SkeletalDrake), typeof(SkeletalDragon), typeof(DarkGuardian), typeof(LadyOfTheSnow));
+            // Bounties roughly halved from the initial pass so the event
+            // can run for months without players capping out the reward
+            // catalog in a week. Trash stays at 1 (floor -- below this is
+            // no drop at all).
+            Add(t.Bounties, 1, typeof(Skeleton), typeof(Zombie), typeof(Bogle), typeof(Ghoul));
+            Add(t.Bounties, 1, typeof(BoneKnight), typeof(BoneMagi), typeof(SkeletalKnight), typeof(SkeletalMage),
+                                typeof(Mummy), typeof(Wraith), typeof(Spectre), typeof(Shade), typeof(Spellbinder));
+            Add(t.Bounties, 2, typeof(Lich), typeof(RottingCorpse), typeof(DreamWraith), typeof(ShadowDweller), typeof(GargoyleShade));
+            Add(t.Bounties, 7, typeof(LichLord), typeof(AncientLich), typeof(SkeletalDrake), typeof(SkeletalDragon), typeof(DarkGuardian), typeof(LadyOfTheSnow));
 
             t.Population[typeof(Skeleton)]       = 18;
             t.Population[typeof(Zombie)]         = 18;
             t.Population[typeof(Ghoul)]          = 12;
-            t.Population[typeof(Bogle)]          = 9;
-            t.Population[typeof(SkeletalKnight)] = 9;
-            t.Population[typeof(SkeletalMage)]   = 9;
-            t.Population[typeof(BoneKnight)]     = 6;
-            t.Population[typeof(BoneMagi)]       = 6;
-            t.Population[typeof(Mummy)]          = 6;
-            t.Population[typeof(Wraith)]         = 6;
-            t.Population[typeof(Lich)]           = 3;
-            t.Population[typeof(RottingCorpse)]  = 3;
-            t.Population[typeof(LichLord)]       = 3;
-            t.Population[typeof(SkeletalDragon)] = 3;
-            t.Population[typeof(LadyOfTheSnow)]  = 2;
+            t.Population[typeof(Bogle)]          = 11;
+            t.Population[typeof(SkeletalKnight)] = 11;
+            t.Population[typeof(SkeletalMage)]   = 11;
+            t.Population[typeof(BoneKnight)]     = 10;
+            t.Population[typeof(BoneMagi)]       = 10;
+            t.Population[typeof(Mummy)]          = 10;
+            t.Population[typeof(Wraith)]         = 10;
+            t.Population[typeof(Lich)]           = 8;
+            t.Population[typeof(RottingCorpse)]  = 7;
+            t.Population[typeof(LichLord)]       = 5;
+            t.Population[typeof(SkeletalDragon)] = 5;
+            t.Population[typeof(LadyOfTheSnow)]  = 5;
 
             // Reward catalog -- 31 items kept from the original Undead event.
             t.Rewards.Add(new InvasionRewardEntry(typeof(AnkousSoulBinder),                "Ankou's Soul Binder",                200));
