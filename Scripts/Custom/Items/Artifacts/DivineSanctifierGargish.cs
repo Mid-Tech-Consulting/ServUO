@@ -34,7 +34,7 @@ namespace Server.Items
 
             MinDamage = 11;
             MaxDamage = 15;
-            Speed = 27; // 2.75s
+            Speed = 2.25f; // ML weapons: Speed is the literal tooltip seconds
 
             StrRequirement = 45;
 
