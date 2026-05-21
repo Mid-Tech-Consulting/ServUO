@@ -6,6 +6,8 @@ namespace Server.Items
     {
         public override bool IsArtifact { get { return true; } }
 
+        private SkillName m_BonusSkill;
+
         public static SkillName GetRandomSkill()
         {
             SkillName[] skills = new SkillName[] { SkillName.Magery, SkillName.Mysticism, SkillName.Necromancy, SkillName.Chivalry, SkillName.Bushido, SkillName.Ninjitsu, SkillName.MagicResist };
@@ -20,7 +22,8 @@ namespace Server.Items
 
             AbsorptionAttributes.EaterFire = 15;
 
-            SkillBonuses.SetValues(0, GetRandomSkill(), 20.0);
+            m_BonusSkill = GetRandomSkill();
+            SkillBonuses.SetValues(0, m_BonusSkill, 20.0);
             Attributes.BonusStr = 5;
             Attributes.BonusInt = 5;
             Attributes.BonusHits = 5;
@@ -51,19 +54,28 @@ namespace Server.Items
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(0);
+            writer.Write(1);
+            writer.Write((int)m_BonusSkill);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
-            reader.ReadInt();
+            int version = reader.ReadInt();
+
+            if (version >= 1)
+            {
+                m_BonusSkill = (SkillName)reader.ReadInt();
+                SkillBonuses.SetValues(0, m_BonusSkill, 20.0);
+            }
         }
     }
 
     public class GargishKiltOfTheArchlich : GargishPlateKilt
     {
         public override bool IsArtifact { get { return true; } }
+
+        private SkillName m_BonusSkill;
 
         [Constructable]
         public GargishKiltOfTheArchlich()
@@ -73,7 +85,8 @@ namespace Server.Items
 
             AbsorptionAttributes.EaterFire = 15;
 
-            SkillBonuses.SetValues(0, GlovesOfTheArchlich.GetRandomSkill(), 20.0);
+            m_BonusSkill = GlovesOfTheArchlich.GetRandomSkill();
+            SkillBonuses.SetValues(0, m_BonusSkill, 20.0);
             Attributes.BonusStr = 5;
             Attributes.BonusInt = 5;
             Attributes.BonusHits = 5;
@@ -104,13 +117,20 @@ namespace Server.Items
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(0);
+            writer.Write(1);
+            writer.Write((int)m_BonusSkill);
         }
 
         public override void Deserialize(GenericReader reader)
         {
             base.Deserialize(reader);
-            reader.ReadInt();
+            int version = reader.ReadInt();
+
+            if (version >= 1)
+            {
+                m_BonusSkill = (SkillName)reader.ReadInt();
+                SkillBonuses.SetValues(0, m_BonusSkill, 20.0);
+            }
         }
     }
 }
