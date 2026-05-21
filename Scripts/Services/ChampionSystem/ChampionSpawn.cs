@@ -286,6 +286,8 @@ namespace Server.Engines.CannedEvil
             }
             set
             {
+                int oldRank = Rank;
+
                 for (int i = m_RedSkulls.Count - 1; i >= value; --i)
                 {
                     m_RedSkulls[i].Delete();
@@ -306,6 +308,12 @@ namespace Server.Engines.CannedEvil
                 }
 
                 InvalidateProperties();
+
+                int newRank = Rank;
+                if (newRank != oldRank)
+                {
+                    ClearCreaturesOtherThanRank(newRank);
+                }
             }
         }
 
@@ -328,6 +336,34 @@ namespace Server.Engines.CannedEvil
                     m_RedSkulls[i].Delete();
 
                 m_RedSkulls.Clear();
+            }
+        }
+
+        public void ClearCreaturesOtherThanRank(int newRank)
+        {
+            if (m_Creatures == null)
+                return;
+
+            for (int i = m_Creatures.Count - 1; i >= 0; --i)
+            {
+                if (i >= m_Creatures.Count)
+                    continue;
+
+                Mobile m = m_Creatures[i];
+                if (m != null)
+                {
+                    if (GetRankFor(m) != newRank)
+                    {
+                        if (!m.Deleted)
+                            m.Delete();
+
+                        m_Creatures.RemoveAt(i);
+                    }
+                }
+                else
+                {
+                    m_Creatures.RemoveAt(i);
+                }
             }
         }
 
@@ -785,7 +821,14 @@ namespace Server.Engines.CannedEvil
         // that locks up clients in range. Respawn is called every 1 second by
         // OnSlice, so spreading the new spawns over multiple ticks gives the
         // client breathing room without making the spawn feel slow.
-        private const int MaxSpawnsPerRespawnTick = 4;
+        private int m_MaxSpawnsPerRespawnTick = 2;
+
+        [CommandProperty(AccessLevel.GameMaster)]
+        public int MaxSpawnsPerRespawnTick
+        {
+            get { return m_MaxSpawnsPerRespawnTick; }
+            set { m_MaxSpawnsPerRespawnTick = Math.Max(1, value); }
+        }
 
         public void Respawn()
         {
@@ -812,7 +855,7 @@ namespace Server.Engines.CannedEvil
 			}
 
 			int spawnedThisTick = 0;
-			while (mobCount <= maxSpawn && spawnedThisTick < MaxSpawnsPerRespawnTick)
+			while (mobCount <= maxSpawn && spawnedThisTick < m_MaxSpawnsPerRespawnTick)
             {
                 Mobile m = Spawn();
 
@@ -1260,7 +1303,9 @@ namespace Server.Engines.CannedEvil
         {
             base.Serialize(writer);
 
-            writer.Write((int)8); // version
+            writer.Write((int)9); // version
+
+            writer.Write(m_MaxSpawnsPerRespawnTick);
 
             writer.Write(StartLevel);
 
@@ -1317,6 +1362,9 @@ namespace Server.Engines.CannedEvil
 
             switch( version )
             {
+                case 9:
+                    m_MaxSpawnsPerRespawnTick = reader.ReadInt();
+                    goto case 8;
                 case 8:
                     StartLevel = reader.ReadInt();
                     goto case 7;

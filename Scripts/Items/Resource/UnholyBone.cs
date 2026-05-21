@@ -130,6 +130,12 @@ namespace Server.Items
 
                 spawn.MoveToWorld(this.m_Item.Location, this.m_Item.Map);
 
+                Timer.DelayCall(TimeSpan.FromMinutes(3.0), () =>
+                {
+                    if (spawn != null && !spawn.Deleted)
+                        spawn.Delete();
+                });
+
                 this.m_Item.Delete();
             }
         }

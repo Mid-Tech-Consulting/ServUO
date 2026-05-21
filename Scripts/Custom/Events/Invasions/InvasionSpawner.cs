@@ -18,8 +18,27 @@ namespace Server.Items
     //   the theme's Population mix.
     //
     // Set Active = false and double-click to despawn everything alive.
-    public abstract class InvasionSpawner : Item
+    public abstract class InvasionSpawner : Item, ISpawner
     {
+        #region ISpawner
+        public bool UnlinkOnTaming { get { return true; } }
+        public Point3D HomeLocation { get { return Location; } }
+
+        public void Remove(ISpawnable spawn)
+        {
+            if (spawn is Mobile)
+                m_Spawned.Remove((Mobile)spawn);
+        }
+
+        public void GetSpawnProperties(ISpawnable spawn, ObjectPropertyList list)
+        {
+        }
+
+        public void GetSpawnContextEntries(ISpawnable spawn, Mobile user, List<Server.ContextMenus.ContextMenuEntry> list)
+        {
+        }
+        #endregion
+
         public abstract InvasionTheme Theme { get; }
 
         private bool m_Active;
@@ -100,7 +119,7 @@ namespace Server.Items
         private void StartTicking()
         {
             StopTicking();
-            m_Timer = Timer.DelayCall(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(60), Tick);
+            m_Timer = Timer.DelayCall(TimeSpan.FromSeconds(5), Tick);
         }
 
         private void StopTicking()
@@ -130,6 +149,9 @@ namespace Server.Items
                 live[t] = n + 1;
             }
 
+            int spawned = 0;
+            bool hasMoreMissing = false;
+
             foreach (KeyValuePair<Type, int> target in Theme.Population)
             {
                 int have;
@@ -137,7 +159,25 @@ namespace Server.Items
 
                 int missing = target.Value - have;
                 for (int i = 0; i < missing; i++)
+                {
+                    if (spawned >= 5)
+                    {
+                        hasMoreMissing = true;
+                        break;
+                    }
+
                     SpawnOne(target.Key);
+                    spawned++;
+                }
+
+                if (hasMoreMissing)
+                    break;
+            }
+
+            if (m_Active)
+            {
+                TimeSpan delay = hasMoreMissing ? TimeSpan.FromSeconds(2) : TimeSpan.FromSeconds(60);
+                m_Timer = Timer.DelayCall(delay, Tick);
             }
         }
 
@@ -156,6 +196,7 @@ namespace Server.Items
 
             bc.Home = loc;
             bc.RangeHome = m_HomeRange;
+            bc.Spawner = this;
 
             // Roll for paragon conversion BEFORE MoveToWorld -- doing it
             // after places the creature in the world with its un-paragoned

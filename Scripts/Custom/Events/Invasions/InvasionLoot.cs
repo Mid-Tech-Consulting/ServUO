@@ -91,8 +91,9 @@ namespace Server.Custom.Events
 
             // No active spawner for this theme = event isn't running = no
             // tokens. Players need a GM-placed and Activated spawner before
-            // their kills count.
-            if (!IsThemeActive(hit.Theme))
+            // their kills count. Also ensure the creature was actually spawned
+            // by an InvasionSpawner, preventing tokens from dropping on regular/champion spawns.
+            if (!IsThemeActive(hit.Theme) || dead.Spawner == null || !(dead.Spawner is InvasionSpawner))
                 return;
 
             Item award = Activator.CreateInstance(hit.Theme.TokenType, new object[] { hit.Amount }) as Item;
