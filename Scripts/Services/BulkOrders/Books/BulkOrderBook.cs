@@ -175,7 +175,7 @@ namespace Server.Engines.BulkOrders
             int total = base.GetTotal(type);
 			
             if (type == TotalType.Items)
-                total = this.m_ItemCount;
+                total = 0;
 
             return total;
         }
