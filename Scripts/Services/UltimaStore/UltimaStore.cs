@@ -132,6 +132,9 @@ namespace Server.Engines.UOStore
 
             // Equipment
             cat = StoreCategory.Equipment;
+            Register<Tabard>("Tabard", 0, 0xA412, 0, 0, 500, cat);
+            Register<ShoulderParrot>("Shoulder Parrot", 0, 0xA2CA, 0, 0, 500, cat);
+
             Register<VirtueShield>(1109616, 1158384, 0x7818, 0, 0, 1500, cat);
             Register<HoodedBritanniaRobe>(1125155, 1158016, 0xA0AB, 0, 0, 1500, cat, ConstructRobe);
             Register<HoodedBritanniaRobe>(1125155, 1158016, 0xA0AC, 0, 0, 1500, cat, ConstructRobe);
@@ -160,7 +163,6 @@ namespace Server.Engines.UOStore
             Register<PigmentsOfTokuno>(new TextDefinition[] { 1070933, 1070990 }, 1156906, 0, 0x9CAA, 0, 400, cat, ConstructPigments); // Luna White
 
             Register<CommemorativeRobe>(1157009, 1156908, 0x4B9D, 0, 0, 500, cat);
-            Register<Tabard>("Tabard", 0, 0xA412, 0, 0, 500, cat);
 
             Register<PigmentsOfTokuno>(new TextDefinition[] { 1070933, 1070992 }, 1156906, 0, 0x9CAF, 0, 400, cat, ConstructPigments); // Shadow Dancer Black
             Register<PigmentsOfTokuno>(new TextDefinition[] { 1070933, 1070989 }, 1156906, 0, 0x9CAE, 0, 400, cat, ConstructPigments); // Invulnerability Blue
