@@ -4,7 +4,7 @@ using Server;
 
 namespace Server.Items
 {
-    public class RiftwardensPendant : BaseNecklace
+    public class RiftwardensPendant : BaseTalisman
     {
         public override bool IsArtifact { get { return true; } }
 
