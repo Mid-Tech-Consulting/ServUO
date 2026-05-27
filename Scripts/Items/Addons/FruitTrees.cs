@@ -7,11 +7,13 @@ namespace Server.Items
     {
         private const int MaxFruits = 10;
         private int m_Fruits;
+        private DateTime m_NextGrowth;
 
         public BaseFruitTreeAddon()
             : base()
         {
             m_Fruits = 1;
+            m_NextGrowth = DateTime.Now + TimeSpan.FromDays(1);
             Timer.DelayCall(TimeSpan.FromDays(1), new TimerCallback(GrowFruit));
         }
 
@@ -63,9 +65,10 @@ namespace Server.Items
         {
             base.Serialize(writer);
 
-            writer.WriteEncodedInt(0); // version
+            writer.WriteEncodedInt(1); // version
 
             writer.Write((int)m_Fruits);
+            writer.Write(m_NextGrowth);
         }
 
         public override void Deserialize(GenericReader reader)
@@ -76,7 +79,13 @@ namespace Server.Items
 
             m_Fruits = reader.ReadInt();
 
-            Timer.DelayCall(TimeSpan.FromDays(1), new TimerCallback(GrowFruit));
+            if (version >= 1)
+                m_NextGrowth = reader.ReadDateTime();
+            else
+                m_NextGrowth = DateTime.Now + TimeSpan.FromDays(1);
+
+            TimeSpan delay = m_NextGrowth - DateTime.Now;
+            Timer.DelayCall(delay > TimeSpan.Zero ? delay : TimeSpan.Zero, new TimerCallback(GrowFruit));
         }
 
         private void GrowFruit()
@@ -87,6 +96,7 @@ namespace Server.Items
             if (m_Fruits < MaxFruits)
                 m_Fruits++;
 
+            m_NextGrowth = DateTime.Now + TimeSpan.FromDays(1);
             Timer.DelayCall(TimeSpan.FromDays(1), new TimerCallback(GrowFruit));
         }
     }
