@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net48</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<AssemblyName>ServUO</AssemblyName>
 		<ApplicationIcon>servuo.ico</ApplicationIcon>
@@ -11,6 +11,7 @@
 		<UseVSHostingProcess>False</UseVSHostingProcess>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Platforms>x64</Platforms>
+		<NoWarn>CA1416</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<OutputPath>..\</OutputPath>
@@ -24,5 +25,10 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Ultima\Ultima.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Drawing.Common" Version="9.0.0" />
+		<PackageReference Include="System.Diagnostics.EventLog" Version="9.0.0" />
+		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.0" />
 	</ItemGroup>
 </Project>
