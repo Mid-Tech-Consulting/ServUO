@@ -159,7 +159,7 @@ namespace Ultima
 			{
 				m_StreamBuffer = new byte[max];
 			}
-			stream.Read(m_StreamBuffer, 0, max);
+			stream.ReadExactly(m_StreamBuffer, 0, max);
 
 			fixed (byte* data = m_StreamBuffer)
 			{
@@ -202,7 +202,7 @@ namespace Ultima
 				var memmul = new MemoryStream();
 				using (BinaryWriter binidx = new BinaryWriter(memidx), binmul = new BinaryWriter(memmul))
 				{
-					var sha = new SHA256Managed();
+					var sha = SHA256.Create();
 					//StreamWriter Tex = new StreamWriter(new FileStream("d:/texlog.txt", FileMode.Create, FileAccess.ReadWrite));
 					for (int index = 0; index < GetIdxLength(); ++index)
 					{

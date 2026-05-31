@@ -9,7 +9,6 @@ namespace Server
     {
         private readonly string m_AssemblyName;
 
-        private readonly AppDomain m_AppDomain;
         private readonly AssemblyBuilder m_AssemblyBuilder;
         private readonly ModuleBuilder m_ModuleBuilder;
 
@@ -17,25 +16,11 @@ namespace Server
         {
             this.m_AssemblyName = assemblyName;
 
-            this.m_AppDomain = AppDomain.CurrentDomain;
-
-            this.m_AssemblyBuilder = this.m_AppDomain.DefineDynamicAssembly(
+            this.m_AssemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
                 new AssemblyName(assemblyName),
-                canSave ? AssemblyBuilderAccess.RunAndSave : AssemblyBuilderAccess.Run);
+                AssemblyBuilderAccess.Run);
 
-            if (canSave)
-            {
-                this.m_ModuleBuilder = this.m_AssemblyBuilder.DefineDynamicModule(
-                    assemblyName,
-                    String.Format("{0}.dll", assemblyName.ToLower()),
-                    false);
-            }
-            else
-            {
-                this.m_ModuleBuilder = this.m_AssemblyBuilder.DefineDynamicModule(
-                    assemblyName,
-                    false);
-            }
+            this.m_ModuleBuilder = this.m_AssemblyBuilder.DefineDynamicModule(assemblyName);
         }
 
         public TypeBuilder DefineType(string typeName, TypeAttributes attrs, Type parentType)
@@ -45,8 +30,7 @@ namespace Server
 
         public void Save()
         {
-            this.m_AssemblyBuilder.Save(
-                String.Format("{0}.dll", this.m_AssemblyName.ToLower()));
+            // Assembly saving is not supported or needed in modern .NET
         }
     }
 

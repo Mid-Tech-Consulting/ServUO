@@ -189,7 +189,7 @@ namespace Ultima
 				Validbuffer = new byte[4];
 			}
 			stream.Seek(4, SeekOrigin.Current);
-			stream.Read(Validbuffer, 0, 4);
+			stream.ReadExactly(Validbuffer, 0, 4);
 			fixed (byte* b = Validbuffer)
 			{
 				var dat = (short*)b;
@@ -295,7 +295,7 @@ namespace Ultima
 				return null;
 			}
 			var buffer = new byte[length];
-			stream.Read(buffer, 0, length);
+			stream.ReadExactly(buffer, 0, length);
 			stream.Close();
 			return buffer;
 		}
@@ -374,7 +374,7 @@ namespace Ultima
 				return null;
 			}
 			var buffer = new byte[length];
-			stream.Read(buffer, 0, length);
+			stream.ReadExactly(buffer, 0, length);
 			stream.Close();
 			return buffer;
 		}
@@ -459,7 +459,7 @@ namespace Ultima
 			{
 				m_StreamBuffer = new byte[length];
 			}
-			stream.Read(m_StreamBuffer, 0, length);
+			stream.ReadExactly(m_StreamBuffer, 0, length);
 			stream.Close();
 
 			fixed (byte* data = m_StreamBuffer)
@@ -531,7 +531,7 @@ namespace Ultima
 			{
 				m_StreamBuffer = new byte[length];
 			}
-			stream.Read(m_StreamBuffer, 0, length);
+			stream.ReadExactly(m_StreamBuffer, 0, length);
 			stream.Close();
 			fixed (byte* bindata = m_StreamBuffer)
 			{
@@ -587,7 +587,7 @@ namespace Ultima
 			{
 				var memidx = new MemoryStream();
 				var memmul = new MemoryStream();
-				var sha = new SHA256Managed();
+				var sha = SHA256.Create();
 				//StreamWriter Tex = new StreamWriter(new FileStream("d:/artlog.txt", FileMode.Create, FileAccess.ReadWrite));
 
 				using (BinaryWriter binidx = new BinaryWriter(memidx), binmul = new BinaryWriter(memmul))

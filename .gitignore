@@ -62,3 +62,20 @@ Config/Database.cfg
 !/bin/rosyln/*
 .claude/settings.json
 Config/Database.cfg
+
+# .NET 10 Build Artifacts
+/ServUO.dll
+/ServUO.dll.config
+/ServUO.runtimeconfig.json
+/ServUO.deps.json
+/Scripts.deps.json
+/Ultima.deps.json
+/runtimes/
+/System.Drawing.Common.dll
+/System.Diagnostics.EventLog.dll
+/System.Diagnostics.PerformanceCounter.dll
+/Microsoft.Win32.SystemEvents.dll
+/System.Configuration.ConfigurationManager.dll
+/System.Security.Cryptography.ProtectedData.dll
+/System.Private.Windows.Core.dll
+

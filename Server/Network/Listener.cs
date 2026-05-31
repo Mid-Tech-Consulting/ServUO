@@ -85,7 +85,6 @@ namespace Server.Network
                 SendTimeout = 1000,
                 ReceiveTimeout = 1000,
                 ExclusiveAddressUse = false,
-                UseOnlyOverlappedIO = false,
                 NoDelay = true,
                 LingerState =
                 {

@@ -18,3 +18,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyKeyName("")]
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en")]
+[assembly: System.Runtime.Versioning.SupportedOSPlatform("windows")]
+

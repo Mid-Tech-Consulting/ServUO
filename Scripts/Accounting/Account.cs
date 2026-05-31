@@ -24,9 +24,9 @@ namespace Server.Accounting
 		public static readonly TimeSpan InactiveDuration = TimeSpan.FromDays(180.0);
 		public static readonly TimeSpan EmptyInactiveDuration = TimeSpan.FromDays(30.0);
 
-		private static MD5CryptoServiceProvider m_MD5HashProvider;
-		private static SHA1CryptoServiceProvider m_SHA1HashProvider;
-        private static SHA512CryptoServiceProvider m_SHA512HashProvider;
+		private static MD5 m_MD5HashProvider;
+		private static SHA1 m_SHA1HashProvider;
+        private static SHA512 m_SHA512HashProvider;
         private static byte[] m_HashBuffer;
 
 		public static void Configure()
@@ -780,7 +780,7 @@ namespace Server.Accounting
 		{
 			if (m_MD5HashProvider == null)
 			{
-				m_MD5HashProvider = new MD5CryptoServiceProvider();
+				m_MD5HashProvider = MD5.Create();
 			}
 
 			if (m_HashBuffer == null)
@@ -798,7 +798,7 @@ namespace Server.Accounting
 		{
 			if (m_SHA1HashProvider == null)
 			{
-				m_SHA1HashProvider = new SHA1CryptoServiceProvider();
+				m_SHA1HashProvider = SHA1.Create();
 			}
 
 			if (m_HashBuffer == null)
@@ -816,7 +816,7 @@ namespace Server.Accounting
         {
             if (m_SHA512HashProvider == null)
             {
-                m_SHA512HashProvider = new SHA512CryptoServiceProvider();
+                m_SHA512HashProvider = SHA512.Create();
             }
 
             if (m_HashBuffer == null)

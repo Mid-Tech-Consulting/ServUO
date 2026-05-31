@@ -59,7 +59,7 @@ namespace Server.Misc
 		{
 			_PollTimer = Timer.DelayCall(TimeSpan.Zero, TimeSpan.FromMilliseconds(100), ProcessCommand);
 
-			_Listen.BeginInvoke(r => ProcessInput(_Listen.EndInvoke(r)), null);
+			System.Threading.Tasks.Task.Run(() => ProcessInput(_Listen()));
 		}
 
 		private static void ProcessInput(string input)
@@ -86,7 +86,7 @@ namespace Server.Misc
 
 			Interlocked.Exchange(ref _Command, String.Empty);
 
-			_Listen.BeginInvoke(r => ProcessInput(_Listen.EndInvoke(r)), null);
+			System.Threading.Tasks.Task.Run(() => ProcessInput(_Listen()));
 		}
 
 		private static PageEntry[] _Pages;

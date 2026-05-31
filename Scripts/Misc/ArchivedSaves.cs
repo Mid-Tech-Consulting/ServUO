@@ -208,7 +208,18 @@ namespace Server.Misc
 
             _Sync.Reset();
 
-            var t = _Pack.BeginInvoke(source, EndPack, source);
+            System.Threading.Tasks.Task t = null;
+            t = System.Threading.Tasks.Task.Run(() =>
+            {
+                try
+                {
+                    _Pack.Invoke(source);
+                }
+                finally
+                {
+                    EndPack(t);
+                }
+            });
 
             lock (_TaskRoot)
                 _Tasks.Add(t);
@@ -216,7 +227,7 @@ namespace Server.Misc
 
         private static void EndPack(IAsyncResult r)
         {
-            _Pack.EndInvoke(r);
+
 
             lock (_TaskRoot)
                 _Tasks.Remove(r);
@@ -265,7 +276,18 @@ namespace Server.Misc
 
             _Sync.Reset();
 
-            var t = _Prune.BeginInvoke(threshold, EndPrune, threshold);
+            System.Threading.Tasks.Task t = null;
+            t = System.Threading.Tasks.Task.Run(() =>
+            {
+                try
+                {
+                    _Prune.Invoke(threshold);
+                }
+                finally
+                {
+                    EndPrune(t);
+                }
+            });
 
             lock (_TaskRoot)
                 _Tasks.Add(t);
@@ -273,7 +295,7 @@ namespace Server.Misc
 
         private static void EndPrune(IAsyncResult r)
         {
-            _Prune.EndInvoke(r);
+
 
             lock (_TaskRoot)
                 _Tasks.Remove(r);
