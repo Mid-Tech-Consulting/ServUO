@@ -61,6 +61,7 @@ namespace Server.Mobiles
         public override OppositionGroup OppositionGroup { get { return OppositionGroup.FeyAndUndead; } }
         public override Poison PoisonImmune { get { return Poison.Lethal; } }
         public override TribeType Tribe { get { return TribeType.Undead; } }
+        public override int TreasureMapLevel { get { return 5; } }
 
         public override void GenerateLoot()
         {
