@@ -877,7 +877,7 @@ namespace Ultima
 					long currpos = 0;
 					try
 					{
-						fs.Read(buffer, 0, buffer.Length);
+						fs.ReadExactly(buffer, 0, buffer.Length);
 						for (int i = 0; i < 0x4000; i += 32)
 						{
 							var ptrheader = new IntPtr((long)gc.AddrOfPinnedObject() + currpos);

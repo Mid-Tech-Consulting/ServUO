@@ -1,4 +1,4 @@
-﻿#region References
+#region References
 using System;
 using System.Globalization;
 using System.IO;
@@ -56,7 +56,7 @@ namespace Ultima
 					m_Colors = new short[fs.Length / 2];
 					GCHandle gc = GCHandle.Alloc(m_Colors, GCHandleType.Pinned);
 					var buffer = new byte[(int)fs.Length];
-					fs.Read(buffer, 0, (int)fs.Length);
+					fs.ReadExactly(buffer, 0, (int)fs.Length);
 					Marshal.Copy(buffer, 0, gc.AddrOfPinnedObject(), (int)fs.Length);
 					gc.Free();
 				}

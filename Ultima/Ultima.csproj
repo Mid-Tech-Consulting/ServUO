@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net10.0-windows</TargetFramework>
 		<OutputType>Library</OutputType>
 		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
 		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 		<UseVSHostingProcess>False</UseVSHostingProcess>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Platforms>x64</Platforms>
-		<NoWarn>$(NoWarn);CA1416;CA2022;SYSLIB0021;SYSLIB0023;CS0618;CS8073</NoWarn>
+		<SupportedOSPlatform>windows</SupportedOSPlatform>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<OutputPath>..\</OutputPath>

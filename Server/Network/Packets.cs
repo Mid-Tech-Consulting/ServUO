@@ -4808,33 +4808,33 @@ m_Stream.Write( (int) renderMode );
 			{
 				if (m_MD5Provider == null)
 				{
-					m_MD5Provider = new MD5CryptoServiceProvider();
+					m_MD5Provider = MD5.Create();
 				}
-
+ 
 				m_Stream.UnderlyingStream.Flush();
-
+ 
 				var hashCode = m_MD5Provider.ComputeHash(
 					m_Stream.UnderlyingStream.GetBuffer(), 0, (int)m_Stream.UnderlyingStream.Length);
 				var buffer = new byte[28];
-
+ 
 				for (int i = 0; i < count; ++i)
 				{
 					Utility.RandomBytes(buffer);
-
+ 
 					m_Stream.Seek(35 + (i * 60), SeekOrigin.Begin);
 					m_Stream.Write(buffer, 0, buffer.Length);
 				}
-
+ 
 				m_Stream.Seek(35, SeekOrigin.Begin);
 				m_Stream.Write((int)((long)disabled >> 32));
 				m_Stream.Write((int)disabled);
-
+ 
 				m_Stream.Seek(95, SeekOrigin.Begin);
 				m_Stream.Write(hashCode, 0, hashCode.Length);
 			}
 		}
-
-		private static MD5CryptoServiceProvider m_MD5Provider;
+ 
+		private static MD5 m_MD5Provider;
 
 		public static CharacterListFlags AdditionalFlags { get; set; }
 	}
@@ -4908,33 +4908,33 @@ m_Stream.Write( (int) renderMode );
 			{
 				if (m_MD5Provider == null)
 				{
-					m_MD5Provider = new MD5CryptoServiceProvider();
+					m_MD5Provider = MD5.Create();
 				}
-
+ 
 				m_Stream.UnderlyingStream.Flush();
-
+ 
 				var hashCode = m_MD5Provider.ComputeHash(
 					m_Stream.UnderlyingStream.GetBuffer(), 0, (int)m_Stream.UnderlyingStream.Length);
 				var buffer = new byte[28];
-
+ 
 				for (int i = 0; i < count; ++i)
 				{
 					Utility.RandomBytes(buffer);
-
+ 
 					m_Stream.Seek(35 + (i * 60), SeekOrigin.Begin);
 					m_Stream.Write(buffer, 0, buffer.Length);
 				}
-
+ 
 				m_Stream.Seek(35, SeekOrigin.Begin);
 				m_Stream.Write((int)((long)disabled >> 32));
 				m_Stream.Write((int)disabled);
-
+ 
 				m_Stream.Seek(95, SeekOrigin.Begin);
 				m_Stream.Write(hashCode, 0, hashCode.Length);
 			}
 		}
-
-		private static MD5CryptoServiceProvider m_MD5Provider;
+ 
+		private static MD5 m_MD5Provider;
 	}
 
 	public sealed class ClearWeaponAbility : Packet
@@ -5070,7 +5070,7 @@ m_Stream.Write( (int) renderMode );
 
 		public IPEndPoint Address { get; set; }
 
-		public ServerInfo(string name, int fullPercent, TimeZone tz, IPEndPoint address)
+		public ServerInfo(string name, int fullPercent, TimeZoneInfo tz, IPEndPoint address)
 		{
 			Name = name;
 			FullPercent = fullPercent;

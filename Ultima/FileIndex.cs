@@ -344,7 +344,7 @@ namespace Ultima
 					IdxLength = index.Length;
 					GCHandle gc = GCHandle.Alloc(Index, GCHandleType.Pinned);
 					var buffer = new byte[index.Length];
-					index.Read(buffer, 0, (int)index.Length);
+					index.ReadExactly(buffer, 0, (int)index.Length);
 					Marshal.Copy(buffer, 0, gc.AddrOfPinnedObject(), (int)Math.Min(IdxLength, length * 12));
 					gc.Free();
 					for (int i = count; i < length; ++i)
@@ -433,7 +433,7 @@ namespace Ultima
 					Index = new Entry3D[count];
 					GCHandle gc = GCHandle.Alloc(Index, GCHandleType.Pinned);
 					var buffer = new byte[index.Length];
-					index.Read(buffer, 0, (int)index.Length);
+					index.ReadExactly(buffer, 0, (int)index.Length);
 					Marshal.Copy(buffer, 0, gc.AddrOfPinnedObject(), (int)index.Length);
 					gc.Free();
 				}

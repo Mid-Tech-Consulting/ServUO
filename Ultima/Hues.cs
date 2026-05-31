@@ -46,7 +46,7 @@ namespace Ultima
 					GCHandle gc = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 					try
 					{
-						fs.Read(buffer, 0, buffer.Length);
+						fs.ReadExactly(buffer, 0, buffer.Length);
 						long currpos = 0;
 
 						for (int i = 0; i < blockCount; ++i)

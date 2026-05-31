@@ -89,8 +89,10 @@ namespace Server.TournamentSystem
                     else
                         name2 = stats.RunnerUp;
 
-                    if (stats.WinDate != null)
+                    if (stats.WinDate != DateTime.MinValue)
                         winTime = stats.WinDate.Date;
+                    else
+                        winTime = DateTime.MinValue;
 
                     int idx = GetStatsIndex(stats);
 

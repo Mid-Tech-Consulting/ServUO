@@ -1,4 +1,4 @@
-﻿#region References
+#region References
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,7 +39,7 @@ namespace Ultima
 				unsafe
 				{
 					int order = 0;
-					fs.Read(buffer, 0, buffer.Length);
+					fs.ReadExactly(buffer, 0, buffer.Length);
 					fixed (byte* data = buffer)
 					{
 						byte* bindat = data;

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net10.0-windows</TargetFramework>
 		<OutputType>Library</OutputType>
 		<AssemblyName>Scripts</AssemblyName>
 		<RootNamespace>Server</RootNamespace>
@@ -10,7 +10,6 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<UseWindowsForms>false</UseWindowsForms>
 		<Platforms>x64</Platforms>
-		<NoWarn>$(NoWarn);CA1416;CA2022;SYSLIB0021;SYSLIB0023;CS0618;CS8073</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<OutputPath>..\</OutputPath>

@@ -155,7 +155,7 @@ namespace Ultima
 				return null;
 			}
 			var buffer = new byte[length];
-			stream.Read(buffer, 0, length);
+			stream.ReadExactly(buffer, 0, length);
 			stream.Close();
 			return buffer;
 		}
@@ -219,7 +219,7 @@ namespace Ultima
 				m_ColorTable = colorTable = new byte[128];
 			}
 
-			stream.Read(streamBuffer, 0, length);
+			stream.ReadExactly(streamBuffer, 0, length);
 
 			fixed (short* psHueColors = hue.Colors)
 			{
@@ -396,7 +396,7 @@ namespace Ultima
 			{
 				m_StreamBuffer = new byte[length];
 			}
-			stream.Read(m_StreamBuffer, 0, length);
+			stream.ReadExactly(m_StreamBuffer, 0, length);
 
 			fixed (byte* data = m_StreamBuffer)
 			{
