@@ -122,8 +122,80 @@ namespace Server.Items
         }
     }
 
+    public class FlyingParrot : Item
+    {
+        private readonly Mobile m_Owner;
+        private readonly DateTime m_FlyEnd;
+        private readonly Timer m_Timer;
+
+        public FlyingParrot(Mobile owner, int hue, TimeSpan duration) : base(0xA2CC)
+        {
+            Movable = false;
+            Hue = hue;
+            m_Owner = owner;
+            m_FlyEnd = DateTime.UtcNow + duration;
+            MoveToWorld(new Point3D(owner.X, owner.Y, owner.Z + 15), owner.Map);
+
+            m_Timer = Timer.DelayCall(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), FlyOnTick);
+            m_Timer.Start();
+        }
+
+        public FlyingParrot(Serial serial) : base(serial)
+        {
+        }
+
+        private void FlyOnTick()
+        {
+            if (m_Owner == null || m_Owner.Deleted || m_Owner.Map == Map.Internal || Map == Map.Internal)
+            {
+                Delete();
+                return;
+            }
+
+            if (m_FlyEnd < DateTime.UtcNow)
+            {
+                Delete();
+            }
+            else
+            {
+                double seconds = (DateTime.UtcNow - (m_FlyEnd - TimeSpan.FromSeconds(10))).TotalSeconds;
+                double angle = seconds * 3.0; // Circular speed
+
+                int xOffset = (int)(Math.Sin(angle) * 1.5);
+                int yOffset = (int)(Math.Cos(angle) * 1.5);
+                int zOffset = 14 + (int)(Math.Sin(seconds * 5) * 2);
+
+                Point3D newLoc = new Point3D(m_Owner.X + xOffset, m_Owner.Y + yOffset, m_Owner.Z + zOffset);
+
+                if (newLoc != Location || Map != m_Owner.Map)
+                {
+                    MoveToWorld(newLoc, m_Owner.Map);
+                }
+            }
+        }
+
+        public override void OnAfterDelete()
+        {
+            base.OnAfterDelete();
+            m_Timer?.Stop();
+        }
+
+        public override void Serialize(GenericWriter writer)
+        {
+            base.Serialize(writer);
+            writer.Write(0);
+        }
+
+        public override void Deserialize(GenericReader reader)
+        {
+            base.Deserialize(reader);
+            reader.ReadInt();
+            Delete(); // Delete on boot
+        }
+    }
+
     [Flipable(0xA2CA, 0xA2CB)]
-    public class ShoulderParrot : BaseOuterTorso
+    public class ShoulderParrot : BaseCloak
     {
         public static void Initialize()
         {
@@ -156,103 +228,29 @@ namespace Server.Items
             }
         }
 
-        public class ParrotFlightState
-        {
-            public DateTime NextFly { get; set; }
-            public DateTime FlyEnd { get; set; }
-            public Timer Timer { get; set; }
-            public Mobile LastShoulder { get; set; }
-            public int OriginalItemID { get; set; }
-        }
-
-        private static readonly System.Collections.Generic.Dictionary<Item, ParrotFlightState> _ActiveFlights = new System.Collections.Generic.Dictionary<Item, ParrotFlightState>();
+        private static readonly System.Collections.Generic.Dictionary<Item, DateTime> _NextFlyTimes = new System.Collections.Generic.Dictionary<Item, DateTime>();
 
         public static void PlayParrotFlight(Item item, Mobile m)
         {
-            if (m.FindItemOnLayer(Layer.OuterTorso) == item)
+            if (m.FindItemOnLayer(Layer.Cloak) == item || m.FindItemOnLayer(Layer.OuterTorso) == item)
             {
-                _ActiveFlights.TryGetValue(item, out var state);
+                _NextFlyTimes.TryGetValue(item, out var nextFly);
 
-                if (state == null)
-                {
-                    state = new ParrotFlightState();
-                    _ActiveFlights[item] = state;
-                }
-
-                if (state.NextFly > DateTime.UtcNow)
+                if (nextFly > DateTime.UtcNow)
                 {
                     m.SendLocalizedMessage(1158956); // Your parrot is too tired to fly right now.
                 }
                 else
                 {
-                    state.LastShoulder = m;
-                    state.OriginalItemID = item.ItemID;
-                    state.FlyEnd = DateTime.UtcNow + TimeSpan.FromSeconds(Utility.RandomMinMax(6, 10));
+                    _NextFlyTimes[item] = DateTime.UtcNow + TimeSpan.FromMinutes(2);
 
-                    state.Timer = Timer.DelayCall(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), () => FlyOnTick(item));
-                    state.Timer.Start();
-
-                    item.Movable = false;
-                    item.MoveToWorld(new Point3D(m.X, m.Y, m.Z + 15), m.Map);
-                    item.ItemID = 0xA2CC;
+                    // Spawn the separate flying parrot animation! The equipped item remains fully equipped!
+                    new FlyingParrot(m, item.Hue, TimeSpan.FromSeconds(Utility.RandomMinMax(6, 10)));
                 }
             }
             else
             {
                 m.SendLocalizedMessage(1158957); // Your parrot can't fly here.
-            }
-        }
-
-        private static void FlyOnTick(Item item)
-        {
-            if (!_ActiveFlights.TryGetValue(item, out var state) || state.LastShoulder == null || state.LastShoulder.Deleted || state.LastShoulder.Map == Map.Internal || item.Map == Map.Internal)
-            {
-                item.Movable = true;
-                item.ItemID = 0xA2CA;
-                if (state != null)
-                {
-                    state.Timer?.Stop();
-                    _ActiveFlights.Remove(item);
-                }
-                return;
-            }
-
-            if (state.FlyEnd < DateTime.UtcNow)
-            {
-                item.Movable = true;
-                item.ItemID = state.OriginalItemID;
-
-                if (state.LastShoulder.FindItemOnLayer(Layer.OuterTorso) != null)
-                {
-                    state.LastShoulder.Backpack.DropItem(item);
-                }
-                else
-                {
-                    state.LastShoulder.AddItem(item);
-                }
-
-                state.Timer.Stop();
-                state.NextFly = DateTime.UtcNow + TimeSpan.FromMinutes(2);
-                state.LastShoulder = null;
-                _ActiveFlights.Remove(item);
-            }
-            else
-            {
-                double seconds = (DateTime.UtcNow - (state.FlyEnd - TimeSpan.FromSeconds(10))).TotalSeconds;
-                double angle = seconds * 3.0; // Circular speed
-
-                int xOffset = (int)(Math.Sin(angle) * 1.5);
-                int yOffset = (int)(Math.Cos(angle) * 1.5);
-                
-                // Bob up and down near head height (Z + 12 to Z + 16)
-                int zOffset = 14 + (int)(Math.Sin(seconds * 5) * 2);
-
-                Point3D newLoc = new Point3D(state.LastShoulder.X + xOffset, state.LastShoulder.Y + yOffset, state.LastShoulder.Z + zOffset);
-
-                if (newLoc != item.Location || item.Map != state.LastShoulder.Map)
-                {
-                    item.MoveToWorld(newLoc, state.LastShoulder.Map);
-                }
             }
         }
 
@@ -326,7 +324,7 @@ namespace Server.Items
 
                 Timer.DelayCall(() =>
                 {
-                    if (_LastShoulder.FindItemOnLayer(Layer.OuterTorso) != null)
+                    if (_LastShoulder.FindItemOnLayer(Layer.Cloak) != null)
                     {
                         _LastShoulder.Backpack.DropItem(this);
                     }
