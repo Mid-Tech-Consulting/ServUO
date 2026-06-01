@@ -802,9 +802,7 @@ namespace Server.Network
 
                                     try
                                     {
-                                        var segment = new ArraySegment<byte>(gram.Buffer, 0, gram.Length);
-
-                                        _ = Socket.SendAsync(segment, SocketFlags.None).ContinueWith(OnSend);
+                                        StartSendLoop(gram);
                                     }
                                     catch (Exception ex)
                                     {
@@ -961,57 +959,52 @@ namespace Server.Network
             }
         }
 
-        private void OnSend(Task<int> task)
+        private async void StartSendLoop(SendQueue.Gram firstGram)
         {
             try
             {
-                if (task.IsFaulted)
+                SendQueue.Gram gram = firstGram;
+
+                while (gram != null)
                 {
-                    throw task.Exception;
-                }
+                    m_NextCheckActivity = Core.TickCount + 90000;
 
-                var bytes = task.Result;
-
-                if (bytes <= 0)
-                {
-                    Dispose(false);
-                    return;
-                }
-
-                m_NextCheckActivity = Core.TickCount + 90000;
-
-                if (m_CoalesceSleep >= 0)
-                {
-                    Thread.Sleep(m_CoalesceSleep);
-                }
-
-                SendQueue.Gram gram;
-
-                lock (m_SendQueue)
-                {
-                    gram = m_SendQueue.Dequeue();
-
-                    if (gram == null && m_SendQueue.IsFlushReady)
+                    if (m_CoalesceSleep >= 0)
                     {
-                        gram = m_SendQueue.CheckFlushReady();
+                        await Task.Delay(m_CoalesceSleep);
                     }
-                }
 
-                if (gram != null)
-                {
                     try
                     {
-                        var segment = new ArraySegment<byte>(gram.Buffer, 0, gram.Length);
+                        var memory = new ReadOnlyMemory<byte>(gram.Buffer, 0, gram.Length);
+                        int bytesSent = await Socket.SendAsync(memory, SocketFlags.None);
 
-                        _ = Socket.SendAsync(segment, SocketFlags.None).ContinueWith(OnSend);
+                        if (bytesSent <= 0)
+                        {
+                            Dispose(false);
+                            break;
+                        }
                     }
                     catch (Exception ex)
                     {
                         TraceException(ex);
                         Dispose(false);
+                        break;
+                    }
+
+                    lock (m_SendQueue)
+                    {
+                        _ = m_SendQueue.Dequeue();
+
+                        gram = null;
+                        if (m_SendQueue.IsFlushReady)
+                        {
+                            gram = m_SendQueue.CheckFlushReady();
+                        }
                     }
                 }
-                else
+
+                if (gram == null)
                 {
                     lock (_SendLock)
                     {
@@ -1101,9 +1094,7 @@ namespace Server.Network
                     {
                         _Sending = true;
 
-                        var segment = new ArraySegment<byte>(gram.Buffer, 0, gram.Length);
-
-                        _ = Socket.SendAsync(segment, SocketFlags.None).ContinueWith(OnSend);
+                        StartSendLoop(gram);
 
                         return true;
                     }
