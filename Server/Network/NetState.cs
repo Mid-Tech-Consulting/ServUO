@@ -994,10 +994,9 @@ namespace Server.Network
 
                     lock (m_SendQueue)
                     {
-                        _ = m_SendQueue.Dequeue();
+                        gram = m_SendQueue.Dequeue();
 
-                        gram = null;
-                        if (m_SendQueue.IsFlushReady)
+                        if (gram == null && m_SendQueue.IsFlushReady)
                         {
                             gram = m_SendQueue.CheckFlushReady();
                         }
