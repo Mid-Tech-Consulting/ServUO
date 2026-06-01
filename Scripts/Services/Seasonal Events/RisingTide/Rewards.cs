@@ -234,6 +234,19 @@ namespace Server.Items
         {
         }
 
+        public override void OnAdded(object parent)
+        {
+            base.OnAdded(parent);
+
+            if (parent is Mobile)
+            {
+                if (((Mobile)parent).Female)
+                    ItemID = 0xA2CB;
+                else
+                    ItemID = 0xA2CA;
+            }
+        }
+
         public override void Serialize(GenericWriter writer)
         {
             base.Serialize(writer);
