@@ -125,6 +125,37 @@ namespace Server.Items
     [Flipable(0xA2CA, 0xA2CB)]
     public class ShoulderParrot : BaseOuterTorso
     {
+        public static void Initialize()
+        {
+            if (0xA2CA < TileData.ItemTable.Length)
+            {
+                ItemData maleData = TileData.ItemTable[0xA2CA];
+                ItemData femaleData = TileData.ItemTable[0xA2CB];
+
+                Utility.PushColor(ConsoleColor.DarkYellow);
+                Console.WriteLine("Shoulder Parrot (Male) TileData: Name='{0}', Flags={1}, Anim={2}", maleData.Name, maleData.Flags, maleData.Quality);
+                Console.WriteLine("Shoulder Parrot (Female) TileData: Name='{0}', Flags={1}, Anim={2}", femaleData.Name, femaleData.Flags, femaleData.Quality);
+
+                if ((maleData.Flags & TileFlag.Wearable) == 0 || maleData.Quality == 0)
+                {
+                    Console.WriteLine("Patching Shoulder Parrot TileData in memory for walking animation support...");
+                    
+                    TileData.ItemTable[0xA2CA].Flags |= TileFlag.Wearable | TileFlag.Animation | TileFlag.PartialHue;
+                    TileData.ItemTable[0xA2CA].Quality = 1107;
+                    if (string.IsNullOrEmpty(TileData.ItemTable[0xA2CA].Name) || TileData.ItemTable[0xA2CA].Name == "null")
+                        TileData.ItemTable[0xA2CA].Name = "Shoulder Parrot";
+
+                    TileData.ItemTable[0xA2CB].Flags |= TileFlag.Wearable | TileFlag.Animation | TileFlag.PartialHue;
+                    TileData.ItemTable[0xA2CB].Quality = 1108;
+                    if (string.IsNullOrEmpty(TileData.ItemTable[0xA2CB].Name) || TileData.ItemTable[0xA2CB].Name == "null")
+                        TileData.ItemTable[0xA2CB].Name = "Shoulder Parrot";
+
+                    Console.WriteLine("Patch completed: Male Anim={0}, Female Anim={1}", TileData.ItemTable[0xA2CA].Quality, TileData.ItemTable[0xA2CB].Quality);
+                }
+                Utility.PopColor();
+            }
+        }
+
         private DateTime _NextFly;
         private DateTime _FlyEnd;
         private Timer _Timer;
