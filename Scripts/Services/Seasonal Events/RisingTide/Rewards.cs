@@ -156,12 +156,108 @@ namespace Server.Items
             }
         }
 
-        private DateTime _NextFly;
-        private DateTime _FlyEnd;
-        private Timer _Timer;
-        private Mobile _LastShoulder;
+        public class ParrotFlightState
+        {
+            public DateTime NextFly { get; set; }
+            public DateTime FlyEnd { get; set; }
+            public Timer Timer { get; set; }
+            public Mobile LastShoulder { get; set; }
+            public int OriginalItemID { get; set; }
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<Item, ParrotFlightState> _ActiveFlights = new System.Collections.Generic.Dictionary<Item, ParrotFlightState>();
+
+        public static void PlayParrotFlight(Item item, Mobile m)
+        {
+            if (m.FindItemOnLayer(Layer.OuterTorso) == item)
+            {
+                _ActiveFlights.TryGetValue(item, out var state);
+
+                if (state == null)
+                {
+                    state = new ParrotFlightState();
+                    _ActiveFlights[item] = state;
+                }
+
+                if (state.NextFly > DateTime.UtcNow)
+                {
+                    m.SendLocalizedMessage(1158956); // Your parrot is too tired to fly right now.
+                }
+                else
+                {
+                    state.LastShoulder = m;
+                    state.OriginalItemID = item.ItemID;
+                    state.FlyEnd = DateTime.UtcNow + TimeSpan.FromSeconds(Utility.RandomMinMax(6, 10));
+
+                    state.Timer = Timer.DelayCall(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), () => FlyOnTick(item));
+                    state.Timer.Start();
+
+                    item.Movable = false;
+                    item.MoveToWorld(new Point3D(m.X, m.Y, m.Z + 15), m.Map);
+                    item.ItemID = 0xA2CC;
+                }
+            }
+            else
+            {
+                m.SendLocalizedMessage(1158957); // Your parrot can't fly here.
+            }
+        }
+
+        private static void FlyOnTick(Item item)
+        {
+            if (!_ActiveFlights.TryGetValue(item, out var state) || state.LastShoulder == null || state.LastShoulder.Deleted || state.LastShoulder.Map == Map.Internal || item.Map == Map.Internal)
+            {
+                item.Movable = true;
+                item.ItemID = 0xA2CA;
+                if (state != null)
+                {
+                    state.Timer?.Stop();
+                    _ActiveFlights.Remove(item);
+                }
+                return;
+            }
+
+            if (state.FlyEnd < DateTime.UtcNow)
+            {
+                item.Movable = true;
+                item.ItemID = state.OriginalItemID;
+
+                if (state.LastShoulder.FindItemOnLayer(Layer.OuterTorso) != null)
+                {
+                    state.LastShoulder.Backpack.DropItem(item);
+                }
+                else
+                {
+                    state.LastShoulder.AddItem(item);
+                }
+
+                state.Timer.Stop();
+                state.NextFly = DateTime.UtcNow + TimeSpan.FromMinutes(2);
+                state.LastShoulder = null;
+                _ActiveFlights.Remove(item);
+            }
+            else
+            {
+                double seconds = (DateTime.UtcNow - (state.FlyEnd - TimeSpan.FromSeconds(10))).TotalSeconds;
+                double angle = seconds * 3.0; // Circular speed
+
+                int xOffset = (int)(Math.Sin(angle) * 1.5);
+                int yOffset = (int)(Math.Cos(angle) * 1.5);
+                
+                // Bob up and down near head height (Z + 12 to Z + 16)
+                int zOffset = 14 + (int)(Math.Sin(seconds * 5) * 2);
+
+                Point3D newLoc = new Point3D(state.LastShoulder.X + xOffset, state.LastShoulder.Y + yOffset, state.LastShoulder.Z + zOffset);
+
+                if (newLoc != item.Location || item.Map != state.LastShoulder.Map)
+                {
+                    item.MoveToWorld(newLoc, state.LastShoulder.Map);
+                }
+            }
+        }
 
         private string _MasterName;
+        private Mobile _LastShoulder;
 
         [CommandProperty(AccessLevel.GameMaster)]
         public string MasterName { get { return _MasterName; } set { _MasterName = value; InvalidateProperties(); } }
@@ -187,78 +283,7 @@ namespace Server.Items
 
         public override void OnDoubleClick(Mobile m)
         {
-            if (m.FindItemOnLayer(Layer.OuterTorso) == this)
-            {
-                if (_NextFly > DateTime.UtcNow)
-                {
-                    m.SendLocalizedMessage(1158956); // Your parrot is too tired to fly right now.
-                }
-                else
-                {
-                    _Timer = Timer.DelayCall(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), FlyOnTick);
-                    _Timer.Start();
-
-                    Movable = false;
-                    _LastShoulder = m;
-                    MoveToWorld(new Point3D(m.X, m.Y, m.Z + 15), m.Map);
-                    ItemID = 0xA2CC;
-
-                    _FlyEnd = DateTime.UtcNow + TimeSpan.FromSeconds(Utility.RandomMinMax(6, 10)); // Fly for 6 to 10 seconds
-                }
-            }
-            else
-            {
-                m.SendLocalizedMessage(1158957); // Your parrot can't fly here.
-            }
-        }
-
-        private void FlyOnTick()
-        {
-            if (_LastShoulder == null || _LastShoulder.Deleted || _LastShoulder.Map == Map.Internal || Map == Map.Internal)
-            {
-                Movable = true;
-                ItemID = 0xA2CA;
-                _Timer?.Stop();
-                return;
-            }
-
-            if (_FlyEnd < DateTime.UtcNow)
-            {
-                Movable = true;
-                ItemID = 0xA2CA;
-
-                if (_LastShoulder.FindItemOnLayer(Layer.OuterTorso) != null)
-                {
-                    _LastShoulder.Backpack.DropItem(this);
-                }
-                else
-                {
-                    _LastShoulder.AddItem(this);
-                }
-
-                _LastShoulder = null;
-                _Timer.Stop();
-                _NextFly = DateTime.UtcNow + TimeSpan.FromMinutes(2);
-            }
-            else
-            {
-                // Calculate dynamic circular flight path around player's head
-                double seconds = (DateTime.UtcNow - (_FlyEnd - TimeSpan.FromSeconds(10))).TotalSeconds;
-                double angle = seconds * 3.0; // Circular speed
-
-                int xOffset = (int)(Math.Sin(angle) * 1.5);
-                int yOffset = (int)(Math.Cos(angle) * 1.5);
-                
-                // Bob up and down near head height (Z + 12 to Z + 16)
-                int zOffset = 14 + (int)(Math.Sin(seconds * 5) * 2);
-
-                Point3D newLoc = new Point3D(_LastShoulder.X + xOffset, _LastShoulder.Y + yOffset, _LastShoulder.Z + zOffset);
-
-                if (newLoc != Location || Map != _LastShoulder.Map)
-                {
-                    MoveToWorld(newLoc, _LastShoulder.Map);
-                }
-            }
+            PlayParrotFlight(this, m);
         }
 
         public ShoulderParrot(Serial serial) : base(serial)
@@ -293,21 +318,21 @@ namespace Server.Items
             reader.ReadInt();
 
             _MasterName = reader.ReadString();
-            Mobile m = reader.ReadMobile();
+            _LastShoulder = reader.ReadMobile();
 
-            if (m != null)
+            if (_LastShoulder != null)
             {
                 ItemID = 0xA2CA;
 
                 Timer.DelayCall(() =>
                 {
-                    if (m.FindItemOnLayer(Layer.OuterTorso) != null)
+                    if (_LastShoulder.FindItemOnLayer(Layer.OuterTorso) != null)
                     {
-                        m.Backpack.DropItem(this);
+                        _LastShoulder.Backpack.DropItem(this);
                     }
                     else
                     {
-                        m.AddItem(this);
+                        _LastShoulder.AddItem(this);
                     }
                 });
             }

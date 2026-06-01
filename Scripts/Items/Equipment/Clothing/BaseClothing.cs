@@ -719,6 +719,11 @@ namespace Server.Items
 
             if (mob != null)
             {
+                if (ItemID == 0xA2CA || ItemID == 0xA2CB)
+                {
+                    ItemID = mob.Female ? 0xA2CB : 0xA2CA;
+                }
+
                 if (Core.AOS)
                     m_AosSkillBonuses.AddTo(mob);
 
@@ -740,6 +745,17 @@ namespace Server.Items
             }
 
             base.OnAdded(parent);
+        }
+
+        public override void OnDoubleClick(Mobile from)
+        {
+            if (ItemID == 0xA2CA || ItemID == 0xA2CB)
+            {
+                ShoulderParrot.PlayParrotFlight(this, from);
+                return;
+            }
+
+            base.OnDoubleClick(from);
         }
 
         public override void OnRemoved(object parent)
