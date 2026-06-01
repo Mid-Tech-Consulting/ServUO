@@ -101,7 +101,7 @@ namespace Ultima
 		{
 			var buffer = new byte[bytes];
 
-			pc.ReadExactly(buffer, 0, bytes);
+			pc.Read(buffer, 0, bytes);
 
 			switch (bytes)
 			{

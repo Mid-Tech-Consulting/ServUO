@@ -8,6 +8,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Platforms>x64</Platforms>
 		<SupportedOSPlatform>windows</SupportedOSPlatform>
+		<NoWarn>CA2022</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<OutputPath>..\</OutputPath>

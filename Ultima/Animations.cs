@@ -447,7 +447,7 @@ namespace Ultima
 			{
 				m_StreamBuffer = new byte[length];
 			}
-			stream.ReadExactly(m_StreamBuffer, 0, length);
+			stream.Read(m_StreamBuffer, 0, length);
 			m_MemoryStream = new MemoryStream(m_StreamBuffer, false);
 
 			bool flip = direction > 4;
