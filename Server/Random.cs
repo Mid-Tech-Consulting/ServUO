@@ -135,6 +135,7 @@ namespace Server
 		private byte[] _Buffer = new byte[BUFFER_SIZE];
 
 		private int _Index;
+		private int _filling;
 
 		private readonly object _sync = new object();
 		private readonly object _syncB = new object();
@@ -162,7 +163,11 @@ namespace Server
 					_Index = 0;
 				}
 			}
-			ThreadPool.QueueUserWorkItem(Fill);
+
+			if (Interlocked.CompareExchange(ref _filling, 1, 0) == 0)
+			{
+				ThreadPool.QueueUserWorkItem(Fill);
+			}
 		}
 
 		private void Fill(object o)
@@ -177,6 +182,8 @@ namespace Server
 			{
 				_Buffer = temp;
 			}
+
+			Interlocked.Exchange(ref _filling, 0);
 		}
 
 		private void _GetBytes(byte[] b)
@@ -282,6 +289,7 @@ namespace Server
 		private byte[] _Buffer = new byte[BUFFER_SIZE];
 
 		private int _Index;
+		private int _filling;
 
 		private readonly object _sync = new object();
 		private readonly object _syncB = new object();
@@ -315,13 +323,19 @@ namespace Server
 					_Index = 0;
 				}
 			}
-			ThreadPool.QueueUserWorkItem(Fill);
+
+			if (Interlocked.CompareExchange(ref _filling, 1, 0) == 0)
+			{
+				ThreadPool.QueueUserWorkItem(Fill);
+			}
 		}
 
 		private void Fill(object o)
 		{
 			lock (_syncB)
 				SafeNativeMethods.rdrand_get_bytes(BUFFER_SIZE, _Buffer);
+
+			Interlocked.Exchange(ref _filling, 0);
 		}
 
 		private void _GetBytes(byte[] b)
