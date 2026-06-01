@@ -1190,12 +1190,12 @@ namespace Server.Gumps
                                             // You cannot perform this action while you still have vendors rented out in this house.
                                             from.SendGump(new NoticeGump(1060637, 30720, 1062395, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
                                         }
-                                        else if (m_House.HasAddonContainers)
-                                        {
-                                            // The house can not be customized when add-on containers such as aquariums, elven furniture containers, vanities, and boiling cauldrons 
-                                            // are present in the house.  Please re-deed the add-on containers before customizing the house.
-                                            from.SendGump(new NoticeGump(1060637, 30720, 1074863, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
-                                        }
+                                        //else if (m_House.HasAddonContainers)
+                                        //{
+                                        //    // The house can not be customized when add-on containers such as aquariums, elven furniture containers, vanities, and boiling cauldrons 
+                                        //    // are present in the house.  Please re-deed the add-on containers before customizing the house.
+                                        //    from.SendGump(new NoticeGump(1060637, 30720, 1074863, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
+                                        //}
                                         else
                                         {
                                             HousePlacementEntry e = m_House.ConvertEntry;
@@ -1227,12 +1227,12 @@ namespace Server.Gumps
                                             from.SendGump(new NoticeGump(1060637, 30720, 1062395, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
                                         }
                                         #region Mondain's Legacy
-                                        else if (m_House.HasAddonContainers)
-                                        {
-                                            // The house can not be customized when add-on containers such as aquariums, elven furniture containers, vanities, and boiling cauldrons 
-                                            // are present in the house.  Please re-deed the add-on containers before customizing the house.
-                                            from.SendGump(new NoticeGump(1060637, 30720, 1074863, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
-                                        }
+                                        //else if (m_House.HasAddonContainers)
+                                        //{
+                                        //    // The house can not be customized when add-on containers such as aquariums, elven furniture containers, vanities, and boiling cauldrons 
+                                        //    // are present in the house.  Please re-deed the add-on containers before customizing the house.
+                                        //    from.SendGump(new NoticeGump(1060637, 30720, 1074863, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
+                                        //}
                                         #endregion
                                         else if (m_House.HasActiveAuction)
                                         {
@@ -1313,12 +1313,12 @@ namespace Server.Gumps
                                             // You cannot perform this action while you still have vendors rented out in this house.
                                             from.SendGump(new NoticeGump(1060637, 30720, 1062395, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
                                         }
-                                        else if (m_House.HasAddonContainers)
-                                        {
-                                            /*The house cannot be swapped when certain special house add-ons including aquariums, raised garden beds, house_only items, goza mats, and special 
-                                             * temporary add-ons are present in the house. Please re-deed or remove the special add-ons before swapping the house.*/
-                                            from.SendGump(new NoticeGump(1060637, 30720, 1158659, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
-                                        }
+                                        //else if (m_House.HasAddonContainers)
+                                        //{
+                                        //    /*The house cannot be swapped when certain special house add-ons including aquariums, raised garden beds, house_only items, goza mats, and special 
+                                        //     * temporary add-ons are present in the house. Please re-deed or remove the special add-ons before swapping the house.*/
+                                        //    from.SendGump(new NoticeGump(1060637, 30720, 1158659, 32512, 320, 180, new NoticeGumpCallback(CustomizeNotice_Callback), m_House));
+                                        //}
                                         else
                                         {
                                             /*You are about to swap your house into another classic house. You will be refunded or charged the value of this house. All your possessions 
