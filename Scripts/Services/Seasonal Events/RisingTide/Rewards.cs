@@ -164,7 +164,7 @@ namespace Server.Items
                 }
                 else
                 {
-                    _Timer = Timer.DelayCall(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(500), FlyOnTick);
+                    _Timer = Timer.DelayCall(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), FlyOnTick);
                     _Timer.Start();
 
                     Movable = false;
@@ -172,7 +172,7 @@ namespace Server.Items
                     MoveToWorld(new Point3D(m.X, m.Y, m.Z + 15), m.Map);
                     ItemID = 0xA2CC;
 
-                    _FlyEnd = DateTime.UtcNow + TimeSpan.FromSeconds(Utility.RandomMinMax(3, 5));
+                    _FlyEnd = DateTime.UtcNow + TimeSpan.FromSeconds(Utility.RandomMinMax(6, 10)); // Fly for 6 to 10 seconds
                 }
             }
             else
@@ -183,6 +183,14 @@ namespace Server.Items
 
         private void FlyOnTick()
         {
+            if (_LastShoulder == null || _LastShoulder.Deleted || _LastShoulder.Map == Map.Internal || Map == Map.Internal)
+            {
+                Movable = true;
+                ItemID = 0xA2CA;
+                _Timer?.Stop();
+                return;
+            }
+
             if (_FlyEnd < DateTime.UtcNow)
             {
                 Movable = true;
@@ -200,6 +208,25 @@ namespace Server.Items
                 _LastShoulder = null;
                 _Timer.Stop();
                 _NextFly = DateTime.UtcNow + TimeSpan.FromMinutes(2);
+            }
+            else
+            {
+                // Calculate dynamic circular flight path around player's head
+                double seconds = (DateTime.UtcNow - (_FlyEnd - TimeSpan.FromSeconds(10))).TotalSeconds;
+                double angle = seconds * 3.0; // Circular speed
+
+                int xOffset = (int)(Math.Sin(angle) * 1.5);
+                int yOffset = (int)(Math.Cos(angle) * 1.5);
+                
+                // Bob up and down near head height (Z + 12 to Z + 16)
+                int zOffset = 14 + (int)(Math.Sin(seconds * 5) * 2);
+
+                Point3D newLoc = new Point3D(_LastShoulder.X + xOffset, _LastShoulder.Y + yOffset, _LastShoulder.Z + zOffset);
+
+                if (newLoc != Location || Map != _LastShoulder.Map)
+                {
+                    MoveToWorld(newLoc, _LastShoulder.Map);
+                }
             }
         }
 
