@@ -80,7 +80,7 @@ namespace Server
 
 						fixed (LandTile* pTiles = tiles)
 						{
-							NativeReader.Read(fsData.SafeFileHandle.DangerousGetHandle(), pTiles, 192);
+							fsData.ReadExactly(new System.Span<byte>(pTiles, 192));
 						}
 
 						matrix.SetLandBlock(x, y, tiles);
@@ -150,7 +150,7 @@ namespace Server
 
 							fixed (StaticTile* pTiles = staTiles)
 							{
-								NativeReader.Read(fsData.SafeFileHandle.DangerousGetHandle(), pTiles, length);
+								fsData.ReadExactly(new System.Span<byte>(pTiles, length));
 								
 								StaticTile* pCur = pTiles, pEnd = pTiles + tileCount;
 
