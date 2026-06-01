@@ -167,9 +167,16 @@ namespace Server
 
 		private void Fill(object o)
 		{
+			var temp = new byte[BUFFER_SIZE];
+			lock (_CSP)
+			{
+				_CSP.GetBytes(temp);
+			}
+
 			lock (_syncB)
-				lock (_CSP)
-					_CSP.GetBytes(_Buffer);
+			{
+				_Buffer = temp;
+			}
 		}
 
 		private void _GetBytes(byte[] b)
