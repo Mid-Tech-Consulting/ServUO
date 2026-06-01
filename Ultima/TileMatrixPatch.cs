@@ -183,7 +183,7 @@ namespace Ultima
 								m_Buffer = new byte[192];
 							}
 
-							fsData.ReadExactly(m_Buffer, 0, 192);
+							fsData.Read(m_Buffer, 0, 192);
 
 							Marshal.Copy(m_Buffer, 0, gc.AddrOfPinnedObject(), 192);
 						}
@@ -265,7 +265,7 @@ namespace Ultima
 								m_Buffer = new byte[length];
 							}
 
-							fsData.ReadExactly(m_Buffer, 0, length);
+							fsData.Read(m_Buffer, 0, length);
 
 							Marshal.Copy(m_Buffer, 0, gc.AddrOfPinnedObject(), length);
 

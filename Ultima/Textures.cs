@@ -159,7 +159,7 @@ namespace Ultima
 			{
 				m_StreamBuffer = new byte[max];
 			}
-			stream.ReadExactly(m_StreamBuffer, 0, max);
+			stream.Read(m_StreamBuffer, 0, max);
 
 			fixed (byte* data = m_StreamBuffer)
 			{
