@@ -635,7 +635,7 @@ namespace Server.Network
             }
         }
 
-        private volatile bool _Sending;
+
 
 		private readonly object _SendLock = new object();
 
@@ -784,11 +784,9 @@ namespace Server.Network
                         {
                             lock (_SendLock)
                             {
-                                SendQueue.Gram gram;
-
                                 lock (m_SendQueue)
                                 {
-                                    gram = m_SendQueue.Enqueue(buffer, length);
+                                    m_SendQueue.Enqueue(buffer, length);
                                 }
 
                                 if (buffered && m_SendBufferPool.Count < SendBufferCapacity)
@@ -796,22 +794,7 @@ namespace Server.Network
                                     m_SendBufferPool.ReleaseBuffer(buffer);
                                 }
 
-                                if (gram != null && !_Sending)
-                                {
-                                    _Sending = true;
-
-                                    try
-                                    {
-                                        var segment = new ArraySegment<byte>(gram.Buffer, 0, gram.Length);
-
-                                        _ = Socket.SendAsync(segment, SocketFlags.None).ContinueWith(OnSend);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        TraceException(ex);
-                                        Dispose(false);
-                                    }
-                                }
+                                InternalSend();
                             }
                         }
                         catch (CapacityExceededException)
@@ -961,61 +944,51 @@ namespace Server.Network
             }
         }
 
-        private void OnSend(Task<int> task)
+        private void InternalSend()
         {
+            if (Socket == null)
+            {
+                return;
+            }
+
             try
             {
-                if (task.IsFaulted)
-                {
-                    throw task.Exception;
-                }
-
-                var bytes = task.Result;
-
-                if (bytes <= 0)
-                {
-                    Dispose(false);
-                    return;
-                }
-
                 m_NextCheckActivity = Core.TickCount + 90000;
 
-                if (m_CoalesceSleep >= 0)
+                while (true)
                 {
-                    Thread.Sleep(m_CoalesceSleep);
-                }
+                    SendQueue.Gram gram;
 
-                SendQueue.Gram gram;
-
-                lock (m_SendQueue)
-                {
-                    gram = m_SendQueue.Dequeue();
-
-                    if (gram == null && m_SendQueue.IsFlushReady)
+                    lock (m_SendQueue)
                     {
-                        gram = m_SendQueue.CheckFlushReady();
-                    }
-                }
+                        gram = m_SendQueue.Dequeue();
 
-                if (gram != null)
-                {
+                        if (gram == null && m_SendQueue.IsFlushReady)
+                        {
+                            gram = m_SendQueue.CheckFlushReady();
+                        }
+                    }
+
+                    if (gram == null)
+                    {
+                        break;
+                    }
+
                     try
                     {
-                        var segment = new ArraySegment<byte>(gram.Buffer, 0, gram.Length);
+                        int bytesSent = Socket.Send(gram.Buffer, 0, gram.Length, SocketFlags.None);
 
-                        _ = Socket.SendAsync(segment, SocketFlags.None).ContinueWith(OnSend);
+                        if (bytesSent <= 0)
+                        {
+                            Dispose(false);
+                            break;
+                        }
                     }
                     catch (Exception ex)
                     {
                         TraceException(ex);
                         Dispose(false);
-                    }
-                }
-                else
-                {
-                    lock (_SendLock)
-                    {
-                        _Sending = false;
+                        break;
                     }
                 }
             }
@@ -1078,44 +1051,10 @@ namespace Server.Network
 
             lock (_SendLock)
             {
-                if (_Sending)
-                {
-                    return false;
-                }
-
-                SendQueue.Gram gram;
-
-                lock (m_SendQueue)
-                {
-                    if (!m_SendQueue.IsFlushReady)
-                    {
-                        return false;
-                    }
-
-                    gram = m_SendQueue.CheckFlushReady();
-                }
-
-                if (gram != null)
-                {
-                    try
-                    {
-                        _Sending = true;
-
-                        var segment = new ArraySegment<byte>(gram.Buffer, 0, gram.Length);
-
-                        _ = Socket.SendAsync(segment, SocketFlags.None).ContinueWith(OnSend);
-
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        TraceException(ex);
-                        Dispose(false);
-                    }
-                }
+                InternalSend();
             }
 
-            return false;
+            return true;
         }
 
         public PacketHandler GetHandler(int packetID)
