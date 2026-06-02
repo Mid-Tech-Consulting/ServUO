@@ -194,9 +194,188 @@ namespace Server.Items
         }
     }
 
+    public class RunningParrot : Item
+    {
+        private readonly Mobile m_Owner;
+        private readonly Timer m_Timer;
+
+        public RunningParrot(Mobile owner, int hue) : base(0xA2CC)
+        {
+            Movable = false;
+            Hue = hue;
+            m_Owner = owner;
+
+            // Initial position based on owner's direction
+            int xOffset = 0;
+            int yOffset = 0;
+            Direction dir = owner.Direction & Direction.Mask;
+            switch (dir)
+            {
+                case Direction.North: xOffset = -1; yOffset = 1; break;
+                case Direction.East: xOffset = -1; yOffset = -1; break;
+                case Direction.South: xOffset = 1; yOffset = -1; break;
+                case Direction.West: xOffset = 1; yOffset = 1; break;
+                case Direction.Up: xOffset = -1; yOffset = 1; break;
+                case Direction.Right: xOffset = -1; yOffset = -1; break;
+                case Direction.Down: xOffset = 1; yOffset = -1; break;
+                case Direction.Left: xOffset = 1; yOffset = 1; break;
+                default: xOffset = -1; yOffset = 1; break;
+            }
+            MoveToWorld(new Point3D(owner.X + xOffset, owner.Y + yOffset, owner.Z + 12), owner.Map);
+
+            m_Timer = Timer.DelayCall(TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(50), OnTick);
+            m_Timer.Start();
+        }
+
+        public RunningParrot(Serial serial) : base(serial)
+        {
+        }
+
+        private void OnTick()
+        {
+            if (m_Owner == null || m_Owner.Deleted || m_Owner.Map == Map.Internal || Map == Map.Internal)
+            {
+                Delete();
+                return;
+            }
+
+            // Calculate offset based on owner's direction to keep it on the shoulder/trailing
+            int xOffset = 0;
+            int yOffset = 0;
+            Direction dir = m_Owner.Direction & Direction.Mask;
+            switch (dir)
+            {
+                case Direction.North: xOffset = -1; yOffset = 1; break;
+                case Direction.East: xOffset = -1; yOffset = -1; break;
+                case Direction.South: xOffset = 1; yOffset = -1; break;
+                case Direction.West: xOffset = 1; yOffset = 1; break;
+                case Direction.Up: xOffset = -1; yOffset = 1; break;
+                case Direction.Right: xOffset = -1; yOffset = -1; break;
+                case Direction.Down: xOffset = 1; yOffset = -1; break;
+                case Direction.Left: xOffset = 1; yOffset = 1; break;
+            }
+
+            // Subtle bobbing to represent flapping
+            double seconds = (DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds;
+            int zOffset = 12 + (int)(Math.Sin(seconds * 10) * 1.0);
+
+            Point3D newLoc = new Point3D(m_Owner.X + xOffset, m_Owner.Y + yOffset, m_Owner.Z + zOffset);
+
+            if (newLoc != Location || Map != m_Owner.Map)
+            {
+                MoveToWorld(newLoc, m_Owner.Map);
+            }
+        }
+
+        public override void OnAfterDelete()
+        {
+            base.OnAfterDelete();
+            m_Timer?.Stop();
+        }
+
+        public override void Serialize(GenericWriter writer)
+        {
+            base.Serialize(writer);
+            writer.Write(0);
+        }
+
+        public override void Deserialize(GenericReader reader)
+        {
+            base.Deserialize(reader);
+            reader.ReadInt();
+            Delete(); // Delete on boot
+        }
+    }
+
     [Flipable(0xA2CA, 0xA2CB)]
     public class ShoulderParrot : BaseOuterTorso
     {
+        public static void Initialize()
+        {
+            EventSink.Movement += new MovementEventHandler(EventSink_Movement);
+        }
+
+        private class ParrotMoveState
+        {
+            public RunningParrot RunningParrot { get; set; }
+            public DateTime LastMoved { get; set; }
+            public Timer StopTimer { get; set; }
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<Mobile, ParrotMoveState> _ActiveMovements = new System.Collections.Generic.Dictionary<Mobile, ParrotMoveState>();
+
+        public static void EventSink_Movement(MovementEventArgs e)
+        {
+            Mobile m = e.Mobile;
+
+            if (m == null || !m.Player || !m.Alive)
+                return;
+
+            ParrotMoveState state;
+            bool hasState = _ActiveMovements.TryGetValue(m, out state);
+
+            if (hasState)
+            {
+                state.LastMoved = DateTime.UtcNow;
+                return;
+            }
+
+            // Find equipped parrot or transmogged item (ItemID 0xA2CA or 0xA2CB)
+            Item parrot = m.FindItemOnLayer(Layer.Cloak);
+            if (parrot == null || (parrot.ItemID != 0xA2CA && parrot.ItemID != 0xA2CB))
+            {
+                parrot = m.FindItemOnLayer(Layer.OuterTorso);
+            }
+
+            if (parrot != null && (parrot.ItemID == 0xA2CA || parrot.ItemID == 0xA2CB))
+            {
+                // Spawn the flapping bird right next to their shoulder! We do NOT hide the equipped item!
+                RunningParrot runningParrot = new RunningParrot(m, parrot.Hue);
+
+                state = new ParrotMoveState
+                {
+                    RunningParrot = runningParrot,
+                    LastMoved = DateTime.UtcNow
+                };
+
+                _ActiveMovements[m] = state;
+
+                // Start checking for stop
+                state.StopTimer = Timer.DelayCall(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), () => CheckPlayerStop(m));
+                state.StopTimer.Start();
+            }
+        }
+
+        private static void CheckPlayerStop(Mobile m)
+        {
+            if (!_ActiveMovements.TryGetValue(m, out var state))
+                return;
+
+            // If player was deleted, died, or logged out, clean up
+            if (m.Deleted || !m.Alive || m.Map == Map.Internal)
+            {
+                CleanupState(m, state);
+                return;
+            }
+
+            // Check if player hasn't moved in 400ms
+            if (DateTime.UtcNow - state.LastMoved > TimeSpan.FromMilliseconds(400))
+            {
+                CleanupState(m, state);
+            }
+        }
+
+        private static void CleanupState(Mobile m, ParrotMoveState state)
+        {
+            state.StopTimer?.Stop();
+
+            if (state.RunningParrot != null && !state.RunningParrot.Deleted)
+            {
+                state.RunningParrot.Delete();
+            }
+
+            _ActiveMovements.Remove(m);
+        }
 
         private static readonly System.Collections.Generic.Dictionary<Item, DateTime> _NextFlyTimes = new System.Collections.Generic.Dictionary<Item, DateTime>();
 
