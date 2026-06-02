@@ -195,7 +195,7 @@ namespace Server.Items
     }
 
     [Flipable(0xA2CA, 0xA2CB)]
-    public class ShoulderParrot : BaseCloak
+    public class ShoulderParrot : BaseOuterTorso
     {
 
         private static readonly System.Collections.Generic.Dictionary<Item, DateTime> _NextFlyTimes = new System.Collections.Generic.Dictionary<Item, DateTime>();
@@ -294,7 +294,7 @@ namespace Server.Items
 
                 Timer.DelayCall(() =>
                 {
-                    if (_LastShoulder.FindItemOnLayer(Layer.Cloak) != null)
+                    if (_LastShoulder.FindItemOnLayer(Layer.OuterTorso) != null)
                     {
                         _LastShoulder.Backpack.DropItem(this);
                     }
