@@ -49,7 +49,7 @@ namespace Server.Items
                     typeof(ClanCA), typeof(ClanCT),
                     typeof(ClanRS), typeof(ClanRC),
                     typeof(ClanSS), typeof(ClanSH),
-                    typeof(Barracoon), typeof(MasterTheophilus),
+                    typeof(Barracoon), typeof(CustomChampion), typeof(MasterTheophilus),
                     typeof(Lurg), typeof(ArcticOgreLord),
                     typeof(Cyclops), typeof(Ettin),
                     typeof(EvilMage), typeof(EvilMageLord),
@@ -132,7 +132,7 @@ namespace Server.Items
                     typeof(RottingCorpse), typeof(Shade),
                     typeof(ShadowKnight), typeof(SkeletalKnight),
                     typeof(SkeletalMage), typeof(SkeletalMount),
-                    typeof(Skeleton), typeof(Spectre),
+                    typeof(Skeleton), typeof(Skeleton2), typeof(Spectre),
                     typeof(Wraith), typeof(Zombie),
                     typeof(UnfrozenMummy), typeof(RedDeath),
                     typeof(SirPatrick), typeof(LadyJennifyr),
@@ -325,7 +325,7 @@ namespace Server.Items
                         typeof(EffeteUndeadGargoyle), typeof(PitFiend),
                         typeof(ArchDaemon), typeof(AbyssalAbomination),
                         typeof(Virtuebane), typeof(LesserOni),
-                        typeof(Lifestealer)
+                        typeof(Lifestealer), typeof(FlameImp)
                     );
 
                 abyss.Entries = new SlayerEntry[]

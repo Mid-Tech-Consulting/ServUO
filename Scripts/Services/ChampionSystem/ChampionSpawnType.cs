@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Server.Mobiles;
 
 namespace Server.Engines.CannedEvil
@@ -68,11 +69,18 @@ namespace Server.Engines.CannedEvil
             m_SpawnTypes = spawnTypes;
         }
 
+        public static List<ChampionSpawnInfo> DynamicTable = new List<ChampionSpawnInfo>();
+
+        public static void Register(ChampionSpawnInfo info)
+        {
+            DynamicTable.Add(info);
+        }
+
         public static ChampionSpawnInfo[] Table
         {
             get
             {
-                return m_Table;
+                return DynamicTable.ToArray();
             }
         }
 
@@ -116,7 +124,7 @@ namespace Server.Engines.CannedEvil
             new ChampionSpawnInfo("Unholy Terror", typeof(Neira), new string[] { "Scourge", "Punisher", "Nemesis" }, new Type[][]	// Unholy Terror
             { // Unholy Terror
                 (Core.AOS ? new Type[] { typeof(Bogle), typeof(Ghoul), typeof(Shade), typeof(Spectre), typeof(Wraith) }// Level 1 (Pre-AoS)
-                 : new Type[] { typeof(Ghoul), typeof(Shade), typeof(Spectre), typeof(Wraith) }), // Level 1
+                  : new Type[] { typeof(Ghoul), typeof(Shade), typeof(Spectre), typeof(Wraith) }), // Level 1
 
                 new Type[] { typeof(BoneMagi), typeof(Mummy), typeof(SkeletalMage) }, // Level 2
                 new Type[] { typeof(BoneKnight), typeof(Lich), typeof(SkeletalKnight) }, // Level 3
@@ -176,14 +184,19 @@ namespace Server.Engines.CannedEvil
 			} ),
         };
 
+        static ChampionSpawnInfo()
+        {
+            DynamicTable.AddRange(m_Table);
+        }
+
         public static ChampionSpawnInfo GetInfo(ChampionSpawnType type)
         {
             int v = (int)type;
 
-            if (v < 0 || v >= m_Table.Length)
+            if (v < 0 || v >= DynamicTable.Count)
                 v = 0;
 
-            return m_Table[v];
+            return DynamicTable[v];
         }
     }
 }
