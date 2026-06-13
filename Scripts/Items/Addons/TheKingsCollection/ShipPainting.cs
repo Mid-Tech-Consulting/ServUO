@@ -52,13 +52,13 @@ namespace Server.Items
             {
                 if (ResourceCount > 0)
                 {
-                    ResourceCount--;
                     // Use the modern PowderCharge (graphic 0xA2BE). HeavyPowderCharge
                     // is the legacy class -- its Deserialize auto-converts to
                     // PowderCharge on EJ world load, but a freshly-constructed
                     // instance never deserializes, so the painting was handing
                     // out a graphic 0x4224 stack that the cannons reject.
-                    Item item = new PowderCharge();
+                    Item item = new PowderCharge(ResourceCount);
+                    ResourceCount = 0;
 
                     from.AddToBackpack(item);
                     from.SendLocalizedMessage(1154174); // Powder charges have been placed in your backpack.
