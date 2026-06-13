@@ -10,15 +10,16 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<UseWindowsForms>false</UseWindowsForms>
 		<Platforms>x64</Platforms>
+		<DefineConstants>ServUO</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<OutputPath>..\</OutputPath>
-		<DefineConstants>TRACE;DEBUG;NEWTIMERS;ServUO</DefineConstants>
+		<DefineConstants>$(DefineConstants);TRACE;DEBUG;NEWTIMERS</DefineConstants>
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<OutputPath>..\</OutputPath>
-		<DefineConstants>TRACE;NEWTIMERS;ServUO</DefineConstants>
+		<DefineConstants>$(DefineConstants);TRACE;NEWTIMERS</DefineConstants>
 		<DebugType>none</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
