@@ -2418,6 +2418,25 @@ namespace Server.Items
             if (!Ethics.Ethic.CheckEquip(from, this))
                 return false;
 
+            bool morph = from.FindItemOnLayer(Layer.Earrings) is MorphEarrings;
+
+            if (from.Race == Race.Gargoyle && !CanBeWornByGargoyles)
+            {
+                from.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1111708); // Gargoyles can't wear this.
+                return false;
+            }
+            if (RequiredRace != null && from.Race != RequiredRace && !morph)
+            {
+                if (RequiredRace == Race.Elf)
+                    from.SendLocalizedMessage(1072203); // Only Elves may use this.
+                else if (RequiredRace == Race.Gargoyle)
+                    from.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1111707); // Only gargoyles can wear this.
+                else
+                    from.SendMessage("Only {0} may use this.", RequiredRace.PluralName);
+
+                return false;
+            }
+
             if (from.IsPlayer())
             {
                 if (_Owner != null && _Owner != from)
@@ -2443,25 +2462,7 @@ namespace Server.Items
                     return false;
                 }
 
-                bool morph = from.FindItemOnLayer(Layer.Earrings) is MorphEarrings;
-
-                if (from.Race == Race.Gargoyle && !CanBeWornByGargoyles)
-                {
-                    from.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1111708); // Gargoyles can't wear this.
-                    return false;
-                }
-                if (RequiredRace != null && from.Race != RequiredRace && !morph)
-                {
-                    if (RequiredRace == Race.Elf)
-                        from.SendLocalizedMessage(1072203); // Only Elves may use this.
-                    else if (RequiredRace == Race.Gargoyle)
-                        from.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1111707); // Only gargoyles can wear this.
-                    else
-                        from.SendMessage("Only {0} may use this.", RequiredRace.PluralName);
-
-                    return false;
-                }
-                else if (!AllowMaleWearer && !from.Female)
+                if (!AllowMaleWearer && !from.Female)
                 {
                     if (AllowFemaleWearer)
                         from.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1010388); // Only females can wear this.
