@@ -63,14 +63,18 @@ namespace Server.Items
             {
                 if (ResourceCount > 0)
                 {
-                    Item item = Loot.Construct(m_Potions);
+                    int toGive = ResourceCount;
+                    ResourceCount = 0;
 
-                    if (item == null)
-                        return;
+                    for (int i = 0; i < toGive; i++)
+                    {
+                        Item item = Loot.Construct(m_Potions);
 
-                    ResourceCount--;
-
-                    from.AddToBackpack(item);
+                        if (item != null)
+                        {
+                            from.AddToBackpack(item);
+                        }
+                    }
                     from.SendLocalizedMessage(1154176); // Potions have been placed in your backpack.
                 }
                 else

@@ -52,10 +52,14 @@ namespace Server.Items
             {
                 if (ResourceCount > 0)
                 {
-                    ResourceCount--;
-                    Item item = ScrollOfTranscendence.CreateRandom(1, 1);
+                    int toGive = ResourceCount;
+                    ResourceCount = 0;
 
-                    from.AddToBackpack(item);
+                    for (int i = 0; i < toGive; i++)
+                    {
+                        Item item = ScrollOfTranscendence.CreateRandom(1, 1);
+                        from.AddToBackpack(item);
+                    }
                     from.SendLocalizedMessage(1154177); // Scrolls of Transcendence have been placed in your backpack.
                 }
                 else
