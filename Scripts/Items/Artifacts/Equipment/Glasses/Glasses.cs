@@ -57,7 +57,7 @@ namespace Server.Items
                 return false;
             }
 			
-            return true;
+            return base.CanEquip(m);
         }
 
         public override void Serialize(GenericWriter writer)
