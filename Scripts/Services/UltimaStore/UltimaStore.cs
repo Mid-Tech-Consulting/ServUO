@@ -41,8 +41,8 @@ namespace Server.Engines.UOStore
 
         // Rotate this each month to recolor all monthly-themed store items
         // (mount statues, monthly hair/beard dye, monthly soulstone). 0 = no tint.
-        // Current: 0x07B7 (mythic red).
-        public const int ColorOfTheMonthHue = 0x07B7;
+        // Current: 2067 (etch fade blue sparkle).
+        public const int ColorOfTheMonthHue = 2067;
 
         public static bool Enabled { get { return Configuration.Enabled; } set { Configuration.Enabled = value; } }
 
