@@ -275,6 +275,9 @@ namespace Server.Engines.Harvest
                 if (i == 6 && (from.Region == null || !from.Region.IsPartOf("Underworld")))
                     continue;
 
+                if (tool is BGFishingPole && i == 5)
+                    continue;
+
                 if (junkproof && i == 5 && 0.80 >= Utility.RandomDouble())
                     continue;
 
@@ -1069,6 +1072,9 @@ namespace Server.Engines.Harvest
             for (int i = 0; i < m_LavaMutateTable.Length; ++i)
             {
                 MutateEntry entry = m_LavaMutateTable[i];
+
+                if (type is BGFishingPole && i == 0)
+                    continue;
 
                 if (skillBase >= entry.m_ReqSkill)
                 {
