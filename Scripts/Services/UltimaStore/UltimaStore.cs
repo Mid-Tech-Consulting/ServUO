@@ -43,6 +43,7 @@ namespace Server.Engines.UOStore
         // (mount statues, monthly hair/beard dye, monthly soulstone). 0 = no tint.
         // Current: 0x07B7 (mythic red).
         public const int ColorOfTheMonthHue = 0x07B7;
+        public static bool ForcePatrioticMode { get; set; } = true; // Set to true to override/force patriotic mode for testing or events
 
         public static bool Enabled { get { return Configuration.Enabled; } set { Configuration.Enabled = value; } }
 
@@ -345,6 +346,25 @@ namespace Server.Engines.UOStore
 
             Register<ArmorEngravingToolToken>(1080547, 1156652, 0, 0x9C65, 0, 200, cat);
             Register<BagOfBulkOrderCovers>(1071116, 1156654, 0, 0x9CC6, 0, 200, cat, ConstructBOBCoverTwo);
+
+            Timer.DelayCall(TimeSpan.FromSeconds(5.0), () =>
+            {
+                foreach (Item item in World.Items.Values)
+                {
+                    if (item.Name != null && item.Name.Contains("4th of July"))
+                    {
+                        new PatrioticTimer(item).Start();
+                    }
+                }
+
+                foreach (Mobile mob in World.Mobiles.Values)
+                {
+                    if (mob.Name != null && mob.Name.Contains("4th of July"))
+                    {
+                        new PatrioticTimer(mob).Start();
+                    }
+                }
+            });
         }
 
         public static void Register<T>(TextDefinition name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null) where T : Item
@@ -584,17 +604,41 @@ namespace Server.Engines.UOStore
 
         public static Item ConstructMonthlyHairDye(Mobile m, StoreEntry entry)
         {
-            return new MonthlyHairDye(entry.Hue);
+            Item item = new MonthlyHairDye(entry.Hue);
+
+            if (DateTime.Now.Month == 7 || ForcePatrioticMode)
+            {
+                item.Name = "Monthly Hair Dye (4th of July)";
+                new PatrioticTimer(item).Start();
+            }
+
+            return item;
         }
 
         public static Item ConstructMonthlyBeardDye(Mobile m, StoreEntry entry)
         {
-            return new MonthlyBeardDye(entry.Hue);
+            Item item = new MonthlyBeardDye(entry.Hue);
+
+            if (DateTime.Now.Month == 7 || ForcePatrioticMode)
+            {
+                item.Name = "Monthly Beard Dye (4th of July)";
+                new PatrioticTimer(item).Start();
+            }
+
+            return item;
         }
 
         public static Item ConstructMonthlySoulstone(Mobile m, StoreEntry entry)
         {
-            return new MonthlySoulstone(entry.Hue);
+            Item item = new MonthlySoulstone(entry.Hue);
+
+            if (DateTime.Now.Month == 7 || ForcePatrioticMode)
+            {
+                item.Name = "Monthly Soulstone (4th of July)";
+                new PatrioticTimer(item).Start();
+            }
+
+            return item;
         }
 
         public static Item ConstructHuedMount(Mobile m, StoreEntry entry)
@@ -611,9 +655,40 @@ namespace Server.Engines.UOStore
                     eth.TransparentMountedHue = entry.Hue;
                     eth.NonTransparentMountedHue = entry.Hue;
                 }
+
+                if ((DateTime.Now.Month == 7 || ForcePatrioticMode) && entry.Hue == ColorOfTheMonthHue)
+                {
+                    string originalName = item.Name;
+                    if (string.IsNullOrEmpty(originalName))
+                    {
+                        originalName = item.GetType().Name;
+                        originalName = System.Text.RegularExpressions.Regex.Replace(originalName, "([A-Z])", " $1").Trim();
+                    }
+                    item.Name = originalName + " (4th of July)";
+                    new PatrioticTimer(item).Start();
+                }
             }
 
             return item;
+        }
+
+        public static bool IsMonthlyItem(Item item)
+        {
+            if (item == null)
+                return false;
+
+            Type t = item.GetType();
+            return t == typeof(MonthlyHairDye) ||
+                   t == typeof(MonthlyBeardDye) ||
+                   t == typeof(MonthlySoulstone) ||
+                   t.Name == "CoconutCrabStatue" ||
+                   t.Name == "SkeletalCatStatue" ||
+                   t.Name == "EowmuStatue" ||
+                   t.Name == "WindrunnerStatue" ||
+                   t.Name == "LasherStatue" ||
+                   t.Name == "ChargerOfTheFallen" ||
+                   t.Name == "EtherealDragonHildebrandt" ||
+                   t.Name == "EtherealHellfireSteed";
         }
         #endregion
 

@@ -27,8 +27,17 @@ namespace Server.Gumps
             {
                 m = Activator.CreateInstance(((ICreatureStatuette)m_Item).CreatureType) as BaseCreature;
 
-                if (m != null && m_Item.Hue != 0)
-                    m.Hue = m_Item.Hue;
+                if (m != null)
+                {
+                    if (m_Item.Hue != 0)
+                        m.Hue = m_Item.Hue;
+
+                    if (m_Item.Name != null && m_Item.Name.Contains("4th of July"))
+                    {
+                        m.Name = m_Item.Name.Replace(" Statue", "");
+                        new Server.Items.PatrioticTimer(m).Start();
+                    }
+                }
             }
 
             if (m != null)

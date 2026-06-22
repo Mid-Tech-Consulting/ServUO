@@ -196,6 +196,20 @@ namespace Server.Items
 						User.SendLocalizedMessage(501199);  // You dye your hair
 						Dye.Delete();
 						User.PlaySound(0x4E);
+
+                        Item hair = User.FindItemOnLayer(Layer.Hair);
+                        if (hair != null)
+                        {
+                            if (Dye.Name != null && Dye.Name.Contains("4th of July"))
+                            {
+                                hair.Name = "Hair (4th of July)";
+                                new PatrioticTimer(hair).Start();
+                            }
+                            else
+                            {
+                                hair.Name = null;
+                            }
+                        }
 					}
 					else
 					{
