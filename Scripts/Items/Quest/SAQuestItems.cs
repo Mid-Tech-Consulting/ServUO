@@ -254,10 +254,11 @@ namespace Server.Items
 
         [Constructable]
         public CongealedSlugAcid(int amount)
-            : base(0x5742)
+            : base(0x122A)
         {
             Stackable = true;
             Amount = amount;
+            Hue = 0x51;
         }
 
         public CongealedSlugAcid(Serial serial)
