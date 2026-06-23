@@ -284,6 +284,28 @@ namespace Server.Engines.Craft
 
                     ((BaseArmor)newitem).Altered = true;
                 }
+                else if (origItem is BaseJewel && newitem is BaseArmor)
+                {
+                    BaseJewel oldjewel = (BaseJewel)origItem;
+                    BaseArmor newarmor = (BaseArmor)newitem;
+
+                    CopyAttributes(oldjewel.Attributes, newarmor.Attributes);
+                    CopyAttributes(oldjewel.SkillBonuses, newarmor.SkillBonuses);
+                    CopyAttributes(oldjewel.NegativeAttributes, newarmor.NegativeAttributes);
+
+                    newarmor.PhysicalBonus = oldjewel.Resistances.Physical;
+                    newarmor.FireBonus = oldjewel.Resistances.Fire;
+                    newarmor.ColdBonus = oldjewel.Resistances.Cold;
+                    newarmor.PoisonBonus = oldjewel.Resistances.Poison;
+                    newarmor.EnergyBonus = oldjewel.Resistances.Energy;
+
+                    if (oldjewel.Protection != null && !oldjewel.Protection.IsEmpty)
+                    {
+                        newarmor.SetProtection(oldjewel.Protection.Type, oldjewel.Protection.Name, oldjewel.Protection.Amount);
+                    }
+
+                    newarmor.Altered = true;
+                }
                 else
                 {
                     return;
@@ -335,6 +357,26 @@ namespace Server.Engines.Craft
                 from.SendGump(new CraftGump(from, m_System, m_Tool, number));
             else
                 from.SendLocalizedMessage(number);
+        }
+
+        private static void CopyAttributes(BaseAttributes from, BaseAttributes to)
+        {
+            if (from == null || to == null)
+                return;
+
+            var type = typeof(BaseAttributes);
+            var namesField = type.GetField("m_Names", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var valuesField = type.GetField("m_Values", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (namesField != null && valuesField != null)
+            {
+                namesField.SetValue(to, namesField.GetValue(from));
+                var fromValues = (int[])valuesField.GetValue(from);
+                if (fromValues != null)
+                {
+                    valuesField.SetValue(to, fromValues.Clone());
+                }
+            }
         }
 
         private void AlterResists(Item newItem, Item oldItem)

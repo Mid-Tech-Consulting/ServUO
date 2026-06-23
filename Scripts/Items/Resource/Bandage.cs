@@ -282,6 +282,22 @@ namespace Server.Items
             {
                 double healing = m_Healer.Skills[SkillName.Healing].Value;
                 double anatomy = m_Healer.Skills[SkillName.Anatomy].Value;
+
+                int healingBonus = m_HealingBonus;
+
+                FirstAidBelt belt = m_Healer.FindItemOnLayer(Layer.Waist) as FirstAidBelt;
+
+                if (belt != null)
+                    healingBonus += belt.HealingBonus;
+
+                Item item = m_Healer.FindItemOnLayer(Layer.TwoHanded);
+
+                if (item is Asclepius || item is GargishAsclepius)
+                    healingBonus += 15;
+
+                if (healingBonus > 0)
+                    healing += healingBonus;
+
                 double chance = ((healing + anatomy) - 120) * 25;
 
                 if (poisoned)
@@ -322,7 +338,7 @@ namespace Server.Items
         {
             StopHeal();
 
-int healerNumber = -1, patientNumber = -1;
+			int healerNumber = -1, patientNumber = -1;
             bool playSound = true;
             bool checkSkills = false;
 
@@ -330,6 +346,22 @@ int healerNumber = -1, patientNumber = -1;
             SkillName secondarySkill = GetSecondarySkill(m_Healer, m_Patient);
 
             BaseCreature petPatient = m_Patient as BaseCreature;
+
+            double healing = m_Healer.Skills[primarySkill].Value;
+            double anatomy = m_Healer.Skills[secondarySkill].Value;
+
+            FirstAidBelt belt = m_Healer.FindItemOnLayer(Layer.Waist) as FirstAidBelt;
+
+            if (belt != null)
+                m_HealingBonus += belt.HealingBonus;
+
+            Item item = m_Healer.FindItemOnLayer(Layer.TwoHanded);
+
+            if (item is Asclepius || item is GargishAsclepius)
+                m_HealingBonus += 15;
+
+            if (m_HealingBonus > 0)
+                healing += m_HealingBonus;
 
             if (!m_Healer.Alive)
             {
@@ -345,8 +377,6 @@ int healerNumber = -1, patientNumber = -1;
             }
             else if (!m_Patient.Alive || (petPatient != null && petPatient.IsDeadPet))
             {
-                double healing = m_Healer.Skills[primarySkill].Value;
-                double anatomy = m_Healer.Skills[secondarySkill].Value;
                 double chance = ((healing - 68.0) / 50.0) - (m_Slips * 0.02);
 
                 if (((checkSkills = (healing >= 80.0 && anatomy >= 80.0)) && chance > Utility.RandomDouble()) ||
@@ -445,8 +475,6 @@ int healerNumber = -1, patientNumber = -1;
             {
                 m_Healer.SendLocalizedMessage(500969); // You finish applying the bandages.
 
-                double healing = m_Healer.Skills[primarySkill].Value;
-                double anatomy = m_Healer.Skills[secondarySkill].Value;
                 double chance = ((healing - 30.0) / 50.0) - (m_Patient.Poison.RealLevel * 0.1) - (m_Slips * 0.02);
 
                 if ((checkSkills = (healing >= 60.0 && anatomy >= 60.0)) && chance > Utility.RandomDouble())
@@ -490,22 +518,6 @@ int healerNumber = -1, patientNumber = -1;
             {
                 checkSkills = true;
                 patientNumber = -1;
-
-                double healing = m_Healer.Skills[primarySkill].Value;
-                double anatomy = m_Healer.Skills[secondarySkill].Value;
-
-                FirstAidBelt belt = m_Healer.FindItemOnLayer(Layer.Waist) as FirstAidBelt;
-
-                if (belt != null)
-                    m_HealingBonus += belt.HealingBonus;
-
-                Item item = m_Healer.FindItemOnLayer(Layer.TwoHanded);
-
-                if (item is Asclepius || item is GargishAsclepius)
-                    m_HealingBonus += 15;
-
-                if (m_HealingBonus > 0)
-                    healing += m_HealingBonus;
 
                 double chance = ((healing + 10.0) / 100.0) - (m_Slips * 0.02);
 

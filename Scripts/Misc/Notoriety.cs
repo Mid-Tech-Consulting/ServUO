@@ -104,6 +104,12 @@ namespace Server.Misc
 				(!(target is PlayerMobile) || !((PlayerMobile)target).Young))
 				return false; // Young players cannot perform beneficial actions towards older players
 
+			var fromParty = Party.Get(from);
+			var targetParty = Party.Get(target);
+
+			if (fromParty != null && targetParty != null && fromParty == targetParty)
+				return true;
+
 			var fromGuild = from.Guild as Guild;
 			var targetGuild = target.Guild as Guild;
 
@@ -232,6 +238,14 @@ namespace Server.Misc
 						return Notoriety.Enemy;
 				}
 
+				var sourceParty = Party.Get(source);
+				var targetParty = Party.Get(target.Owner);
+
+				if (sourceParty != null && targetParty != null && sourceParty == targetParty)
+				{
+					return Notoriety.Ally;
+				}
+
 				if (Settings.Enabled)
 				{
 					var srcFaction = Faction.Find(source, true, true);
@@ -259,7 +273,7 @@ namespace Server.Misc
 				if (DateTime.UtcNow >= (target.TimeOfDeath + Corpse.MonsterLootRightSacrifice))
 					return actual;
 
-				var sourceParty = Party.Get(source);
+				sourceParty = Party.Get(source);
 
 				foreach (var m in target.Aggressors)
 				{
@@ -287,6 +301,14 @@ namespace Server.Misc
 
 					if (sourceGuild.IsEnemy(targetGuild))
 						return Notoriety.Enemy;
+				}
+
+				var sourceParty = Party.Get(source);
+				var targetParty = Party.Get(target.Owner);
+
+				if (sourceParty != null && targetParty != null && sourceParty == targetParty)
+				{
+					return Notoriety.Ally;
 				}
 
 				var srcFaction = Faction.Find(source, true, true);
@@ -377,6 +399,29 @@ namespace Server.Misc
 				}
 			}
 
+			var sourceGuild = GetGuildFor(source.Guild as Guild, source);
+			var targetGuild = GetGuildFor(target.Guild as Guild, target);
+
+			if (sourceGuild != null && targetGuild != null)
+			{
+				if (sourceGuild == targetGuild)
+					return Notoriety.Ally;
+
+				if (sourceGuild.IsAlly(targetGuild))
+					return Notoriety.Ally;
+
+				if (sourceGuild.IsEnemy(targetGuild))
+					return Notoriety.Enemy;
+			}
+
+			var sourceParty = Party.Get(source);
+			var targetParty = Party.Get(target);
+
+			if (sourceParty != null && targetParty != null && sourceParty == targetParty)
+			{
+				return Notoriety.Ally;
+			}
+
 			if (target.Murderer)
 				return Notoriety.Murderer;
 
@@ -397,21 +442,6 @@ namespace Server.Misc
 
 			if (target.Criminal)
 				return Notoriety.Criminal;
-
-			var sourceGuild = GetGuildFor(source.Guild as Guild, source);
-			var targetGuild = GetGuildFor(target.Guild as Guild, target);
-
-			if (sourceGuild != null && targetGuild != null)
-			{
-				if (sourceGuild == targetGuild && !target.Criminal)
-					return Notoriety.Ally;
-
-				if (sourceGuild.IsAlly(targetGuild) && !target.Criminal)
-					return Notoriety.Ally;
-
-				if (sourceGuild.IsEnemy(targetGuild))
-					return Notoriety.Enemy;
-			}
 
 			if (Settings.Enabled)
 			{
