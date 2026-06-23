@@ -8,7 +8,7 @@ namespace Server.Engines.Quests
         public AllThatGlitters()
             : base()
         {
-            AddObjective(new ObtainObjective(typeof(CongealedSlugAcid), "Congealed Slug Acid", 5, 0x5742));
+            AddObjective(new ObtainObjective(typeof(CongealedSlugAcid), "Congealed Slug Acid", 5, 0x122A));
             AddObjective(new ObtainObjective(typeof(PileofInspectedGoldIngots), "Pile of Inspected Gold Ingots", 1, 0x1BEA));
 
             AddReward(new BaseReward(typeof(ElixirofGoldConversion), "Elixir of Gold Conversion"));
