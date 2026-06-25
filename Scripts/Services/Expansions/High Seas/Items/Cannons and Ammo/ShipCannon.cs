@@ -854,6 +854,11 @@ namespace Server.Items
                     target.OnTakenDamage(shooter, damage);
                 }
 
+                if (ammoInfo != null && (ammoInfo.Type == typeof(Server.Custom.Ships.LightDestroyerCannonball) || ammoInfo.Type == typeof(Server.Custom.Ships.HeavyDestroyerCannonball) || ammoInfo.Type == typeof(Server.Custom.Ships.ScuttleCannonball)))
+                {
+                    Server.Custom.Ships.ScuttleHitSystem.TryRegisterScuttleHit(target, shooter);
+                }
+
                 if (Galleon.Map != null)
                 {
                     IPooledEnumerable eable = Galleon.Map.GetItemsInRange(hit, 1);

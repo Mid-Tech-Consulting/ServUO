@@ -1445,6 +1445,8 @@ namespace Server.Multis
 
             string args = string.Format("{0}\t{1}\t{2}", ((int)clothTemp).ToString(), ((int)woodTemp).ToString(), ((int)Durability).ToString());
             from.SendLocalizedMessage(1116598, args); //You effect permanent repairs using ~1_CLOTH~ yards of cloth and ~2_WOOD~ pieces of lumber. The ship is now ~3_DMGPCT~% repaired.
+
+            Server.Custom.Ships.ScuttleHitSystem.CancelScuttle(this);
         }
 
         private class EmergencyRepairDamageTimer : Timer
