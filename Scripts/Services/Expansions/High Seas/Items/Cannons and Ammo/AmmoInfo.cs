@@ -35,6 +35,10 @@ namespace Server.Items
 
                 Infos[typeof(FlameCannonball)] = new AmmoInfo(typeof(HeavyFlameCannonball), AmmunitionType.FlameCannonball, 1149633, 5000, 5000, 3, true, 50, 50, 0, 0, 0, false);
                 Infos[typeof(FrostCannonball)] = new AmmoInfo(typeof(HeavyFrostCannonball), AmmunitionType.FrostCannonball, 1149634, 30, 50, 3, true, 50, 0, 50, 0, 0, false);
+
+                Infos[typeof(Server.Custom.Ships.ScuttleCannonball)] = new AmmoInfo(typeof(Server.Custom.Ships.ScuttleCannonball), AmmunitionType.Cannonball, 1095804, 5000, 5000, 3);
+                Infos[typeof(Server.Custom.Ships.LightDestroyerCannonball)] = new AmmoInfo(typeof(Server.Custom.Ships.LightDestroyerCannonball), AmmunitionType.Cannonball, 1095804, 5000, 5000, 3);
+                Infos[typeof(Server.Custom.Ships.HeavyDestroyerCannonball)] = new AmmoInfo(typeof(Server.Custom.Ships.HeavyDestroyerCannonball), AmmunitionType.Cannonball, 1095804, 5000, 5000, 3);
             }
             else
             {
@@ -47,6 +51,10 @@ namespace Server.Items
                 Infos[typeof(LightFlameCannonball)] = new AmmoInfo(typeof(LightFlameCannonball), AmmunitionType.FlameCannonball, 1149633, 5000, 5000, 3, true, 50, 50, 0, 0, 0, false);
                 Infos[typeof(HeavyFrostCannonball)] = new AmmoInfo(typeof(HeavyFrostCannonball), AmmunitionType.FrostCannonball, 1149634, 5000, 5000, 3, true, 50, 0, 50, 0, 0, false);
                 Infos[typeof(LightFrostCannonball)] = new AmmoInfo(typeof(LightFrostCannonball), AmmunitionType.FrostCannonball, 1149634, 5000, 5000, 3, true, 50, 0, 50, 0, 0, false);
+
+                Infos[typeof(Server.Custom.Ships.ScuttleCannonball)] = new AmmoInfo(typeof(Server.Custom.Ships.ScuttleCannonball), AmmunitionType.Cannonball, 1095804, 5000, 5000, 3);
+                Infos[typeof(Server.Custom.Ships.LightDestroyerCannonball)] = new AmmoInfo(typeof(Server.Custom.Ships.LightDestroyerCannonball), AmmunitionType.Cannonball, 1095804, 5000, 5000, 3);
+                Infos[typeof(Server.Custom.Ships.HeavyDestroyerCannonball)] = new AmmoInfo(typeof(Server.Custom.Ships.HeavyDestroyerCannonball), AmmunitionType.Cannonball, 1095804, 6500, 6500, 3);
             }
         }
 
