@@ -10,10 +10,8 @@ namespace Server.Gumps
 {
 	public class CrystalPortalGump : Gump
 	{
-		// Display order for the facet picker page.
 		private static readonly Map[] _Facets = new[]
 		{
-			Map.Trammel,
 			Map.Felucca,
 			Map.Ilshenar,
 			Map.Malas,
@@ -21,23 +19,19 @@ namespace Server.Gumps
 			Map.TerMur
 		};
 
-		private const int EntriesPerPage = 10;
-
 		private readonly Mobile m_From;
 		private readonly CrystalPortal m_Portal;
-		private readonly Map m_Facet;          // null = facet picker
-		private readonly int m_PageIndex;
+		private readonly Map m_Facet;
 
 		public CrystalPortalGump(Mobile from, CrystalPortal portal)
-			: this(from, portal, null, 0) { }
+			: this(from, portal, GetDefaultFacet(from)) { }
 
-		public CrystalPortalGump(Mobile from, CrystalPortal portal, Map facet, int pageIndex)
+		public CrystalPortalGump(Mobile from, CrystalPortal portal, Map facet)
 			: base(50, 50)
 		{
 			m_From = from;
 			m_Portal = portal;
 			m_Facet = facet;
-			m_PageIndex = pageIndex;
 
 			from.CloseGump(typeof(CrystalPortalGump));
 
@@ -46,135 +40,144 @@ namespace Server.Gumps
 			Dragable = true;
 			Resizable = false;
 
-			AddBackground(0, 0, 380, 420, 9270);
+			// Gold-bordered dark background, width 480, height 600
+			AddBackground(0, 0, 480, 600, 9270);
 
-			AddHtml(0, 12, 380, 22, Center("<basefont color=#FFFFFF>Crystal Portal" + (facet == null ? "" : " (" + facet.Name + ")") + "</basefont>"), false, false);
+			// Title: Crystal Portal with crystal balls on both sides
+			AddItem(100, 10, 0x468B);
+			AddHtml(0, 15, 480, 22, "<DIV ALIGN=CENTER><BASEFONT COLOR=#5DFFE5 SIZE=5><b>Crystal Portal</b></BASEFONT></DIV>", false, false);
+			AddItem(340, 10, 0x468B);
 
-			if (facet == null)
-				BuildFacetPicker();
-			else
-				BuildDestinationList();
-		}
-
-		private static string Center(string text)
-		{
-			return "<center>" + text + "</center>";
-		}
-
-		private void BuildFacetPicker()
-		{
-			AddHtml(0, 38, 380, 18, Center("<basefont color=#CCCCCC>Select a facet</basefont>"), false, false);
-
-			int y = 70;
+			// Facet tabs at the top (using wider parchment banners)
+			int yTab = 48;
 			for (int i = 0; i < _Facets.Length; i++)
 			{
-				Map facet = _Facets[i];
+				Map f = _Facets[i];
+				int col = i % 3;
+				int row = i / 3;
 
-				// Skip facets with no destinations defined.
-				if (!CrystalPortal.GetDestinations(facet).Any())
-					continue;
+				int x = 15 + col * 150;
+				int y = yTab + row * 38;
 
-				AddButton(40, y + 1, 0x4B9, 0x4BA, 100 + i, GumpButtonType.Reply, 0);
-				AddHtml(70, y, 280, 22, "<basefont color=#FFFFFF>" + facet.Name + "</basefont>", false, false);
-				y += 28;
+				if (i >= 3)
+				{
+					x = 90 + (i - 3) * 150;
+				}
+
+				string name = f.Name;
+				if (f == Map.Tokuno)
+				{
+					name = "Tokuno Islands";
+				}
+				else if (f == Map.TerMur)
+				{
+					name = "Ter Mur & Eodon";
+				}
+
+				if (f == m_Facet)
+				{
+					AddImage(x, y, 0x637);
+					AddHtml(x, y + 5, 140, 20, String.Format("<DIV ALIGN=CENTER><BASEFONT COLOR=#000000 SIZE=3><b>{0}</b></BASEFONT></DIV>", name), false, false);
+				}
+				else
+				{
+					AddButton(x, y, 0x636, 0x637, 100 + i, GumpButtonType.Reply, 0);
+					AddHtml(x, y + 5, 140, 20, String.Format("<DIV ALIGN=CENTER><BASEFONT COLOR=#000000 SIZE=3>{0}</BASEFONT></DIV>", name), false, false);
+				}
 			}
 
-			AddButton(170, 380, 0xFB1, 0xFB3, 0, GumpButtonType.Reply, 0); // Close
-			AddHtml(205, 380, 100, 22, "<basefont color=#FFFFFF>Close</basefont>", false, false);
+			// Column Headers: Moongates and Banks
+			AddHtml(20, 142, 200, 20, "<BASEFONT COLOR=#5DFFE5 SIZE=4><b>Moongates</b></BASEFONT>", false, false);
+			AddHtml(250, 142, 200, 20, "<BASEFONT COLOR=#5DFFE5 SIZE=4><b>Banks</b></BASEFONT>", false, false);
+
+			int mIndex = 0;
+			int bIndex = 0;
+
+			for (int i = 0; i < CrystalPortal.AllDestinations.Length; i++)
+			{
+				CrystalPortal.Destination d = CrystalPortal.AllDestinations[i];
+				if (d.Map != m_Facet)
+				{
+					continue;
+				}
+
+				string cleanLabel = d.Label
+					.Replace(" Moongate", "")
+					.Replace(" moongate", "")
+					.Replace(" Mint", "")
+					.Replace(" mint", "")
+					.Replace(" Bank", "")
+					.Replace(" bank", "");
+
+				if (d.SpeechKey.IndexOf("moongate") >= 0)
+				{
+					int x = 20;
+					int y = 172 + mIndex * 24;
+					mIndex++;
+
+					AddButton(x, y + 2, 0x4B9, 0x4BA, 1000 + i, GumpButtonType.Reply, 0);
+					AddHtml(x + 25, y, 180, 20, String.Format("<BASEFONT COLOR=#FFFFFF SIZE=4>{0}</BASEFONT>", cleanLabel), false, false);
+				}
+				else
+				{
+					int x = 250;
+					int y = 172 + bIndex * 24;
+					bIndex++;
+
+					AddButton(x, y + 2, 0x4B9, 0x4BA, 1000 + i, GumpButtonType.Reply, 0);
+					AddHtml(x + 25, y, 180, 20, String.Format("<BASEFONT COLOR=#FFFFFF SIZE=4>{0}</BASEFONT>", cleanLabel), false, false);
+				}
+			}
 		}
 
-		private void BuildDestinationList()
+		private static Map GetDefaultFacet(Mobile from)
 		{
-			CrystalPortal.Destination[] dests = CrystalPortal.GetDestinations(m_Facet).ToArray();
-			int totalPages = Math.Max(1, (dests.Length + EntriesPerPage - 1) / EntriesPerPage);
-			int page = Math.Max(0, Math.Min(m_PageIndex, totalPages - 1));
-
-			AddHtml(0, 38, 380, 18, Center("<basefont color=#CCCCCC>Select a destination</basefont>"), false, false);
-			AddHtml(0, 56, 380, 18, Center("<basefont color=#999999>(or SAY the destination name)</basefont>"), false, false);
-
-			int start = page * EntriesPerPage;
-			int end = Math.Min(start + EntriesPerPage, dests.Length);
-
-			int y = 86;
-			for (int i = start; i < end; i++)
+			Map map = from.Map;
+			if (map == Map.Felucca || map == Map.Malas || map == Map.Tokuno || map == Map.TerMur)
 			{
-				CrystalPortal.Destination d = dests[i];
-				AddButton(40, y + 1, 0x4B9, 0x4BA, 1000 + i, GumpButtonType.Reply, 0);
-				AddHtml(70, y, 280, 22, "<basefont color=#FFFFFF>" + d.Label + "</basefont>", false, false);
-				y += 26;
+				return map;
 			}
-
-			// Footer
-			AddHtml(40, 380, 100, 22, String.Format("<basefont color=#FFFFFF>Page {0} / {1}</basefont>", page + 1, totalPages), false, false);
-
-			AddButton(150, 380, 0xFB1, 0xFB3, 1, GumpButtonType.Reply, 0); // Back to facet picker
-			AddHtml(185, 380, 60, 22, "<basefont color=#FFFFFF>Back</basefont>", false, false);
-
-			if (page > 0)
-				AddButton(240, 380, 0x15E3, 0x15E7, 2, GumpButtonType.Reply, 0); // Prev
-
-			if (page + 1 < totalPages)
-				AddButton(340, 380, 0x15E1, 0x15E5, 3, GumpButtonType.Reply, 0); // Next
+			return Map.Felucca;
 		}
 
 		public override void OnResponse(NetState sender, RelayInfo info)
 		{
 			if (m_From == null || m_From.Deleted || sender.Mobile != m_From)
+			{
 				return;
+			}
 
 			if (m_Portal == null || m_Portal.Deleted)
+			{
 				return;
+			}
 
 			int id = info.ButtonID;
 
 			if (id == 0)
-				return;
-
-			// Facet picker page: pick a facet
-			if (m_Facet == null)
 			{
-				int facetIndex = id - 100;
-				if (facetIndex >= 0 && facetIndex < _Facets.Length)
-				{
-					Map facet = _Facets[facetIndex];
-					m_From.SendGump(new CrystalPortalGump(m_From, m_Portal, facet, 0));
-				}
 				return;
 			}
 
-			// Destination page navigation
-			if (id == 1)
+			if (id >= 100 && id < 100 + _Facets.Length)
 			{
-				m_From.SendGump(new CrystalPortalGump(m_From, m_Portal));
-				return;
-			}
-
-			if (id == 2)
-			{
-				m_From.SendGump(new CrystalPortalGump(m_From, m_Portal, m_Facet, m_PageIndex - 1));
-				return;
-			}
-
-			if (id == 3)
-			{
-				m_From.SendGump(new CrystalPortalGump(m_From, m_Portal, m_Facet, m_PageIndex + 1));
+				Map facet = _Facets[id - 100];
+				m_From.SendGump(new CrystalPortalGump(m_From, m_Portal, facet));
 				return;
 			}
 
 			int destIndex = id - 1000;
-			CrystalPortal.Destination[] dests = CrystalPortal.GetDestinations(m_Facet).ToArray();
-
-			if (destIndex < 0 || destIndex >= dests.Length)
-				return;
-
-			if (!m_From.InRange(m_Portal.Location, 3))
+			if (destIndex >= 0 && destIndex < CrystalPortal.AllDestinations.Length)
 			{
-				m_From.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1019045); // I can't reach that.
-				return;
-			}
+				if (!m_From.InRange(m_Portal.Location, 3))
+				{
+					m_From.LocalOverheadMessage(MessageType.Regular, 0x3B2, 1019045); // I can't reach that.
+					return;
+				}
 
-			CrystalPortal.Destination d = dests[destIndex];
-			m_Portal.TryTeleport(m_From, d.Location, d.Map);
+				CrystalPortal.Destination d = CrystalPortal.AllDestinations[destIndex];
+				m_Portal.TryTeleport(m_From, d.Location, d.Map);
+			}
 		}
 	}
 }

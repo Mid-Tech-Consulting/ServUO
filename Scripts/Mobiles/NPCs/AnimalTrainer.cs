@@ -200,7 +200,7 @@ namespace Server.Mobiles
 
 		private void CloseClaimList(Mobile from)
 		{
-			from.CloseGump(typeof(ClaimListGump));
+			from.CloseGump(typeof(StableListGump));
 		}
 
 		public void BeginClaimList(Mobile from)
@@ -233,7 +233,7 @@ namespace Server.Mobiles
 
 			if (list.Count > 0)
 			{
-				from.SendGump(new ClaimListGump(this, from, list));
+				from.SendGump(new StableListGump(this.Name, from, list, 0, (m, pet) => this.EndClaimList(m, pet)));
 			}
 			else
 			{
@@ -483,7 +483,14 @@ namespace Server.Mobiles
                 return;
             }
 
-			if (!e.Handled && e.HasKeyword(0x0008)) // *stable*
+			if (!e.Handled && e.Speech.ToLower().IndexOf("stables") >= 0)
+			{
+				e.Handled = true;
+
+				CloseClaimList(e.Mobile);
+				BeginClaimList(e.Mobile);
+			}
+			else if (!e.Handled && e.HasKeyword(0x0008)) // *stable*
 			{
 				e.Handled = true;
 
@@ -563,66 +570,7 @@ namespace Server.Mobiles
 			}
 		}
 
-		private class ClaimListGump : Gump
-		{
-			private readonly Mobile m_From;
-			private readonly List<BaseCreature> m_List;
-			private readonly AnimalTrainer m_Trainer;
 
-			public ClaimListGump(AnimalTrainer trainer, Mobile from, List<BaseCreature> list)
-				: base(50, 50)
-			{
-				m_Trainer = trainer;
-				m_From = from;
-				m_List = list;
-
-				from.CloseGump(typeof(ClaimListGump));
-
-				AddPage(0);
-
-				AddBackground(0, 0, 325, 50 + (list.Count * 20), 9250);
-				AddAlphaRegion(5, 5, 315, 40 + (list.Count * 20));
-
-				AddHtml(
-					15,
-					15,
-					275,
-					20,
-                    "<BASEFONT COLOR=#000008>Select a pet to retrieve from the stables:</BASEFONT>",
-					false,
-					false);
-
-				for (var i = 0; i < list.Count; ++i)
-				{
-					var pet = list[i];
-
-					if (pet == null || pet.Deleted)
-					{
-						continue;
-					}
-
-					AddButton(15, 39 + (i * 20), 10006, 10006, i + 1, GumpButtonType.Reply, 0);
-					AddHtml(
-						32,
-						35 + (i * 20),
-						275,
-						18,
-						String.Format("<BASEFONT COLOR=#C6C6EF>{0}</BASEFONT>", pet.Name),
-						false,
-						false);
-				}
-			}
-
-			public override void OnResponse(NetState sender, RelayInfo info)
-			{
-				var index = info.ButtonID - 1;
-
-				if (index >= 0 && index < m_List.Count)
-				{
-					m_Trainer.EndClaimList(m_From, m_List[index]);
-				}
-			}
-		}
 
 		private class ClaimAllEntry : ContextMenuEntry
 		{
