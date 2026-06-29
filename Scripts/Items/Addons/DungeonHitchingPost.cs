@@ -288,7 +288,7 @@ namespace Server.Items
             }
 
             if (list.Count > 0)
-                from.SendGump(new ClaimListGump(this, from, list));
+                from.SendGump(new StableListGump("Dungeon Hitching Post", from, list, 0, (m, pet) => this.EndClaimList(m, pet)));
             else
                 from.SendLocalizedMessage(502671); // But I have no animals stabled with me at the moment!
         }
@@ -331,7 +331,12 @@ namespace Server.Items
 
         public override void OnSpeech(SpeechEventArgs e)
         {
-            if (!e.Handled && e.HasKeyword(0x0008))
+            if (!e.Handled && e.Speech.ToLower().IndexOf("stables") >= 0)
+            {
+                e.Handled = true;
+                this.BeginClaimList(e.Mobile);
+            }
+            else if (!e.Handled && e.HasKeyword(0x0008))
             {
                 e.Handled = true;
                 this.BeginStable(e.Mobile);
@@ -351,50 +356,7 @@ namespace Server.Items
             }
         }
 
-        private class ClaimListGump : Gump
-        {
-            private readonly DungeonHitchingPost m_Post;
-            private readonly Mobile m_From;
-            private readonly List<BaseCreature> m_List;
 
-            public ClaimListGump(DungeonHitchingPost post, Mobile from, List<BaseCreature> list)
-                : base(50, 50)
-            {
-                this.m_Post = post;
-                this.m_From = from;
-                this.m_List = list;
-
-                from.CloseGump(typeof(ClaimListGump));
-
-                this.AddPage(0);
-
-                this.AddBackground(0, 0, 325, 50 + (list.Count * 20), 9250);
-                this.AddAlphaRegion(5, 5, 315, 40 + (list.Count * 20));
-
-                this.AddHtml(15, 15, 275, 20, "<BASEFONT COLOR=#FFFFFF>Select a pet to retrieve from the stables:</BASEFONT>", false, false);
-
-                for (int i = 0; i < list.Count; ++i)
-                {
-                    BaseCreature pet = list[i];
-
-                    if (pet == null || pet.Deleted)
-                        continue;
-
-                    this.AddButton(15, 39 + (i * 20), 10006, 10006, i + 1, GumpButtonType.Reply, 0);
-                    this.AddHtml(32, 35 + (i * 20), 275, 18, String.Format("<BASEFONT COLOR=#C0C0EE>{0}</BASEFONT>", pet.Name), false, false);
-                }
-            }
-
-            public override void OnResponse(NetState sender, RelayInfo info)
-            {
-                int index = info.ButtonID - 1;
-
-                if (index >= 0 && index < this.m_List.Count)
-                {
-                    this.m_Post.EndClaimList(this.m_From, this.m_List[index]);
-                }
-            }
-        }
 
         public override void Serialize(GenericWriter writer)
         {

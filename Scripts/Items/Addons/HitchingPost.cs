@@ -144,51 +144,7 @@ namespace Server.Items
             }
         }
 
-        private class ClaimListGump : Gump
-        {
-            private readonly HitchingPost m_Post;
-            private readonly Mobile m_From;
-            private readonly List<BaseCreature> m_List;
 
-            public ClaimListGump(HitchingPost post, Mobile from, List<BaseCreature> list)
-                : base(50, 50)
-            {
-                m_Post = post;
-                m_From = from;
-                m_List = list;
-
-                from.CloseGump(typeof(ClaimListGump));
-
-                AddPage(0);
-
-                AddBackground(0, 0, 325, 50 + (list.Count * 20), 9250);
-                AddAlphaRegion(5, 5, 315, 40 + (list.Count * 20));
-
-                AddHtml(15, 15, 275, 20, "<BASEFONT COLOR=#FFFFFF>Select a pet to retrieve from the stables:</BASEFONT>", false, false);
-
-                for (int i = 0; i < list.Count; ++i)
-                {
-                    BaseCreature pet = list[i];
-
-                    if (pet == null || pet.Deleted)
-                        continue;
-
-                    AddButton(15, 39 + (i * 20), 10006, 10006, i + 1, GumpButtonType.Reply, 0);
-                    AddHtml(32, 35 + (i * 20), 275, 18, String.Format("<BASEFONT COLOR=#C0C0EE>{0}</BASEFONT>", pet.Name), false, false);
-                }
-            }
-
-            public override void OnResponse(NetState sender, RelayInfo info)
-            {
-                int index = info.ButtonID - 1;
-
-                if (index >= 0 && index < m_List.Count)
-                {
-                    m_Post.UsesRemaining -= 1;
-                    m_Post.EndClaimList(m_From, m_List[index]);
-                }
-            }
-        }
 
         private class StableTarget : Target
         {
@@ -248,7 +204,7 @@ namespace Server.Items
                 }
 
                 if (list.Count > 0)
-                    from.SendGump(new ClaimListGump(this, from, list));
+                    from.SendGump(new StableListGump("Hitching Post", from, list, 0, (m, pet) => { this.UsesRemaining -= 1; this.EndClaimList(m, pet); }));
                 else
                     from.SendLocalizedMessage(502671); // But I have no animals stabled with me at the moment!
             }
@@ -493,7 +449,12 @@ namespace Server.Items
         {
             if (CheckAccess(e.Mobile) && IsLockedDown)
             {
-                if (!e.Handled && e.HasKeyword(0x0008))
+                if (!e.Handled && e.Speech.ToLower().IndexOf("stables") >= 0)
+                {
+                    e.Handled = true;
+                    BeginClaimList(e.Mobile);
+                }
+                else if (!e.Handled && e.HasKeyword(0x0008))
                 {
                     e.Handled = true;
                     BeginStable(e.Mobile);

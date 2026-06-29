@@ -184,7 +184,7 @@ namespace Server.Items
 
 			if (ValidateUse(m, true))
 			{
-				if (SpellHelper.CheckTravel(m, map, loc, TravelCheckType.RecallTo))
+				if (map == Map.Ilshenar || SpellHelper.CheckTravel(m, map, loc, TravelCheckType.RecallTo))
 				{
 					OnTeleport(m, loc, map);
 				}
@@ -291,6 +291,20 @@ namespace Server.Items
 			new Destination("fel trinsic moongate", "Trinsic Moongate", new Point3D(1828, 2948, -20), Map.Felucca),
 			new Destination("fel vesper moongate", "Vesper Moongate", new Point3D(2701, 692, 5), Map.Felucca),
 			new Destination("fel yew moongate", "Yew Moongate", new Point3D(771, 752, 5), Map.Felucca),
+
+			// Ilshenar bank
+			new Destination("ilshenar mint", "Ilshenar Mint", new Point3D(1234, 558, -19), Map.Ilshenar),
+
+			// Ilshenar moongates
+			new Destination("compassion moongate", "Compassion Moongate", new Point3D(1215, 467, -13), Map.Ilshenar),
+			new Destination("honesty moongate", "Honesty Moongate", new Point3D(722, 1366, -60), Map.Ilshenar),
+			new Destination("honor moongate", "Honor Moongate", new Point3D(744, 724, -28), Map.Ilshenar),
+			new Destination("humility moongate", "Humility Moongate", new Point3D(281, 1016, 0), Map.Ilshenar),
+			new Destination("justice moongate", "Justice Moongate", new Point3D(987, 1011, -32), Map.Ilshenar),
+			new Destination("sacrifice moongate", "Sacrifice Moongate", new Point3D(1174, 1286, -30), Map.Ilshenar),
+			new Destination("spirituality moongate", "Spirituality Moongate", new Point3D(1532, 1340, -3), Map.Ilshenar),
+			new Destination("valor moongate", "Valor Moongate", new Point3D(528, 216, -45), Map.Ilshenar),
+			new Destination("chaos moongate", "Chaos Moongate", new Point3D(1721, 218, 96), Map.Ilshenar),
 
 			// Malas
 			new Destination("luna mint", "Luna Mint", new Point3D(1015, 527, -65), Map.Malas),
