@@ -11056,8 +11056,30 @@ namespace Server
 
 		public virtual bool EquipItem(Item item)
 		{
-			if (item == null || item.Deleted || !item.CanEquip(this))
+			if (item == null || item.Deleted)
 			{
+				return false;
+			}
+
+			// Auto-swap same-layer conflict before equipping.
+			// Restores it if the equip ultimately fails.
+			Item sameLayerConflict = null;
+
+			if (item.Layer >= Layer.FirstValid && item.Layer <= Layer.LastUserValid && item.Layer != Layer.Backpack)
+			{
+				sameLayerConflict = FindItemOnLayer(item.Layer);
+				if (sameLayerConflict != null)
+				{
+					AddToBackpack(sameLayerConflict);
+				}
+			}
+
+			if (!item.CanEquip(this))
+			{
+				if (sameLayerConflict != null && sameLayerConflict.IsChildOf(Backpack))
+				{
+					EquipItem(sameLayerConflict);
+				}
 				return false;
 			}
 
@@ -11065,15 +11087,27 @@ namespace Server
 			// Restores it if the equip ultimately fails for another reason.
 			Item swappedOut = null;
 
-			if (item is IWeapon)
+			if (item.Layer == Layer.OneHanded || item.Layer == Layer.TwoHanded)
 			{
-				Layer conflictLayer = item.Layer == Layer.OneHanded ? Layer.TwoHanded : Layer.OneHanded;
-				Item conflict = FindItemOnLayer(conflictLayer);
-
-				if (conflict is IWeapon)
+				if (item is IWeapon && item.Layer == Layer.TwoHanded)
 				{
-					swappedOut = conflict;
-					AddToBackpack(conflict);
+					// Equipping a 2-handed weapon: unequip anything in the one-handed slot (handbook, 1h weapon, etc.)
+					Item conflict = FindItemOnLayer(Layer.OneHanded);
+					if (conflict != null)
+					{
+						swappedOut = conflict;
+						AddToBackpack(conflict);
+					}
+				}
+				else if (item.Layer == Layer.OneHanded)
+				{
+					// Equipping a 1-handed item (1h weapon, spellbook, etc.): unequip a 2-handed weapon if equipped
+					Item conflict = FindItemOnLayer(Layer.TwoHanded);
+					if (conflict is IWeapon)
+					{
+						swappedOut = conflict;
+						AddToBackpack(conflict);
+					}
 				}
 			}
 
@@ -11083,6 +11117,9 @@ namespace Server
 				{
 					if (swappedOut != null && swappedOut.IsChildOf(Backpack))
 						EquipItem(swappedOut);
+
+					if (sameLayerConflict != null && sameLayerConflict.IsChildOf(Backpack))
+						EquipItem(sameLayerConflict);
 
 					return false;
 				}
@@ -11096,6 +11133,9 @@ namespace Server
 
 			if (swappedOut != null && swappedOut.IsChildOf(Backpack))
 				EquipItem(swappedOut);
+
+			if (sameLayerConflict != null && sameLayerConflict.IsChildOf(Backpack))
+				EquipItem(sameLayerConflict);
 
 			return false;
 		}

@@ -302,5 +302,13 @@ namespace Server.Items
                 EnergyNonImbuing += info.ShieldEnergyResist;
             }
         }
+
+        public override bool AllowEquipedCast(Mobile from)
+        {
+            if (base.AllowEquipedCast(from))
+                return true;
+
+            return (Attributes.SpellChanneling != 0 || Enhancement.GetValue(from, AosAttribute.SpellChanneling) != 0);
+        }
     }
 }
