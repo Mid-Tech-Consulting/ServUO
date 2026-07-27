@@ -27639,10 +27639,10 @@
     <Name>Outdoors#395</Name>
     <UniqueId>4ecfea02-cf44-4c67-8671-57f4b8d9f6fd</UniqueId>
     <Map>Felucca</Map>
-    <X>1012</X>
-    <Y>821</Y>
-    <Width>10</Width>
-    <Height>10</Height>
+    <X>1015</X>
+    <Y>824</Y>
+    <Width>4</Width>
+    <Height>4</Height>
     <CentreX>1017</CentreX>
     <CentreY>826</CentreY>
     <CentreZ>0</CentreZ>
@@ -80265,10 +80265,10 @@
     <Name>Outdoors#394</Name>
     <UniqueId>d9aeff85-443d-4d82-a512-d03fa3759162</UniqueId>
     <Map>Felucca</Map>
-    <X>1010</X>
-    <Y>701</Y>
-    <Width>10</Width>
-    <Height>10</Height>
+    <X>1013</X>
+    <Y>704</Y>
+    <Width>4</Width>
+    <Height>4</Height>
     <CentreX>1015</CentreX>
     <CentreY>706</CentreY>
     <CentreZ>0</CentreZ>
