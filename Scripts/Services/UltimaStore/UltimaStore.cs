@@ -41,8 +41,8 @@ namespace Server.Engines.UOStore
 
         // Rotate this each month to recolor all monthly-themed store items
         // (mount statues, monthly hair/beard dye, monthly soulstone). 0 = no tint.
-        // Current: 1153 (luna white).
-        public const int ColorOfTheMonthHue = 1153;
+        // Current: 1167 (lime green).
+        public const int ColorOfTheMonthHue = 1167;
 
         public static bool Enabled { get { return Configuration.Enabled; } set { Configuration.Enabled = value; } }
 
