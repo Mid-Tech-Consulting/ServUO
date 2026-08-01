@@ -41,8 +41,34 @@ namespace Server.Engines.UOStore
 
         // Rotate this each month to recolor all monthly-themed store items
         // (mount statues, monthly hair/beard dye, monthly soulstone). 0 = no tint.
-        // Current: 1167 (lime green).
-        public const int ColorOfTheMonthHue = 1167;
+        public static readonly Dictionary<int, int> MonthlyHues = new Dictionary<int, int>
+        {
+            { 1, 0 },      // January
+            { 2, 0 },      // February
+            { 3, 0 },      // March
+            { 4, 0x0ABB }, // April (Sapphire Blue)
+            { 5, 0x000B }, // May (Sigil Dye Tub hue)
+            { 6, 0x07B7 }, // June (Mythic Red)
+            { 7, 1153 },   // July (Luna White)
+            { 8, 1167 },   // August (Lime Green)
+            { 9, 0 },      // September
+            { 10, 1124 },  // October (Halloween Orange)
+            { 11, 2048 },  // November (Glacial/Void Black)
+            { 12, 0 }      // December
+        };
+
+        public static int ColorOfTheMonthHue
+        {
+            get
+            {
+                int month = DateTime.UtcNow.Month;
+                if (MonthlyHues.ContainsKey(month))
+                {
+                    return MonthlyHues[month];
+                }
+                return 0;
+            }
+        }
 
         public static bool Enabled { get { return Configuration.Enabled; } set { Configuration.Enabled = value; } }
 
