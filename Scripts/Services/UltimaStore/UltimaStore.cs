@@ -43,15 +43,15 @@ namespace Server.Engines.UOStore
         // (mount statues, monthly hair/beard dye, monthly soulstone). 0 = no tint.
         public static readonly Dictionary<int, int> MonthlyHues = new Dictionary<int, int>
         {
-            { 1, 0 },      // January
-            { 2, 0 },      // February
-            { 3, 0 },      // March
+            { 1, 2500 },   // January (Silver)
+            { 2, 1168 },   // February (Pretty Pink / Valentine Pink)
+            { 3, 1173 },   // March (Emerald Green / Irish Green)
             { 4, 0x0ABB }, // April (Sapphire Blue)
             { 5, 0x000B }, // May (Sigil Dye Tub hue)
             { 6, 0x07B7 }, // June (Mythic Red)
             { 7, 1153 },   // July (Luna White)
             { 8, 1167 },   // August (Lime Green)
-            { 9, 0 },      // September
+            { 9, 1801 },   // September (Smoky Gold)
             { 10, 1124 },  // October (Halloween Orange)
             { 11, 2048 },  // November (Glacial/Void Black)
             { 12, 2966 }   // December (Christmas Red)
