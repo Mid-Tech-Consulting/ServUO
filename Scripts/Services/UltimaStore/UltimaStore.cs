@@ -54,7 +54,7 @@ namespace Server.Engines.UOStore
             { 9, 0 },      // September
             { 10, 1124 },  // October (Halloween Orange)
             { 11, 2048 },  // November (Glacial/Void Black)
-            { 12, 0 }      // December
+            { 12, 2966 }   // December (Christmas Red)
         };
 
         public static int ColorOfTheMonthHue
