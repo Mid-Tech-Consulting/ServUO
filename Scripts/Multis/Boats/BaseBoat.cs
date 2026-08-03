@@ -125,7 +125,21 @@ namespace Server.Multis
         public int m_Hits;
 
         [CommandProperty(AccessLevel.GameMaster)]
-        public int Hits { get { return m_Hits; } set { m_Hits = value; ComputeDamage(); InvalidateProperties(); } }
+        public int Hits
+        {
+            get { return m_Hits; }
+            set
+            {
+                m_Hits = value;
+                ComputeDamage();
+                InvalidateProperties();
+
+                if (m_Hits <= 0 && Map != null && Map != Map.Internal)
+                {
+                    OnSink();
+                }
+            }
+        }
 
         [CommandProperty(AccessLevel.GameMaster)]
         public double Durability { get { return m_Hits / (double)MaxHits * 100.0; } }
@@ -452,6 +466,11 @@ namespace Server.Multis
             if (theirState != null)
             {
                 theirState.Send(new DamagePacket(this, amount));
+
+                if (Owner is Mobile captain && captain.Alive && !captain.Deleted)
+                {
+                    theirState.Send(new DamagePacket(captain, amount));
+                }
             }
         }
 

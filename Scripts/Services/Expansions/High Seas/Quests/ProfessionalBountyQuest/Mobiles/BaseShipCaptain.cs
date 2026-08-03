@@ -52,6 +52,21 @@ namespace Server.Mobiles
 
         public override bool PlayerRangeSensitive { get { return false; } }
 
+        public override void GetProperties(ObjectPropertyList list)
+        {
+            base.GetProperties(list);
+
+            if (m_Galleon != null && !m_Galleon.Deleted)
+            {
+                list.Add(1060658, string.Format("Ship Hull\t{0}% ({1}/{2} HP)", (int)m_Galleon.Durability, m_Galleon.Hits, m_Galleon.MaxHits));
+
+                if (m_Galleon.Scuttled)
+                {
+                    list.Add(1116687); // Arr, we be scuttled!
+                }
+            }
+        }
+
         public override double TreasureMapChance { get { return 0.05; } }
         public override int TreasureMapLevel { get { return 7; } }
 

@@ -44,7 +44,8 @@ namespace Server.Items
                 return;
             
             list.Add(Boat.Status);
-            list.Add(1116580 + (int)Boat.DamageTaken); //State: Prisine            
+            list.Add(1116580 + (int)Boat.DamageTaken); //State: Pristine
+            list.Add(1060658, string.Format("Hull Durability\t{0}% ({1}/{2} HP)", (int)Boat.Durability, Boat.Hits, Boat.MaxHits));
         }
 
         public virtual void Say(int number)
