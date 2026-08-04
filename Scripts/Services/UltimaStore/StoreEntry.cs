@@ -5,30 +5,47 @@ namespace Server.Engines.UOStore
 {
     public class StoreEntry
     {
+        private int _hue;
+
         public Type ItemType { get; private set; }
         public TextDefinition[] Name { get; private set; }
         public int Tooltip { get; private set; }
         public int GumpID { get; private set; }
         public int ItemID { get; private set; }
-        public int Hue { get; private set; }
+        public bool UseMonthlyHue { get; private set; }
+
+        public int Hue
+        {
+            get
+            {
+                if (UseMonthlyHue)
+                {
+                    return UltimaStore.ColorOfTheMonthHue;
+                }
+
+                return _hue;
+            }
+        }
+
         public int Price { get; private set; }
         public StoreCategory Category { get; private set; }
         public Func<Mobile, StoreEntry, Item> Constructor { get; private set; }
 
         public int Cost { get { return (int)Math.Ceiling(Price * Configuration.CostMultiplier); } }
 
-        public StoreEntry(Type itemType, TextDefinition name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null)
-            : this(itemType, new[] { name }, tooltip, itemID, gumpID, hue, cost, cat, constructor)
+        public StoreEntry(Type itemType, TextDefinition name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null, bool useMonthlyHue = false)
+            : this(itemType, new[] { name }, tooltip, itemID, gumpID, hue, cost, cat, constructor, useMonthlyHue)
         { }
 
-        public StoreEntry(Type itemType, TextDefinition[] name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null)
+        public StoreEntry(Type itemType, TextDefinition[] name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null, bool useMonthlyHue = false)
         {
             ItemType = itemType;
             Name = name;
             Tooltip = tooltip;
             ItemID = itemID;
             GumpID = gumpID;
-            Hue = hue;
+            _hue = hue;
+            UseMonthlyHue = useMonthlyHue;
             Price = cost;
             Category = cat;
             Constructor = constructor;
