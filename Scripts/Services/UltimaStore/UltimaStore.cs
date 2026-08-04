@@ -41,8 +41,34 @@ namespace Server.Engines.UOStore
 
         // Rotate this each month to recolor all monthly-themed store items
         // (mount statues, monthly hair/beard dye, monthly soulstone). 0 = no tint.
-        // Current: 1167 (lime green).
-        public const int ColorOfTheMonthHue = 1167;
+        public static readonly Dictionary<int, int> MonthlyHues = new Dictionary<int, int>
+        {
+            { 1, 2500 },   // January (Silver)
+            { 2, 1168 },   // February (Pretty Pink / Valentine Pink)
+            { 3, 1173 },   // March (Emerald Green / Irish Green)
+            { 4, 0x0ABB }, // April (Sapphire Blue)
+            { 5, 0x000B }, // May (Sigil Dye Tub hue)
+            { 6, 0x07B7 }, // June (Mythic Red)
+            { 7, 1153 },   // July (Luna White)
+            { 8, 1167 },   // August (Lime Green)
+            { 9, 1801 },   // September (Smoky Gold)
+            { 10, 1124 },  // October (Halloween Orange)
+            { 11, 2048 },  // November (Glacial/Void Black)
+            { 12, 2966 }   // December (Christmas Red)
+        };
+
+        public static int ColorOfTheMonthHue
+        {
+            get
+            {
+                int month = DateTime.UtcNow.Month;
+                if (MonthlyHues.TryGetValue(month, out int hue))
+                {
+                    return hue;
+                }
+                return 0;
+            }
+        }
 
         public static bool Enabled { get { return Configuration.Enabled; } set { Configuration.Enabled = value; } }
 
@@ -93,9 +119,9 @@ namespace Server.Engines.UOStore
             Register<MythicCharacterToken>(new TextDefinition[] { 1156614, 1156615 }, 1156679, 0x2AAA, 0, 0, 1500, cat);
             Register<BankStone>("Bank Stone", 0, 3796, 0, 0x485, 1000, cat);
             Register<PublicSoulstone>("Public Soulstone", 1158405, 0x2A93, 0, 88, 1500, cat);
-            Register<MonthlyHairDye>("Monthly Hair Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyHairDye);
-            Register<MonthlyBeardDye>("Monthly Beard Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyBeardDye);
-            Register<MonthlySoulstone>("Monthly Soulstone", 1158405, 0x2A93, 0, ColorOfTheMonthHue, 1000, cat, ConstructMonthlySoulstone);
+            Register<MonthlyHairDye>("Monthly Hair Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyHairDye, useMonthlyHue: true);
+            Register<MonthlyBeardDye>("Monthly Beard Dye", 1156676, 0xEFE, 0, ColorOfTheMonthHue, 500, cat, ConstructMonthlyBeardDye, useMonthlyHue: true);
+            Register<MonthlySoulstone>("Monthly Soulstone", 1158405, 0x2A93, 0, ColorOfTheMonthHue, 1000, cat, ConstructMonthlySoulstone, useMonthlyHue: true);
             Register<CursedRemovalDeed>("Cursed Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
             Register<NegativeAttributeRemovalDeed>("Attribute Removal Deed", 0, 0x14F0, 0, 1175, 500, cat);
             Register<TransmogrificationPotion>("Transmogrification Potion", 0, 0xF0E, 0, 1161, 500, cat);
@@ -307,14 +333,14 @@ namespace Server.Engines.UOStore
 
             // mounts
             cat = StoreCategory.Mounts;
-            Register<CoconutCrabStatue>(1159165, 1159166, 0xA335, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
-            Register<SkeletalCatStatue>(1158462, 1158738, 0xA138, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
-            Register<EowmuStatue>(1158082, 1158433, 0xA0C0, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
-            Register<WindrunnerStatue>(1124685, 1157373, 0x9ED5, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
-            Register<LasherStatue>(1157214, 1157305, 0x9E35, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
-            Register<ChargerOfTheFallen>(1075187, 1156646, 0x2D9C, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount);
-            Register<EtherealDragonHildebrandt>("Ethereal Dragon Hildebrandt", 0, 0xB162, 0, ColorOfTheMonthHue, 1500, cat, ConstructHuedMount);
-            Register<EtherealHellfireSteed>("Ethereal Hellfire Steed", 0, 0xB165, 0, ColorOfTheMonthHue, 1500, cat, ConstructHuedMount);
+            Register<CoconutCrabStatue>(1159165, 1159166, 0xA335, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount, useMonthlyHue: true);
+            Register<SkeletalCatStatue>(1158462, 1158738, 0xA138, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount, useMonthlyHue: true);
+            Register<EowmuStatue>(1158082, 1158433, 0xA0C0, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount, useMonthlyHue: true);
+            Register<WindrunnerStatue>(1124685, 1157373, 0x9ED5, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount, useMonthlyHue: true);
+            Register<LasherStatue>(1157214, 1157305, 0x9E35, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount, useMonthlyHue: true);
+            Register<ChargerOfTheFallen>(1075187, 1156646, 0x2D9C, 0, ColorOfTheMonthHue, 1000, cat, ConstructHuedMount, useMonthlyHue: true);
+            Register<EtherealDragonHildebrandt>("Ethereal Dragon Hildebrandt", 0, 0xB162, 0, ColorOfTheMonthHue, 1500, cat, ConstructHuedMount, useMonthlyHue: true);
+            Register<EtherealHellfireSteed>("Ethereal Hellfire Steed", 0, 0xB165, 0, ColorOfTheMonthHue, 1500, cat, ConstructHuedMount, useMonthlyHue: true);
 
             // misc
             cat = StoreCategory.Misc;
@@ -347,24 +373,24 @@ namespace Server.Engines.UOStore
             Register<BagOfBulkOrderCovers>(1071116, 1156654, 0, 0x9CC6, 0, 200, cat, ConstructBOBCoverTwo);
         }
 
-        public static void Register<T>(TextDefinition name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null) where T : Item
+        public static void Register<T>(TextDefinition name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null, bool useMonthlyHue = false) where T : Item
         {
-            Register(typeof(T), name, tooltip, itemID, gumpID, hue, cost, cat, constructor);
+            Register(typeof(T), name, tooltip, itemID, gumpID, hue, cost, cat, constructor, useMonthlyHue);
         }
 
-        public static void Register(Type itemType, TextDefinition name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null)
+        public static void Register(Type itemType, TextDefinition name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null, bool useMonthlyHue = false)
         {
-            Register(new StoreEntry(itemType, name, tooltip, itemID, gumpID, hue, cost, cat, constructor));
+            Register(new StoreEntry(itemType, name, tooltip, itemID, gumpID, hue, cost, cat, constructor, useMonthlyHue));
         }
 
-        public static void Register<T>(TextDefinition[] name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null) where T : Item
+        public static void Register<T>(TextDefinition[] name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null, bool useMonthlyHue = false) where T : Item
         {
-            Register(typeof(T), name, tooltip, itemID, gumpID, hue, cost, cat, constructor);
+            Register(typeof(T), name, tooltip, itemID, gumpID, hue, cost, cat, constructor, useMonthlyHue);
         }
 
-        public static void Register(Type itemType, TextDefinition[] name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null)
+        public static void Register(Type itemType, TextDefinition[] name, int tooltip, int itemID, int gumpID, int hue, int cost, StoreCategory cat, Func<Mobile, StoreEntry, Item> constructor = null, bool useMonthlyHue = false)
         {
-            Register(new StoreEntry(itemType, name, tooltip, itemID, gumpID, hue, cost, cat, constructor));
+            Register(new StoreEntry(itemType, name, tooltip, itemID, gumpID, hue, cost, cat, constructor, useMonthlyHue));
         }
 
         public static void Register(StoreEntry entry)
