@@ -85,7 +85,7 @@ namespace Server.Custom.Events
             {
                 new Type[] { typeof(Skeleton2), typeof(Zombie) }, // Level 1 (Undead Slayer)
                 new Type[] { typeof(FlameImp), typeof(Gargoyle) }, // Level 2 (Demon/Abyss Slayer)
-                new Type[] { typeof(GreaterDragon) }, // Level 3 (Reptile Slayer - Greater Dragons)
+                new Type[] { typeof(Dragon), typeof(Drake), typeof(GreaterDragon) }, // Level 3 (Reptile Slayer - Dragons, Drakes, Greater Dragons)
                 new Type[] { typeof(PoisonElemental), typeof(TerathanAvenger) } // Level 4 (Arachnid Slayer)
             };
 

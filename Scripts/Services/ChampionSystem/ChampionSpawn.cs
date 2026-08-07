@@ -989,7 +989,35 @@ namespace Server.Engines.CannedEvil
         {
             try
             {
-                return Activator.CreateInstance(types[Utility.Random(types.Length)]) as Mobile;
+                List<Type> validTypes = new List<Type>();
+
+                foreach (Type t in types)
+                {
+                    if (t == typeof(GreaterDragon))
+                    {
+                        int count = 0;
+                        if (m_Creatures != null)
+                        {
+                            for (int i = 0; i < m_Creatures.Count; ++i)
+                            {
+                                Mobile m = m_Creatures[i];
+                                if (m is GreaterDragon && !m.Deleted && m.Alive)
+                                    count++;
+                            }
+                        }
+
+                        if (count >= 4)
+                            continue;
+                    }
+
+                    validTypes.Add(t);
+                }
+
+                if (validTypes.Count == 0)
+                    return null;
+
+                Type toSpawn = validTypes[Utility.Random(validTypes.Count)];
+                return Activator.CreateInstance(toSpawn) as Mobile;
             }
             catch
             {
