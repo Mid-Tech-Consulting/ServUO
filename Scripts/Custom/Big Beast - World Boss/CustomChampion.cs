@@ -126,6 +126,20 @@ namespace Server.Mobiles
             AddLoot(LootPack.SuperBoss, 4);
         }
 
+        public override Item GetArtifact()
+        {
+            double random = Utility.RandomDouble();
+
+            if (0.15 >= random) // 15% chance for Unique
+                return CreateArtifact(UniqueList);
+            else if (0.45 >= random) // 30% chance for Shared (0.15 to 0.45)
+                return CreateArtifact(SharedList);
+            else if (0.70 >= random) // 25% chance for Decorative (0.45 to 0.70)
+                return CreateArtifact(DecorativeList);
+
+            return null; // 30% chance for no artifact
+        }
+
         public override void OnGotMeleeAttack(Mobile attacker)
         {
             base.OnGotMeleeAttack(attacker);

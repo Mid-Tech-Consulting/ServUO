@@ -1324,7 +1324,7 @@ namespace Server.Engines.CannedEvil
 
         public bool IsEligible(Mobile m, Item Artifact)
         {
-            return m.Player && m.Alive && m.Region != null && m.Region == m_Region && m.Backpack != null && m.Backpack.CheckHold(m, Artifact, false);
+            return m.Player && m.Alive && m.Map == Map && m.Backpack != null && m.Backpack.CheckHold(m, Artifact, false);
         }
 
         public override void Serialize(GenericWriter writer)
