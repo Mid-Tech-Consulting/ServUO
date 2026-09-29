@@ -57,7 +57,7 @@ namespace Ultima
 				}
 				else
 				{
-					Stream = new FileStream(MulPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+					Stream = new FileStream(MulPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 				}
 			}
 
@@ -238,9 +238,9 @@ namespace Ultima
 			 */
 			if (MulPath != null && MulPath.EndsWith(".uop"))
 			{
-				using (var index = new FileStream(MulPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+				using (var index = new FileStream(MulPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 				{
-					Stream = new FileStream(MulPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+					Stream = new FileStream(MulPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
 					var fi = new FileInfo(MulPath);
 					string uopPattern = fi.Name.Replace(fi.Extension, "").ToLowerInvariant();
