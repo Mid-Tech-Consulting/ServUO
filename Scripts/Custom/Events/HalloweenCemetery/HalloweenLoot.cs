@@ -273,7 +273,31 @@ namespace Server.Items
         public int WeightReduction
         {
             get { return m_WeightReduction; }
-            set { m_WeightReduction = value; InvalidateProperties(); }
+            set
+            {
+                int val = Math.Clamp(value, 0, 100);
+
+                if (m_WeightReduction != val)
+                {
+                    int oldEffective = GetTotal(TotalType.Weight);
+                    m_WeightReduction = val;
+                    int newEffective = GetTotal(TotalType.Weight);
+                    int delta = newEffective - oldEffective;
+
+                    if (delta != 0)
+                    {
+                        if (Parent is Item parentItem)
+                            parentItem.UpdateTotal(this, TotalType.Weight, delta);
+                        else if (Parent is Mobile parentMobile)
+                            parentMobile.UpdateTotal(this, TotalType.Weight, delta);
+                        else if (HeldBy != null)
+                            HeldBy.UpdateTotal(this, TotalType.Weight, delta);
+                    }
+
+                    InvalidateWeight();
+                    InvalidateProperties();
+                }
+            }
         }
 
         [Constructable]
@@ -297,6 +321,70 @@ namespace Server.Items
                 total -= (int)(total * ((double)m_WeightReduction / 100.0));
 
             return total;
+        }
+
+        public override void UpdateTotal(Item sender, TotalType type, int delta)
+        {
+            if (type == TotalType.Weight && m_WeightReduction > 0 && sender != this && delta != 0 && !sender.IsVirtualItem)
+            {
+                int oldEffective = GetTotal(TotalType.Weight);
+
+                base.UpdateTotal(sender, type, delta);
+
+                int newEffective = GetTotal(TotalType.Weight);
+                int effectiveDelta = newEffective - oldEffective;
+                int diff = effectiveDelta - delta;
+
+                if (diff != 0)
+                {
+                    if (Parent is Item parentItem)
+                        parentItem.UpdateTotal(sender, TotalType.Weight, diff);
+                    else if (Parent is Mobile parentMobile)
+                        parentMobile.UpdateTotal(sender, TotalType.Weight, diff);
+                    else if (HeldBy != null)
+                        HeldBy.UpdateTotal(sender, TotalType.Weight, diff);
+                }
+            }
+            else
+            {
+                base.UpdateTotal(sender, type, delta);
+            }
+        }
+
+        public override void AddItem(Item dropped)
+        {
+            base.AddItem(dropped);
+            InvalidateWeight();
+        }
+
+        public override void RemoveItem(Item dropped)
+        {
+            base.RemoveItem(dropped);
+            InvalidateWeight();
+        }
+
+        public override void OnAdded(object parent)
+        {
+            base.OnAdded(parent);
+            InvalidateWeight();
+        }
+
+        public override void OnRemoved(object parent)
+        {
+            base.OnRemoved(parent);
+
+            if (parent is Mobile m)
+                m.UpdateTotals();
+            else if (parent is Item i && i.RootParent is Mobile rm)
+                rm.UpdateTotals();
+        }
+
+        public void InvalidateWeight()
+        {
+            if (RootParent is Mobile m)
+            {
+                m.UpdateTotals();
+            }
         }
 
         public override void GetProperties(ObjectPropertyList list)
