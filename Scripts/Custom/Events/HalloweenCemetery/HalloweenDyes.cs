@@ -200,11 +200,45 @@ namespace Server.Items
     }
 
     // Legacy Aliases for backwards-compatibility
-    public class JackOLanternBlazeHairDye : CandyCornOrangeHairDye { [Constructable] public JackOLanternBlazeHairDye() { } public JackOLanternBlazeHairDye(Serial s) : base(s) { } }
-    public class SpectralPhantomHairDye : SpiderSilkWhiteHairDye { [Constructable] public SpectralPhantomHairDye() { } public SpectralPhantomHairDye(Serial s) : base(s) { } }
-    public class VampireBloodHairDye : VibrantCrimsonHairDye { [Constructable] public VampireBloodHairDye() { } public VampireBloodHairDye(Serial s) : base(s) { } }
-    public class WitchesBrewHairDye : SpectralVenomHairDye { [Constructable] public WitchesBrewHairDye() { } public WitchesBrewHairDye(Serial s) : base(s) { } }
-    public class NightmareVoidHairDye : SpectralAmethystHairDye { [Constructable] public NightmareVoidHairDye() { } public NightmareVoidHairDye(Serial s) : base(s) { } }
+    public class JackOLanternBlazeHairDye : CandyCornOrangeHairDye
+    {
+        [Constructable] public JackOLanternBlazeHairDye() { }
+        public JackOLanternBlazeHairDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class SpectralPhantomHairDye : SpiderSilkWhiteHairDye
+    {
+        [Constructable] public SpectralPhantomHairDye() { }
+        public SpectralPhantomHairDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class VampireBloodHairDye : VibrantCrimsonHairDye
+    {
+        [Constructable] public VampireBloodHairDye() { }
+        public VampireBloodHairDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class WitchesBrewHairDye : SpectralVenomHairDye
+    {
+        [Constructable] public WitchesBrewHairDye() { }
+        public WitchesBrewHairDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class NightmareVoidHairDye : SpectralAmethystHairDye
+    {
+        [Constructable] public NightmareVoidHairDye() { }
+        public NightmareVoidHairDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
     #endregion
 
     #region The 5 Special Beard Dyes (Exact Hues from Old Server)
@@ -259,11 +293,45 @@ namespace Server.Items
     }
 
     // Legacy Aliases for backwards-compatibility
-    public class JackOLanternBlazeBeardDye : CandyCornOrangeBeardDye { [Constructable] public JackOLanternBlazeBeardDye() { } public JackOLanternBlazeBeardDye(Serial s) : base(s) { } }
-    public class SpectralPhantomBeardDye : SpiderSilkWhiteBeardDye { [Constructable] public SpectralPhantomBeardDye() { } public SpectralPhantomBeardDye(Serial s) : base(s) { } }
-    public class VampireBloodBeardDye : VibrantCrimsonBeardDye { [Constructable] public VampireBloodBeardDye() { } public VampireBloodBeardDye(Serial s) : base(s) { } }
-    public class WitchesBrewBeardDye : SpectralVenomBeardDye { [Constructable] public WitchesBrewBeardDye() { } public WitchesBrewBeardDye(Serial s) : base(s) { } }
-    public class NightmareVoidBeardDye : SpectralAmethystBeardDye { [Constructable] public NightmareVoidBeardDye() { } public NightmareVoidBeardDye(Serial s) : base(s) { } }
+    public class JackOLanternBlazeBeardDye : CandyCornOrangeBeardDye
+    {
+        [Constructable] public JackOLanternBlazeBeardDye() { }
+        public JackOLanternBlazeBeardDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class SpectralPhantomBeardDye : SpiderSilkWhiteBeardDye
+    {
+        [Constructable] public SpectralPhantomBeardDye() { }
+        public SpectralPhantomBeardDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class VampireBloodBeardDye : VibrantCrimsonBeardDye
+    {
+        [Constructable] public VampireBloodBeardDye() { }
+        public VampireBloodBeardDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class WitchesBrewBeardDye : SpectralVenomBeardDye
+    {
+        [Constructable] public WitchesBrewBeardDye() { }
+        public WitchesBrewBeardDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class NightmareVoidBeardDye : SpectralAmethystBeardDye
+    {
+        [Constructable] public NightmareVoidBeardDye() { }
+        public NightmareVoidBeardDye(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
     #endregion
 
     #region Confirmation Gumps

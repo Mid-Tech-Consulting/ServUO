@@ -136,12 +136,53 @@ namespace Server.Items
     }
 
     // Concrete slayer variants for direct [add commands
-    public class HellspireUndeadCompositeBow : HalloweenCompositeBow { [Constructable] public HellspireUndeadCompositeBow() : base(SlayerName.Silver) { } public HellspireUndeadCompositeBow(Serial s) : base(s) { } }
-    public class HellspireDemonCompositeBow : HalloweenCompositeBow { [Constructable] public HellspireDemonCompositeBow() : base(SlayerName.Exorcism) { } public HellspireDemonCompositeBow(Serial s) : base(s) { } }
-    public class HellspireArachnidCompositeBow : HalloweenCompositeBow { [Constructable] public HellspireArachnidCompositeBow() : base(SlayerName.ArachnidDoom) { } public HellspireArachnidCompositeBow(Serial s) : base(s) { } }
-    public class HellspireReptileCompositeBow : HalloweenCompositeBow { [Constructable] public HellspireReptileCompositeBow() : base(SlayerName.ReptilianDeath) { } public HellspireReptileCompositeBow(Serial s) : base(s) { } }
-    public class HellspireElementalCompositeBow : HalloweenCompositeBow { [Constructable] public HellspireElementalCompositeBow() : base(SlayerName.ElementalBan) { } public HellspireElementalCompositeBow(Serial s) : base(s) { } }
-    public class HellspireRepondCompositeBow : HalloweenCompositeBow { [Constructable] public HellspireRepondCompositeBow() : base(SlayerName.Repond) { } public HellspireRepondCompositeBow(Serial s) : base(s) { } }
+    public class HellspireUndeadCompositeBow : HalloweenCompositeBow
+    {
+        [Constructable] public HellspireUndeadCompositeBow() : base(SlayerName.Silver) { }
+        public HellspireUndeadCompositeBow(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireDemonCompositeBow : HalloweenCompositeBow
+    {
+        [Constructable] public HellspireDemonCompositeBow() : base(SlayerName.Exorcism) { }
+        public HellspireDemonCompositeBow(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireArachnidCompositeBow : HalloweenCompositeBow
+    {
+        [Constructable] public HellspireArachnidCompositeBow() : base(SlayerName.ArachnidDoom) { }
+        public HellspireArachnidCompositeBow(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireReptileCompositeBow : HalloweenCompositeBow
+    {
+        [Constructable] public HellspireReptileCompositeBow() : base(SlayerName.ReptilianDeath) { }
+        public HellspireReptileCompositeBow(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireElementalCompositeBow : HalloweenCompositeBow
+    {
+        [Constructable] public HellspireElementalCompositeBow() : base(SlayerName.ElementalBan) { }
+        public HellspireElementalCompositeBow(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireRepondCompositeBow : HalloweenCompositeBow
+    {
+        [Constructable] public HellspireRepondCompositeBow() : base(SlayerName.Repond) { }
+        public HellspireRepondCompositeBow(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
     #endregion
 
     #region Halloween Soul Glaive (Hellspire Spec for Throwers)
@@ -203,12 +244,53 @@ namespace Server.Items
     }
 
     // Concrete slayer variants for direct [add commands
-    public class HellspireUndeadSoulGlaive : HalloweenSoulGlaive { [Constructable] public HellspireUndeadSoulGlaive() : base(SlayerName.Silver) { } public HellspireUndeadSoulGlaive(Serial s) : base(s) { } }
-    public class HellspireDemonSoulGlaive : HalloweenSoulGlaive { [Constructable] public HellspireDemonSoulGlaive() : base(SlayerName.Exorcism) { } public HellspireDemonSoulGlaive(Serial s) : base(s) { } }
-    public class HellspireArachnidSoulGlaive : HalloweenSoulGlaive { [Constructable] public HellspireArachnidSoulGlaive() : base(SlayerName.ArachnidDoom) { } public HellspireArachnidSoulGlaive(Serial s) : base(s) { } }
-    public class HellspireReptileSoulGlaive : HalloweenSoulGlaive { [Constructable] public HellspireReptileSoulGlaive() : base(SlayerName.ReptilianDeath) { } public HellspireReptileSoulGlaive(Serial s) : base(s) { } }
-    public class HellspireElementalSoulGlaive : HalloweenSoulGlaive { [Constructable] public HellspireElementalSoulGlaive() : base(SlayerName.ElementalBan) { } public HellspireElementalSoulGlaive(Serial s) : base(s) { } }
-    public class HellspireRepondSoulGlaive : HalloweenSoulGlaive { [Constructable] public HellspireRepondSoulGlaive() : base(SlayerName.Repond) { } public HellspireRepondSoulGlaive(Serial s) : base(s) { } }
+    public class HellspireUndeadSoulGlaive : HalloweenSoulGlaive
+    {
+        [Constructable] public HellspireUndeadSoulGlaive() : base(SlayerName.Silver) { }
+        public HellspireUndeadSoulGlaive(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireDemonSoulGlaive : HalloweenSoulGlaive
+    {
+        [Constructable] public HellspireDemonSoulGlaive() : base(SlayerName.Exorcism) { }
+        public HellspireDemonSoulGlaive(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireArachnidSoulGlaive : HalloweenSoulGlaive
+    {
+        [Constructable] public HellspireArachnidSoulGlaive() : base(SlayerName.ArachnidDoom) { }
+        public HellspireArachnidSoulGlaive(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireReptileSoulGlaive : HalloweenSoulGlaive
+    {
+        [Constructable] public HellspireReptileSoulGlaive() : base(SlayerName.ReptilianDeath) { }
+        public HellspireReptileSoulGlaive(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireElementalSoulGlaive : HalloweenSoulGlaive
+    {
+        [Constructable] public HellspireElementalSoulGlaive() : base(SlayerName.ElementalBan) { }
+        public HellspireElementalSoulGlaive(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class HellspireRepondSoulGlaive : HalloweenSoulGlaive
+    {
+        [Constructable] public HellspireRepondSoulGlaive() : base(SlayerName.Repond) { }
+        public HellspireRepondSoulGlaive(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
     #endregion
 
     #region Halloween 64-Spell Grimoire
@@ -259,11 +341,52 @@ namespace Server.Items
     }
 
     // Concrete slayer variants for direct [add commands
-    public class CryptUndeadSpellbook : HalloweenSpellbook { [Constructable] public CryptUndeadSpellbook() : base(SlayerName.Silver) { } public CryptUndeadSpellbook(Serial s) : base(s) { } }
-    public class CryptDemonSpellbook : HalloweenSpellbook { [Constructable] public CryptDemonSpellbook() : base(SlayerName.Exorcism) { } public CryptDemonSpellbook(Serial s) : base(s) { } }
-    public class CryptArachnidSpellbook : HalloweenSpellbook { [Constructable] public CryptArachnidSpellbook() : base(SlayerName.ArachnidDoom) { } public CryptArachnidSpellbook(Serial s) : base(s) { } }
-    public class CryptReptileSpellbook : HalloweenSpellbook { [Constructable] public CryptReptileSpellbook() : base(SlayerName.ReptilianDeath) { } public CryptReptileSpellbook(Serial s) : base(s) { } }
-    public class CryptElementalSpellbook : HalloweenSpellbook { [Constructable] public CryptElementalSpellbook() : base(SlayerName.ElementalBan) { } public CryptElementalSpellbook(Serial s) : base(s) { } }
-    public class CryptRepondSpellbook : HalloweenSpellbook { [Constructable] public CryptRepondSpellbook() : base(SlayerName.Repond) { } public CryptRepondSpellbook(Serial s) : base(s) { } }
+    public class CryptUndeadSpellbook : HalloweenSpellbook
+    {
+        [Constructable] public CryptUndeadSpellbook() : base(SlayerName.Silver) { }
+        public CryptUndeadSpellbook(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class CryptDemonSpellbook : HalloweenSpellbook
+    {
+        [Constructable] public CryptDemonSpellbook() : base(SlayerName.Exorcism) { }
+        public CryptDemonSpellbook(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class CryptArachnidSpellbook : HalloweenSpellbook
+    {
+        [Constructable] public CryptArachnidSpellbook() : base(SlayerName.ArachnidDoom) { }
+        public CryptArachnidSpellbook(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class CryptReptileSpellbook : HalloweenSpellbook
+    {
+        [Constructable] public CryptReptileSpellbook() : base(SlayerName.ReptilianDeath) { }
+        public CryptReptileSpellbook(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class CryptElementalSpellbook : HalloweenSpellbook
+    {
+        [Constructable] public CryptElementalSpellbook() : base(SlayerName.ElementalBan) { }
+        public CryptElementalSpellbook(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
+
+    public class CryptRepondSpellbook : HalloweenSpellbook
+    {
+        [Constructable] public CryptRepondSpellbook() : base(SlayerName.Repond) { }
+        public CryptRepondSpellbook(Serial s) : base(s) { }
+        public override void Serialize(GenericWriter writer) { base.Serialize(writer); writer.Write((int)0); }
+        public override void Deserialize(GenericReader reader) { base.Deserialize(reader); reader.ReadInt(); }
+    }
     #endregion
 }
