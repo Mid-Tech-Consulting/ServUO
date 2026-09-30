@@ -9,7 +9,35 @@ namespace Server.Items
         private int _WeightReduction;
 
         [CommandProperty(AccessLevel.GameMaster)]
-        public int WeightReduction { get { return _WeightReduction; } set { _WeightReduction = value; InvalidateProperties(); } }
+        public int WeightReduction
+        {
+            get { return _WeightReduction; }
+            set
+            {
+                int val = Math.Clamp(value, 0, 100);
+
+                if (_WeightReduction != val)
+                {
+                    int oldEffective = GetTotal(TotalType.Weight);
+                    _WeightReduction = val;
+                    int newEffective = GetTotal(TotalType.Weight);
+                    int delta = newEffective - oldEffective;
+
+                    if (delta != 0)
+                    {
+                        if (Parent is Item parentItem)
+                            parentItem.UpdateTotal(this, TotalType.Weight, delta);
+                        else if (Parent is Mobile parentMobile)
+                            parentMobile.UpdateTotal(this, TotalType.Weight, delta);
+                        else if (HeldBy != null)
+                            HeldBy.UpdateTotal(this, TotalType.Weight, delta);
+                    }
+
+                    InvalidateWeight();
+                    InvalidateProperties();
+                }
+            }
+        }
 
         public abstract Type[] HoldTypes { get; }
 
@@ -31,10 +59,38 @@ namespace Server.Items
         {
             int total = base.GetTotal(type);
 
-            if (type == TotalType.Weight)
-                total -= total * (int)((double)_WeightReduction / 100.0);
+            if (type == TotalType.Weight && _WeightReduction > 0)
+                total -= (int)(total * ((double)_WeightReduction / 100.0));
 
             return total;
+        }
+
+        public override void UpdateTotal(Item sender, TotalType type, int delta)
+        {
+            if (type == TotalType.Weight && _WeightReduction > 0 && sender != this && delta != 0 && !sender.IsVirtualItem)
+            {
+                int oldEffective = GetTotal(TotalType.Weight);
+
+                base.UpdateTotal(sender, type, delta);
+
+                int newEffective = GetTotal(TotalType.Weight);
+                int effectiveDelta = newEffective - oldEffective;
+                int diff = effectiveDelta - delta;
+
+                if (diff != 0)
+                {
+                    if (Parent is Item parentItem)
+                        parentItem.UpdateTotal(sender, TotalType.Weight, diff);
+                    else if (Parent is Mobile parentMobile)
+                        parentMobile.UpdateTotal(sender, TotalType.Weight, diff);
+                    else if (HeldBy != null)
+                        HeldBy.UpdateTotal(sender, TotalType.Weight, diff);
+                }
+            }
+            else
+            {
+                base.UpdateTotal(sender, type, delta);
+            }
         }
 
         public override bool CheckHold(Mobile m, Item item, bool message, bool checkItems, int plusItems, int plusWeight)
@@ -87,6 +143,22 @@ namespace Server.Items
             base.RemoveItem(dropped);
 
             InvalidateWeight();
+        }
+
+        public override void OnAdded(object parent)
+        {
+            base.OnAdded(parent);
+            InvalidateWeight();
+        }
+
+        public override void OnRemoved(object parent)
+        {
+            base.OnRemoved(parent);
+
+            if (parent is Mobile m)
+                m.UpdateTotals();
+            else if (parent is Item i && i.RootParent is Mobile rm)
+                rm.UpdateTotals();
         }
 
         public BaseResourceSatchel(Serial serial)
