@@ -1656,6 +1656,11 @@ namespace Server.Items
 
         public virtual TimeSpan OnSwing(Mobile attacker, IDamageable damageable, double damageBonus)
 		{
+            if (attacker == null || damageable == null || attacker.Deleted || damageable.Deleted || attacker.Map != damageable.Map || !attacker.InRange(damageable, MaxRange))
+            {
+                return GetDelay(attacker);
+            }
+
 			bool canSwing = true;
 
 			if (Core.AOS)

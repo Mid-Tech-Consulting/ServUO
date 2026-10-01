@@ -27,6 +27,7 @@ namespace Server.Items
                 return MinThrowRange + 3;
             }
         }
+
         public override int DefMaxRange
         {
             get
@@ -39,7 +40,7 @@ namespace Server.Items
                 {
                     /*
                      * Each weapon has a base and max range available to it, where the base
-                     * range is modified by the player’s strength to determine the actual range.
+                     * range is modified by the player's strength to determine the actual range.
                      *
                      * Determining the maximum range of each weapon while in use:
                      * - Range = BaseRange + ((PlayerStrength - MinWeaponStrReq) / ((150 - MinWeaponStrReq) / 3))
@@ -48,11 +49,20 @@ namespace Server.Items
                      * As per OSI tests: with 140 Strength you achieve max range for all throwing weapons.
                      */
 
-                    return (baseRange - 3) + ((attacker.Str - AosStrengthReq) / ((140 - AosStrengthReq) / 3));
+                    int strReq = AosStrengthReq;
+                    int divisor = (140 - strReq) / 3;
+
+                    if (divisor <= 0)
+                        divisor = 1;
+
+                    int bonus = Math.Max(0, (attacker.Str - strReq) / divisor);
+                    int range = (baseRange - 3) + bonus;
+
+                    return Math.Min(11, Math.Max(baseRange - 3, range));
                 }
                 else
                 {
-                    return baseRange;
+                    return Math.Min(11, baseRange);
                 }
             }
         }
@@ -146,30 +156,88 @@ namespace Server.Items
 
         public override void OnHit(Mobile attacker, IDamageable damageable, double damageBonus)
         {
-            m_KillSave = damageable.Location;
+            Point3D killSave = damageable.Location;
+            Map map = attacker.Map;
+
+            m_Thrower = attacker;
+            m_Target = null;
+            m_KillSave = killSave;
 
             if (!(WeaponAbility.GetCurrentAbility(attacker) is MysticArc))
-                Timer.DelayCall(TimeSpan.FromMilliseconds(333.0), new TimerCallback(ThrowBack));
+            {
+                Timer.DelayCall(TimeSpan.FromMilliseconds(333.0), () =>
+                {
+                    if (attacker != null && !attacker.Deleted && attacker.Map == map && map != null && map != Map.Internal)
+                    {
+                        Effects.SendMovingParticles(new Entity(Serial.Zero, killSave, map), attacker, EffectID, 18, 0, false, false, Hue, 0, 9502, 1, 0, (EffectLayer)255, 0x100);
+                    }
+
+                    m_Target = null;
+                    m_Thrower = null;
+                });
+            }
 
             base.OnHit(attacker, damageable, damageBonus);
         }
 
         public override void OnMiss(Mobile attacker, IDamageable damageable)
         {
-            m_Target = damageable as Mobile;
+            Mobile target = damageable as Mobile;
+            Point3D missLoc = damageable.Location;
+            Map map = attacker.Map;
+
+            m_Thrower = attacker;
+            m_Target = target;
+            m_KillSave = missLoc;
 
             if (!(WeaponAbility.GetCurrentAbility(attacker) is MysticArc))
-                Timer.DelayCall(TimeSpan.FromMilliseconds(333.0), new TimerCallback(ThrowBack));
+            {
+                Timer.DelayCall(TimeSpan.FromMilliseconds(333.0), () =>
+                {
+                    if (attacker == null || attacker.Deleted || attacker.Map != map || map == null || map == Map.Internal)
+                    {
+                        m_Target = null;
+                        m_Thrower = null;
+                        return;
+                    }
+
+                    if (target != null && !target.Deleted && target.Map == map && attacker.InRange(target, 25))
+                    {
+                        target.MovingEffect(attacker, EffectID, 18, 1, false, false, Hue, 0);
+                    }
+                    else
+                    {
+                        Effects.SendMovingParticles(new Entity(Serial.Zero, missLoc, map), attacker, EffectID, 18, 0, false, false, Hue, 0, 9502, 1, 0, (EffectLayer)255, 0x100);
+                    }
+
+                    m_Target = null;
+                    m_Thrower = null;
+                });
+            }
 
             base.OnMiss(attacker, damageable);
         }
 
         public virtual void ThrowBack()
         {
-            if (m_Target != null)
+            if (m_Thrower == null || m_Thrower.Deleted || m_Thrower.Map == null || m_Thrower.Map == Map.Internal)
+            {
+                m_Target = null;
+                m_Thrower = null;
+                return;
+            }
+
+            if (m_Target != null && !m_Target.Deleted && m_Target.Map == m_Thrower.Map && m_Thrower.InRange(m_Target, 25))
+            {
                 m_Target.MovingEffect(m_Thrower, EffectID, 18, 1, false, false, Hue, 0);
-            else if (m_Thrower != null)
+            }
+            else if (m_Thrower.Map != null)
+            {
                 Effects.SendMovingParticles(new Entity(Serial.Zero, m_KillSave, m_Thrower.Map), m_Thrower, ItemID, 18, 0, false, false, Hue, 0, 9502, 1, 0, (EffectLayer)255, 0x100);
+            }
+
+            m_Target = null;
+            m_Thrower = null;
         }
 
         public override void Serialize(GenericWriter writer)
