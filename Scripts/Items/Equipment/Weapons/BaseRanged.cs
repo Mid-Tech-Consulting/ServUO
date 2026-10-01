@@ -60,6 +60,11 @@ namespace Server.Items
 
 		public override TimeSpan OnSwing(Mobile attacker, IDamageable damageable)
 		{
+            if (attacker == null || damageable == null || attacker.Deleted || damageable.Deleted || attacker.Map != damageable.Map || !attacker.InRange(damageable, MaxRange) || !attacker.InLOS(damageable))
+            {
+                return GetDelay(attacker);
+            }
+
             long nextShoot;
 
             if (attacker is PlayerMobile)
