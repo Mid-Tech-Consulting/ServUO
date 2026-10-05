@@ -85,7 +85,7 @@ namespace Server.Gumps
             new HalloweenRewardEntry(typeof(SpookySpiderwebSash), "Spooky Spiderweb Sash", 450, 0x1541, 1150, "Spectral sash with DCI 10%, HCI 5%, +10 Stam, FC 1, LMC 4%."),
             new HalloweenRewardEntry(typeof(GraveRobbersHaversack), "Grave Robber's Haversack", 525, 0x9B2, 1168, "Witch-green backpack with 50% Weight Reduction."),
             new HalloweenRewardEntry(typeof(JacksSoulLantern), "Jack's Soul Lantern", 600, 0x2F5B, 1161, "Undead slayer talisman, Night Sight, DCI 10%, SDI 12%, LMC 8%, FCR 1."),
-            new HalloweenRewardEntry(typeof(MantleOfTheCryptLord), "Mantle of the Crypt Lord", 750, 0x1515, 1170, "Blessed cloak: +8 Hits/Mana/Stam, MR 2, LRC 15%, All Resists +5%."),
+            new HalloweenRewardEntry(typeof(MantleOfTheCryptLord), "Mantle of the Crypt Lord", 750, 0x1515, 1170, "Blessed cloak / wing armor: +8 Hits/Mana/Stam, MR 2, LRC 15%, All Resists +5%. Alterable for Gargoyles."),
             new HalloweenRewardEntry(typeof(ReapersHarvestScythe), "Reaper's Harvest Scythe", 900, 0x26BA, 1157, "Undead slayer scythe, SC, DI 50%, SSI 30%, HLL/HML/HL 50%, Soul Harvest."),
             new HalloweenRewardEntry(typeof(HalloweenEventBag), "Halloween Event Bag", 150, 0xE76, 1161, "Event prize bag filled with pumpkins, pies, and chances at rare artifacts and dyes.")
         };
@@ -239,7 +239,14 @@ namespace Server.Gumps
             Item reward = null;
             try
             {
-                reward = Activator.CreateInstance(selected.ItemType) as Item;
+                if (selected.ItemType == typeof(MantleOfTheCryptLord) && from.Race == Race.Gargoyle)
+                {
+                    reward = new GargishMantleOfTheCryptLord();
+                }
+                else
+                {
+                    reward = Activator.CreateInstance(selected.ItemType) as Item;
+                }
             }
             catch
             {

@@ -126,6 +126,7 @@ namespace Server.Items
     #endregion
 
     #region Mantle of the Crypt Lord
+    [Alterable(typeof(DefTailoring), typeof(GargishMantleOfTheCryptLord))]
     public class MantleOfTheCryptLord : BaseCloak
     {
         [Constructable]
@@ -149,6 +150,56 @@ namespace Server.Items
         }
 
         public MantleOfTheCryptLord(Serial serial) : base(serial)
+        {
+        }
+
+        public override void GetProperties(ObjectPropertyList list)
+        {
+            base.GetProperties(list);
+            list.Add("<BASEFONT COLOR=#FF7700>Halloween Cemetery Event 2026 Exclusive</BASEFONT>");
+            list.Add("<BASEFONT COLOR=#C0C0C0>Infused with the chilling shadows of the crypts</BASEFONT>");
+        }
+
+        public override void Serialize(GenericWriter writer)
+        {
+            base.Serialize(writer);
+            writer.Write((int)0);
+        }
+
+        public override void Deserialize(GenericReader reader)
+        {
+            base.Deserialize(reader);
+            int version = reader.ReadInt();
+        }
+    }
+
+    [Alterable(typeof(DefTailoring), typeof(MantleOfTheCryptLord))]
+    public class GargishMantleOfTheCryptLord : GargishClothWingArmor
+    {
+        public override Race RequiredRace { get { return Race.Gargoyle; } }
+        public override bool CanBeWornByGargoyles { get { return true; } }
+
+        [Constructable]
+        public GargishMantleOfTheCryptLord() : base(1170) // Nightmare Void Purple
+        {
+            Name = "Mantle of the Crypt Lord";
+            Weight = 3.0;
+            LootType = LootType.Blessed;
+
+            Attributes.BonusHits = 8;
+            Attributes.BonusMana = 8;
+            Attributes.BonusStam = 8;
+            Attributes.RegenMana = 2;
+            Attributes.LowerRegCost = 15;
+
+            Resistances.Physical = 5;
+            Resistances.Fire = 5;
+            Resistances.Cold = 5;
+            Resistances.Poison = 5;
+            Resistances.Energy = 5;
+        }
+
+        public GargishMantleOfTheCryptLord(Serial serial) : base(serial)
         {
         }
 
