@@ -102,6 +102,8 @@ namespace Server.Gumps
             m_Tab = Math.Max(0, Math.Min(3, tab));
 
             int pumpkins = CountPumpkins(from);
+            int packPumpkins = CountBackpackPumpkins(from);
+            int bankPumpkins = CountBankPumpkins(from);
 
             List<HalloweenRewardEntry> currentList;
             switch (m_Tab)
@@ -122,7 +124,10 @@ namespace Server.Gumps
 
             // Title
             AddHtml(25, 20, GumpWidth - 50, 25, "<BASEFONT COLOR=#FF7700 size=6><CENTER><b>Halloween Cemetery Event Rewards</b></CENTER></BASEFONT>", false, false);
-            AddHtml(25, 45, GumpWidth - 50, 20, String.Format("<BASEFONT COLOR=#FFFFFF><CENTER>Your Halloween Pumpkins: <BASEFONT COLOR=#FFA500><b>{0}</b></BASEFONT></CENTER></BASEFONT>", pumpkins), false, false);
+            string pumpkinText = bankPumpkins > 0
+                ? String.Format("<BASEFONT COLOR=#FFFFFF><CENTER>Your Halloween Pumpkins: <BASEFONT COLOR=#FFA500><b>{0:N0}</b></BASEFONT> ({1:N0} pack, {2:N0} bank)</CENTER></BASEFONT>", pumpkins, packPumpkins, bankPumpkins)
+                : String.Format("<BASEFONT COLOR=#FFFFFF><CENTER>Your Halloween Pumpkins: <BASEFONT COLOR=#FFA500><b>{0:N0}</b></BASEFONT></CENTER></BASEFONT>", pumpkins);
+            AddHtml(25, 45, GumpWidth - 50, 20, pumpkinText, false, false);
 
             // Navigation Tabs
             int tabY = 75;
@@ -229,7 +234,7 @@ namespace Server.Gumps
             }
 
             // Standard direct purchase
-            if (!from.Backpack.ConsumeTotal(typeof(HalloweenEventPumpkin), selected.Cost))
+            if (!ConsumePumpkins(from, selected.Cost))
             {
                 from.SendMessage(0x22, "Could not consume the required Halloween Pumpkins.");
                 from.SendGump(new HalloweenRewardGump(from, m_Tab));
@@ -269,10 +274,65 @@ namespace Server.Gumps
 
         public static int CountPumpkins(Mobile from)
         {
+            if (from == null)
+                return 0;
+
+            int total = 0;
+
+            if (from.Backpack != null)
+                total += from.Backpack.GetAmount(typeof(HalloweenEventPumpkin));
+
+            if (from.BankBox != null)
+                total += from.BankBox.GetAmount(typeof(HalloweenEventPumpkin));
+
+            return total;
+        }
+
+        public static int CountBackpackPumpkins(Mobile from)
+        {
             if (from == null || from.Backpack == null)
                 return 0;
 
             return from.Backpack.GetAmount(typeof(HalloweenEventPumpkin));
+        }
+
+        public static int CountBankPumpkins(Mobile from)
+        {
+            if (from == null || from.BankBox == null)
+                return 0;
+
+            return from.BankBox.GetAmount(typeof(HalloweenEventPumpkin));
+        }
+
+        public static bool ConsumePumpkins(Mobile from, int amount)
+        {
+            if (from == null || amount <= 0)
+                return false;
+
+            int packCount = CountBackpackPumpkins(from);
+            int bankCount = CountBankPumpkins(from);
+
+            if (packCount + bankCount < amount)
+                return false;
+
+            if (packCount >= amount)
+            {
+                return from.Backpack.ConsumeTotal(typeof(HalloweenEventPumpkin), amount);
+            }
+
+            int remainder = amount - packCount;
+
+            if (packCount > 0)
+            {
+                from.Backpack.ConsumeTotal(typeof(HalloweenEventPumpkin), packCount);
+            }
+
+            if (from.BankBox != null && remainder > 0)
+            {
+                return from.BankBox.ConsumeTotal(typeof(HalloweenEventPumpkin), remainder);
+            }
+
+            return true;
         }
     }
 
@@ -315,9 +375,14 @@ namespace Server.Gumps
             AddHtml(75, 20, 320, 20, String.Format("<BASEFONT COLOR=#FF7700 size=4><b>{0}</b></BASEFONT>", itemTitle), false, false);
 
             int pumpkins = HalloweenRewardGump.CountPumpkins(from);
+            int packPumpkins = HalloweenRewardGump.CountBackpackPumpkins(from);
+            int bankPumpkins = HalloweenRewardGump.CountBankPumpkins(from);
             bool canAfford = pumpkins >= cost;
             string costColor = canAfford ? "#005500" : "#B22222";
-            AddHtml(75, 40, 320, 20, String.Format("<BASEFONT COLOR=#222222>Cost: <BASEFONT COLOR={0}><b>{1} Pumpkins</b></BASEFONT> (You have: <b>{2}</b>)</BASEFONT>", costColor, cost, pumpkins), false, false);
+            string balanceInfo = bankPumpkins > 0 
+                ? String.Format(" (You have: <b>{0:N0}</b> [{1:N0} pack, {2:N0} bank])", pumpkins, packPumpkins, bankPumpkins) 
+                : String.Format(" (You have: <b>{0:N0}</b>)", pumpkins);
+            AddHtml(75, 40, 320, 20, String.Format("<BASEFONT COLOR=#222222>Cost: <BASEFONT COLOR={0}><b>{1:N0} Pumpkins</b></BASEFONT>{2}</BASEFONT>", costColor, cost, balanceInfo), false, false);
 
             AddHtml(25, 75, 370, 35, "<BASEFONT COLOR=#C0C0C0>Choose which Slayer power you wish to imbue into your new equipment:</BASEFONT>", false, false);
 
@@ -369,7 +434,7 @@ namespace Server.Gumps
                 return;
             }
 
-            if (!from.Backpack.ConsumeTotal(typeof(HalloweenEventPumpkin), m_Cost))
+            if (!HalloweenRewardGump.ConsumePumpkins(from, m_Cost))
             {
                 from.SendMessage(0x22, "Could not consume the required Halloween Pumpkins.");
                 from.SendGump(new HalloweenRewardGump(from, m_ReturnTab));
