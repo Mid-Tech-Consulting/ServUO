@@ -7,6 +7,7 @@ using Server.Gumps;
 using Server.Items;
 using Server.Mobiles;
 using Server.Network;
+using Server.Targeting;
 
 namespace Server.Custom.Events.HalloweenCemetery
 {
@@ -65,6 +66,8 @@ namespace Server.Custom.Events.HalloweenCemetery
             CommandSystem.Register("HalloweenCemetery", AccessLevel.Player, OnHalloweenCemeteryCommand);
             CommandSystem.Register("HalloweenRewards", AccessLevel.Player, OnHalloweenRewardsCommand);
             CommandSystem.Register("HalloweenReward", AccessLevel.Player, OnHalloweenRewardsCommand);
+            CommandSystem.Register("SplitPumpkin", AccessLevel.Player, OnSplitPumpkinCommand);
+            CommandSystem.Register("SplitPumpkins", AccessLevel.Player, OnSplitPumpkinCommand);
         }
 
         [Usage("HalloweenEvent")]
@@ -115,6 +118,56 @@ namespace Server.Custom.Events.HalloweenCemetery
             {
                 e.Mobile.CloseGump(typeof(HalloweenRewardGump));
                 e.Mobile.SendGump(new HalloweenRewardGump(e.Mobile));
+            }
+        }
+
+        [Usage("SplitPumpkin")]
+        [Description("Targets a stack of Halloween Pumpkins to open the split stack gump.")]
+        public static void OnSplitPumpkinCommand(CommandEventArgs e)
+        {
+            Mobile from = e.Mobile;
+
+            if (from == null || !from.Alive)
+                return;
+
+            from.SendMessage(0x35, "Target the stack of Halloween Pumpkins you wish to split:");
+            from.Target = new SplitPumpkinTarget();
+        }
+
+        private class SplitPumpkinTarget : Target
+        {
+            public SplitPumpkinTarget() : base(3, false, TargetFlags.None)
+            {
+            }
+
+            protected override void OnTarget(Mobile from, object targeted)
+            {
+                if (from == null || !from.Alive)
+                    return;
+
+                if (targeted is HalloweenEventPumpkin pumpkin)
+                {
+                    if (pumpkin.Deleted)
+                        return;
+
+                    if (!pumpkin.IsAccessibleTo(from) || !from.InRange(pumpkin.GetWorldLocation(), 3) || !from.CanSee(pumpkin))
+                    {
+                        from.SendLocalizedMessage(500446); // That is too far away.
+                        return;
+                    }
+
+                    if (pumpkin.Amount <= 1)
+                    {
+                        from.SendMessage(0x22, "That stack only has 1 pumpkin and cannot be split.");
+                        return;
+                    }
+
+                    pumpkin.BeginSplit(from);
+                }
+                else
+                {
+                    from.SendMessage(0x22, "That is not a stack of Halloween Pumpkins.");
+                }
             }
         }
 
