@@ -11,7 +11,7 @@ namespace Server.Gumps
         private readonly Mobile m_From;
         private readonly HalloweenEventPumpkin m_Pumpkin;
 
-        private const int GumpWidth = 470;
+        private const int GumpWidth = 500;
         private const int GumpHeight = 280;
 
         public HalloweenPumpkinSplitGump(Mobile from, HalloweenEventPumpkin pumpkin) : base(100, 100)
@@ -28,72 +28,72 @@ namespace Server.Gumps
 
             // Icon & Header
             AddItem(25, 20, 0x4694);
-            AddHtml(75, 20, 360, 25, "<BASEFONT COLOR=#FF7700 size=5><b>Split Halloween Pumpkins</b></BASEFONT>", false, false);
+            AddHtml(75, 20, GumpWidth - 90, 25, "<BASEFONT COLOR=#FF7700 size=5><b>Split Halloween Pumpkins</b></BASEFONT>", false, false);
 
             double totalWeight = pumpkin.Amount * pumpkin.Weight;
-            AddHtml(75, 45, 360, 20, String.Format("<BASEFONT COLOR=#C0C0C0>Stack: <BASEFONT COLOR=#FFFFFF><b>{0:N0}</b></BASEFONT> pumpkins ({1:N1} stones)</BASEFONT>", pumpkin.Amount, totalWeight), false, false);
+            AddHtml(75, 45, GumpWidth - 90, 20, String.Format("<BASEFONT COLOR=#C0C0C0>Stack: <BASEFONT COLOR=#FFFFFF><b>{0:N0}</b></BASEFONT> pumpkins ({1:N1} stones)</BASEFONT>", pumpkin.Amount, totalWeight), false, false);
 
             // Presets Header
-            AddHtml(25, 80, 420, 20, "<BASEFONT COLOR=#FFA500><b>Quick Presets (Split to Backpack):</b></BASEFONT>", false, false);
+            AddHtml(25, 80, GumpWidth - 50, 20, "<BASEFONT COLOR=#FFA500><b>Quick Presets (Split to Backpack):</b></BASEFONT>", false, false);
 
             // Row 1 Presets
             // 150 (Dyes/Bag)
             AddButton(25, 105, 0xFA5, 0xFA7, 10, GumpButtonType.Reply, 0);
-            AddHtml(50, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>150</b></BASEFONT>", false, false);
+            AddHtml(57, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>150</b></BASEFONT>", false, false);
 
             // 450 (Mask/Sash)
-            AddButton(105, 105, 0xFA5, 0xFA7, 11, GumpButtonType.Reply, 0);
-            AddHtml(130, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>450</b></BASEFONT>", false, false);
+            AddButton(110, 105, 0xFA5, 0xFA7, 11, GumpButtonType.Reply, 0);
+            AddHtml(142, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>450</b></BASEFONT>", false, false);
 
             // 600 (Lantern)
-            AddButton(185, 105, 0xFA5, 0xFA7, 12, GumpButtonType.Reply, 0);
-            AddHtml(210, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>600</b></BASEFONT>", false, false);
+            AddButton(195, 105, 0xFA5, 0xFA7, 12, GumpButtonType.Reply, 0);
+            AddHtml(227, 106, 55, 20, "<BASEFONT COLOR=#FFFFFF><b>600</b></BASEFONT>", false, false);
 
             // 750 (Mantle)
-            AddButton(265, 105, 0xFA5, 0xFA7, 13, GumpButtonType.Reply, 0);
-            AddHtml(290, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>750</b></BASEFONT>", false, false);
+            AddButton(285, 105, 0xFA5, 0xFA7, 13, GumpButtonType.Reply, 0);
+            AddHtml(317, 106, 40, 20, "<BASEFONT COLOR=#FFFFFF><b>750</b></BASEFONT>", false, false);
 
             // 900 (Slayer)
-            AddButton(345, 105, 0xFA5, 0xFA7, 14, GumpButtonType.Reply, 0);
-            AddHtml(370, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>900</b></BASEFONT>", false, false);
+            AddButton(360, 105, 0xFA5, 0xFA7, 14, GumpButtonType.Reply, 0);
+            AddHtml(392, 106, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>900</b></BASEFONT>", false, false);
 
             // Row 2 Presets
             // 1,000 (Deeds)
             AddButton(25, 135, 0xFA5, 0xFA7, 15, GumpButtonType.Reply, 0);
-            AddHtml(50, 136, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>1,000</b></BASEFONT>", false, false);
+            AddHtml(57, 136, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>1,000</b></BASEFONT>", false, false);
 
             // 5,000
-            AddButton(105, 135, 0xFA5, 0xFA7, 16, GumpButtonType.Reply, 0);
-            AddHtml(130, 136, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>5,000</b></BASEFONT>", false, false);
+            AddButton(110, 135, 0xFA5, 0xFA7, 16, GumpButtonType.Reply, 0);
+            AddHtml(142, 136, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>5,000</b></BASEFONT>", false, false);
 
             // 10,000 (Dragon)
-            AddButton(185, 135, 0xFA5, 0xFA7, 17, GumpButtonType.Reply, 0);
-            AddHtml(210, 136, 60, 20, "<BASEFONT COLOR=#FFFFFF><b>10,000</b></BASEFONT>", false, false);
+            AddButton(195, 135, 0xFA5, 0xFA7, 17, GumpButtonType.Reply, 0);
+            AddHtml(227, 136, 55, 20, "<BASEFONT COLOR=#FFFFFF><b>10,000</b></BASEFONT>", false, false);
 
             // Half Stack
-            AddButton(265, 135, 0xFA5, 0xFA7, 18, GumpButtonType.Reply, 0);
-            AddHtml(290, 136, 50, 20, "<BASEFONT COLOR=#FFFFFF><b>Half</b></BASEFONT>", false, false);
+            AddButton(285, 135, 0xFA5, 0xFA7, 18, GumpButtonType.Reply, 0);
+            AddHtml(317, 136, 40, 20, "<BASEFONT COLOR=#FFFFFF><b>Half</b></BASEFONT>", false, false);
 
             // Max Carry
             int maxCarry = CalculateMaxCarryable(from, pumpkin);
-            AddButton(345, 135, 0xFA5, 0xFA7, 19, GumpButtonType.Reply, 0);
-            AddHtml(370, 136, 85, 20, String.Format("<BASEFONT COLOR=#FFFFFF><b>Max ({0:N0})</b></BASEFONT>", maxCarry), false, false);
+            AddButton(360, 135, 0xFA5, 0xFA7, 19, GumpButtonType.Reply, 0);
+            AddHtml(392, 136, 95, 20, String.Format("<BASEFONT COLOR=#FFFFFF><b>Max ({0:N0})</b></BASEFONT>", maxCarry), false, false);
 
             // Custom Amount Header & Input
-            AddHtml(25, 170, 420, 20, "<BASEFONT COLOR=#FFA500><b>Or Enter Custom Amount:</b></BASEFONT>", false, false);
+            AddHtml(25, 170, GumpWidth - 50, 20, "<BASEFONT COLOR=#FFA500><b>Or Enter Custom Amount:</b></BASEFONT>", false, false);
 
             AddBackground(25, 195, 110, 26, 0x2486);
             AddTextEntry(30, 198, 100, 20, 0x480, 1, "100");
 
             // Custom Action Buttons
-            AddButton(155, 195, 0xFB7, 0xFB9, 1, GumpButtonType.Reply, 0);
-            AddHtml(190, 197, 135, 20, "<BASEFONT COLOR=#FFFFFF><b>To Backpack</b></BASEFONT>", false, false);
+            AddButton(160, 195, 0xFB7, 0xFB9, 1, GumpButtonType.Reply, 0);
+            AddHtml(195, 197, 120, 20, "<BASEFONT COLOR=#FFFFFF><b>To Backpack</b></BASEFONT>", false, false);
 
-            AddButton(315, 195, 0xFB7, 0xFB9, 2, GumpButtonType.Reply, 0);
-            AddHtml(350, 197, 110, 20, "<BASEFONT COLOR=#C0C0C0>In Container</BASEFONT>", false, false);
+            AddButton(325, 195, 0xFB7, 0xFB9, 2, GumpButtonType.Reply, 0);
+            AddHtml(360, 197, 120, 20, "<BASEFONT COLOR=#C0C0C0>In Container</BASEFONT>", false, false);
 
             // Cancel Button
-            AddButton(195, 238, 0x995, 0x996, 0, GumpButtonType.Reply, 0);
+            AddButton((GumpWidth - 80) / 2, 238, 0x995, 0x996, 0, GumpButtonType.Reply, 0);
         }
 
         private static int ParseAmount(RelayInfo info)

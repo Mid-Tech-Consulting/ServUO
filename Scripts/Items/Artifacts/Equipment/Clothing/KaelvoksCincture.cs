@@ -2,6 +2,7 @@ using System;
 
 namespace Server.Items
 {
+    [Flipable(0xA40E, 0xA40E)]
     public class KaelvoksCincture : HalfApron
     {
         public override bool IsArtifact { get { return true; } }
@@ -9,9 +10,11 @@ namespace Server.Items
         [Constructable]
         public KaelvoksCincture()
         {
+            ItemID = 0xA40E;
             Name = "Kaelvok's Cincture";
-            Hue = 1157;
+            Hue = 0x0AD0;
             Weight = 3.0;
+            Layer = Layer.Waist;
             LootType = LootType.Blessed;
 
             Attributes.BonusStr = 5;
@@ -51,7 +54,7 @@ namespace Server.Items
         public GargishKaelvoksCincture()
         {
             Name = "Gargish Kaelvok's Cincture";
-            Hue = 1157;
+            Hue = 0x0AD0;
             Weight = 2.0;
             LootType = LootType.Blessed;
 
