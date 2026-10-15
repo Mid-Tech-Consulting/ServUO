@@ -13,7 +13,7 @@ namespace Server.Custom.Events.TurkeyEvent
         public static readonly string SavePath = Path.Combine("Saves/Misc", "NovemberTurkeyEvent.bin");
 
         public static bool Enabled { get; set; } = false;
-        public static int FeathersPerKill { get; set; } = 250;
+        public static int FeathersPerKill { get; set; } = 200;
         public static int TurkeysPerFacet { get; set; } = 5;
 
         public static readonly List<EventGiantTurkey> ActiveTurkeys = new List<EventGiantTurkey>();
@@ -228,7 +228,7 @@ namespace Server.Custom.Events.TurkeyEvent
                 using (FileStream fs = new FileStream(SavePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 using (BinaryWriter bw = new BinaryWriter(fs))
                 {
-                    bw.Write((int)0); // version
+                    bw.Write((int)1); // version
                     bw.Write(Enabled);
                     bw.Write(FeathersPerKill);
                     bw.Write(TurkeysPerFacet);
@@ -254,6 +254,11 @@ namespace Server.Custom.Events.TurkeyEvent
                     Enabled = br.ReadBoolean();
                     FeathersPerKill = br.ReadInt32();
                     TurkeysPerFacet = br.ReadInt32();
+
+                    if (version < 1)
+                    {
+                        FeathersPerKill = 200;
+                    }
                 }
             }
             catch (Exception ex)

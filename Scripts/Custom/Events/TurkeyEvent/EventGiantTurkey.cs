@@ -148,7 +148,7 @@ namespace Server.Custom.Events.TurkeyEvent
 
         public override bool OnBeforeDeath()
         {
-            // Award 250 Turkey Feathers to top damager or killer
+            // Award 200 Turkey Feathers to each attacking player's backpack
             DistributeFeathers();
 
             // Notify manager for respawn
@@ -162,28 +162,25 @@ namespace Server.Custom.Events.TurkeyEvent
             int featherAmount = TurkeyEvent.FeathersPerKill;
 
             List<DamageStore> rights = GetLootingRights();
-            PlayerMobile topDamager = null;
-            int highestDamage = 0;
+            HashSet<PlayerMobile> rewarded = new HashSet<PlayerMobile>();
 
             for (int i = 0; i < rights.Count; i++)
             {
                 DamageStore ds = rights[i];
-                if (ds != null && ds.m_Mobile is PlayerMobile pm && ds.m_Damage > highestDamage)
+                if (ds != null && ds.m_Mobile is PlayerMobile pm && !pm.Deleted && ds.m_Damage > 0 && rewarded.Add(pm))
                 {
-                    highestDamage = ds.m_Damage;
-                    topDamager = pm;
+                    if (pm.Backpack != null)
+                    {
+                        pm.AddToBackpack(new TurkeyFeather(featherAmount));
+                        pm.PlaySound(0x2E6);
+                        pm.SendMessage(0x35, "You harvested {0} Turkey Feathers for helping defeat the Giant Turkey!", featherAmount);
+                    }
                 }
             }
 
-            if (topDamager != null && topDamager.Backpack != null)
+            if (rewarded.Count == 0)
             {
-                topDamager.AddToBackpack(new TurkeyFeather(featherAmount));
-                topDamager.PlaySound(0x2E6);
-                topDamager.SendMessage(0x35, "You harvested {0} Turkey Feathers for defeating the Giant Turkey!", featherAmount);
-            }
-            else
-            {
-                // Fallback: Drop on corpse
+                // Fallback: Drop on corpse if no player attackers were found
                 Corpse c = this.Corpse as Corpse;
                 if (c != null)
                 {

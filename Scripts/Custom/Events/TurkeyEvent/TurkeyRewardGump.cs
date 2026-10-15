@@ -255,17 +255,6 @@ namespace Server.Custom.Events.TurkeyEvent
                 return;
             }
 
-            // Animal Taming check for Storm of Akalabeth
-            if (selected.IsAkalabethStatue)
-            {
-                if (from.Skills[SkillName.AnimalTaming].Value < 100.0)
-                {
-                    from.SendMessage(0x22, "You must have at least 100.0 Animal Taming to claim the Storm of Akalabeth.");
-                    from.SendGump(new TurkeyRewardGump(from));
-                    return;
-                }
-            }
-
             // Standard purchase: consume feathers
             if (!ConsumeFeathers(from, selected.Cost))
             {

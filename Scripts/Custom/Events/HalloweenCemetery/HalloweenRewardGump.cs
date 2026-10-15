@@ -214,17 +214,6 @@ namespace Server.Gumps
                 return;
             }
 
-            // Animal Taming & Animal Lore skill requirement for Halloween Dragon
-            if (selected.ItemType == typeof(HalloweenDragonBondedStatuette))
-            {
-                if (from.Skills[SkillName.AnimalTaming].Value < 100.0 || from.Skills[SkillName.AnimalLore].Value < 100.0)
-                {
-                    from.SendMessage(0x22, "You must have at least 100.0 Animal Taming and 100.0 Animal Lore to claim this pet.");
-                    from.SendGump(new HalloweenRewardGump(from, m_Tab));
-                    return;
-                }
-            }
-
             // If it's a Slayer choice weapon/spellbook, open Slayer Selection Gump
             if (selected.IsSlayerChooser)
             {
