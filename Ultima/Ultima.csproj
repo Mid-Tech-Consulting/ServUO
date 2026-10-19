@@ -10,12 +10,12 @@
 		<SupportedOSPlatform>windows</SupportedOSPlatform>
 		<NoWarn>CA2022</NoWarn>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' Or '$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<OutputPath>..\</OutputPath>
 		<DefineConstants>TRACE;DEBUG;NEWTIMERS;ServUO</DefineConstants>
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' Or '$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<OutputPath>..\</OutputPath>
 		<DefineConstants>TRACE;NEWTIMERS;ServUO</DefineConstants>
 		<DebugType>none</DebugType>
