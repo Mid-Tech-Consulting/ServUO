@@ -12,18 +12,20 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Platforms>x64</Platforms>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' Or '$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<OutputPath>..\</OutputPath>
 		<DefineConstants>TRACE;DEBUG;NEWTIMERS;ServUO</DefineConstants>
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' Or '$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<OutputPath>..\</OutputPath>
 		<DefineConstants>TRACE;NEWTIMERS;ServUO</DefineConstants>
 		<DebugType>none</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Ultima\Ultima.csproj" />
+		<ProjectReference Include="..\Ultima\Ultima.csproj">
+			<Private>false</Private>
+		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="System.Drawing.Common" Version="9.0.0" />
