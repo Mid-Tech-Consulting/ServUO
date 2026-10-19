@@ -60,4 +60,5 @@
 		</ItemGroup>
 		<Copy SourceFiles="@(NuGetRuntimeDeps)" DestinationFolder="$(ServUORoot)" SkipUnchangedFiles="true" Condition="Exists('%(NuGetRuntimeDeps.Identity)')" />
 	</Target>
+	<Target Name="IncrementalClean" />
 </Project>
