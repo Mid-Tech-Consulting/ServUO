@@ -1,11 +1,13 @@
 using System;
 
 using Server;
+using Server.Engines.Craft;
 
 namespace Server.Items
 {
-    public class UmbrascaleGargishCeremonialDress : BaseClothing
+    public class UmbrascaleGargishCeremonialDress : BaseClothing, IRepairable
     {
+        public CraftSystem RepairSystem { get { return DefTailoring.CraftSystem; } }
         public override bool IsArtifact { get { return true; } }
         public override Race RequiredRace { get { return Race.Gargoyle; } }
         public override bool CanBeWornByGargoyles { get { return true; } }
