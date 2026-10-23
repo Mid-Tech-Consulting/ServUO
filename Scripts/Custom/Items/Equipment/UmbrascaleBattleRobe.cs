@@ -1,11 +1,13 @@
 using System;
 
 using Server;
+using Server.Engines.Craft;
 
 namespace Server.Items
 {
-    public class UmbrascaleBattleRobe : BaseOuterTorso
+    public class UmbrascaleBattleRobe : BaseOuterTorso, IRepairable
     {
+        public CraftSystem RepairSystem { get { return DefTailoring.CraftSystem; } }
         public override bool IsArtifact { get { return true; } }
 
         [Constructable]
