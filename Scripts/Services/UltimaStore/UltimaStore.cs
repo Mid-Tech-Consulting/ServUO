@@ -53,7 +53,7 @@ namespace Server.Engines.UOStore
             { 8, 1167 },   // August (Lime Green)
             { 9, 1801 },   // September (Smoky Gold)
             { 10, 1161 },  // October (Candy Corn / Halloween Spider Orange)
-            { 11, 2048 },  // November (Glacial/Void Black)
+            { 11, 1 },     // November (Pure Black)
             { 12, 2966 }   // December (Christmas Red)
         };
 
