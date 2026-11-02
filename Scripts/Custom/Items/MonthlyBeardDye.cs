@@ -1,3 +1,4 @@
+using System;
 using Server.Gumps;
 using Server.Mobiles;
 
@@ -69,7 +70,8 @@ namespace Server.Items
             AddBackground(0, 0, 100, 100, 3600);
             AddBackground(100, 140, 227, 50, 9270);
 
-            AddImage(-39, -23, 50702, Dye.Hue - 1);
+            // GumpImage omits hue=0, so Hue 1 (1 - 1 = 0) would render unhued; 2056 (Fade -7) has identical RGB slots to Hue 1.
+            AddImage(-39, -23, 50702, Dye.Hue == 1 ? 2056 : Math.Max(0, Dye.Hue - 1));
 
             AddHtmlLocalized(110, 25, 205, 80, 1074396, C32216(0x0080FF), false, false); // This special hair dye is made of a unique mixture of leaves, permanently changing one's hair color until another dye is used.
             AddHtmlLocalized(120, 155, 160, 20, 1074395, C32216(0x00FFFF), false, false); // <div align=right>Use Permanent Hair Dye</div>
