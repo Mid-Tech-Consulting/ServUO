@@ -157,6 +157,14 @@ namespace Server.Custom.Events.TurkeyEvent
             return base.OnBeforeDeath();
         }
 
+        public override void OnAfterDelete()
+        {
+            base.OnAfterDelete();
+
+            // Ensure direct deletions ([remove, guard cleanup, etc.) also trigger respawn
+            TurkeyEvent.OnTurkeyKilled(this);
+        }
+
         private void DistributeFeathers()
         {
             int featherAmount = TurkeyEvent.FeathersPerKill;

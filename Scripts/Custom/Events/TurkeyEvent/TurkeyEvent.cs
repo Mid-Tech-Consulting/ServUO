@@ -5,6 +5,8 @@ using Server;
 using Server.Commands;
 using Server.Items;
 using Server.Mobiles;
+using Server.Multis;
+using Server.Regions;
 
 namespace Server.Custom.Events.TurkeyEvent
 {
@@ -43,11 +45,14 @@ namespace Server.Custom.Events.TurkeyEvent
             new Rectangle2D(900, 1300, 800, 500)   // Southern Forest
         };
 
-        public static void Initialize()
+        public static void Configure()
         {
             EventSink.WorldSave += OnSave;
             EventSink.WorldLoad += OnLoad;
+        }
 
+        public static void Initialize()
+        {
             CommandSystem.Register("TurkeyEvent", AccessLevel.Player, OnTurkeyEventCommand);
             CommandSystem.Register("NovemberEvent", AccessLevel.Player, OnTurkeyEventCommand);
             CommandSystem.Register("TurkeyAdmin", AccessLevel.Player, OnTurkeyEventCommand);
@@ -58,7 +63,7 @@ namespace Server.Custom.Events.TurkeyEvent
             CommandSystem.Register("GetFeathers", AccessLevel.Counselor, OnGetFeathersCommand);
             CommandSystem.Register("GiveFeathers", AccessLevel.Counselor, OnGetFeathersCommand);
 
-            m_SpawnTimer = Timer.DelayCall(TimeSpan.FromSeconds(30.0), TimeSpan.FromSeconds(60.0), CheckSpawns);
+            m_SpawnTimer = Timer.DelayCall(TimeSpan.FromSeconds(5.0), TimeSpan.FromSeconds(30.0), CheckSpawns);
         }
 
         [Usage("TurkeyEvent")]
@@ -131,13 +136,13 @@ namespace Server.Custom.Events.TurkeyEvent
 
         public static void OnTurkeyKilled(EventGiantTurkey turkey)
         {
-            if (turkey != null)
-            {
-                ActiveTurkeys.Remove(turkey);
-            }
+            bool removed = turkey != null && ActiveTurkeys.Remove(turkey);
 
-            // Schedule a respawn check after delay (e.g. 15 seconds)
-            Timer.DelayCall(TimeSpan.FromSeconds(15.0), CheckSpawns);
+            if (Enabled && (removed || turkey == null))
+            {
+                // Schedule a respawn check after delay (15 seconds)
+                Timer.DelayCall(TimeSpan.FromSeconds(15.0), CheckSpawns);
+            }
         }
 
         public static void CheckSpawns()
@@ -148,7 +153,7 @@ namespace Server.Custom.Events.TurkeyEvent
             // Clean up deleted/null references
             ActiveTurkeys.RemoveAll(t => t == null || t.Deleted || !t.Alive);
 
-            // Maintain 5 in Felucca, 5 in Tokuno, 5 in Malas
+            // Maintain target count in Felucca, Tokuno, and Malas
             SpawnForFacet(Map.Felucca, FeluccaForests);
             SpawnForFacet(Map.Tokuno, TokunoForests);
             SpawnForFacet(Map.Malas, MalasForests);
@@ -182,17 +187,26 @@ namespace Server.Custom.Events.TurkeyEvent
             if (map == null || zones == null || zones.Length == 0)
                 return Point3D.Zero;
 
-            for (int attempt = 0; attempt < 50; attempt++)
+            for (int attempt = 0; attempt < 250; attempt++)
             {
                 Rectangle2D zone = zones[Utility.Random(zones.Length)];
                 int x = Utility.RandomMinMax(zone.X, zone.X + zone.Width);
                 int y = Utility.RandomMinMax(zone.Y, zone.Y + zone.Height);
                 int z = map.GetAverageZ(x, y);
 
-                if (map.CanSpawnMobile(x, y, z))
-                {
-                    return new Point3D(x, y, z);
-                }
+                if (!map.CanSpawnMobile(x, y, z))
+                    continue;
+
+                Point3D loc = new Point3D(x, y, z);
+                Region reg = Region.Find(loc, map);
+
+                if (reg.IsPartOf<GuardedRegion>() || reg.IsPartOf<HouseRegion>() || reg.IsPartOf<DungeonRegion>())
+                    continue;
+
+                if (BaseHouse.FindHouseAt(loc, map, 16) != null)
+                    continue;
+
+                return loc;
             }
 
             return Point3D.Zero;
@@ -200,21 +214,24 @@ namespace Server.Custom.Events.TurkeyEvent
 
         public static void RespawnAll()
         {
+            Enabled = true;
             CleanupTurkeys();
             CheckSpawns();
         }
 
         public static void CleanupTurkeys()
         {
-            for (int i = ActiveTurkeys.Count - 1; i >= 0; i--)
+            List<EventGiantTurkey> toDelete = new List<EventGiantTurkey>(ActiveTurkeys);
+            ActiveTurkeys.Clear();
+
+            for (int i = toDelete.Count - 1; i >= 0; i--)
             {
-                EventGiantTurkey t = ActiveTurkeys[i];
+                EventGiantTurkey t = toDelete[i];
                 if (t != null && !t.Deleted)
                 {
                     t.Delete();
                 }
             }
-            ActiveTurkeys.Clear();
         }
 
         private static void OnSave(WorldSaveEventArgs e)
@@ -228,7 +245,7 @@ namespace Server.Custom.Events.TurkeyEvent
                 using (FileStream fs = new FileStream(SavePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 using (BinaryWriter bw = new BinaryWriter(fs))
                 {
-                    bw.Write((int)1); // version
+                    bw.Write((int)2); // version
                     bw.Write(Enabled);
                     bw.Write(FeathersPerKill);
                     bw.Write(TurkeysPerFacet);
@@ -258,6 +275,18 @@ namespace Server.Custom.Events.TurkeyEvent
                     if (version < 1)
                     {
                         FeathersPerKill = 200;
+                    }
+
+                    if (TurkeysPerFacet <= 0)
+                    {
+                        TurkeysPerFacet = 5;
+                    }
+
+                    // Version 1 registered OnLoad in Initialize() (after WorldLoad), overwriting Enabled with false on restart.
+                    // If surviving event turkeys are still registered in the world, restore Enabled = true automatically.
+                    if (version < 2 && !Enabled && ActiveTurkeys.Count > 0)
+                    {
+                        Enabled = true;
                     }
                 }
             }
