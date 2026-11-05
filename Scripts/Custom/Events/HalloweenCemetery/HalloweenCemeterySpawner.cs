@@ -134,7 +134,11 @@ namespace Server.Custom.Events.HalloweenCemetery
 
             list.Add(String.Format("<BASEFONT COLOR=#FF7700>{0}</BASEFONT>", m_CemeteryName));
 
-            if (m_CurrentWave == CemeteryWave.Cooldown)
+            if (!HalloweenCemeteryEvent.Enabled)
+            {
+                list.Add("<BASEFONT COLOR=#A0A0A0>Status: Event Inactive</BASEFONT>");
+            }
+            else if (m_CurrentWave == CemeteryWave.Cooldown)
             {
                 TimeSpan rem = m_CooldownEnd - DateTime.UtcNow;
                 int mins = Math.Max(1, (int)rem.TotalMinutes);
@@ -160,6 +164,12 @@ namespace Server.Custom.Events.HalloweenCemetery
             if (!from.InRange(GetWorldLocation(), 4))
             {
                 from.SendLocalizedMessage(500446); // That is too far away.
+                return;
+            }
+
+            if (!HalloweenCemeteryEvent.Enabled)
+            {
+                from.SendMessage(0x22, "The Halloween Cemetery Event is currently inactive.");
                 return;
             }
 
@@ -193,6 +203,16 @@ namespace Server.Custom.Events.HalloweenCemetery
         {
             if (Deleted || Map == null || Map == Map.Internal)
                 return;
+
+            if (!HalloweenCemeteryEvent.Enabled)
+            {
+                if (m_ActiveMobs.Count > 0 || m_ActiveBoss != null)
+                {
+                    ClearActiveMobs();
+                    InvalidateProperties();
+                }
+                return;
+            }
 
             // Prune dead or deleted mobs
             for (int i = m_ActiveMobs.Count - 1; i >= 0; i--)
@@ -345,6 +365,14 @@ namespace Server.Custom.Events.HalloweenCemetery
         {
             string bName = m_ActiveBoss != null ? m_ActiveBoss.Name : "The Champion Boss";
             m_ActiveBoss = null;
+
+            if (!HalloweenCemeteryEvent.Enabled)
+            {
+                m_CurrentWave = CemeteryWave.Cooldown;
+                m_CooldownEnd = DateTime.UtcNow + TimeSpan.FromMinutes(5);
+                InvalidateProperties();
+                return;
+            }
 
             // Victory explosion & fanfare
             Effects.SendLocationParticles(EffectItem.Create(Location, Map, EffectItem.DefaultDuration), 0x376A, 10, 30, 1161, 0, 5030, 0);

@@ -15,7 +15,7 @@ namespace Server.Custom.Events.HalloweenCemetery
     {
         public static readonly string SavePath = Path.Combine("Saves/Misc", "HalloweenCemeteryEvent.bin");
 
-        public static bool Enabled { get; set; } = true;
+        public static bool Enabled { get; set; } = false;
         public static double DyeDropChance { get; set; } = 0.04;       // 4.0% base chance
         public static double SpiderMountChance { get; set; } = 0.005;  // 0.5% base chance (1 in 200)
         public static bool LuckAffectsDrops { get; set; } = true;
@@ -54,11 +54,15 @@ namespace Server.Custom.Events.HalloweenCemetery
             new CemeteryHubLocation("Yew Cemetery", new Point3D(725, 1128, 0), new Rectangle2D(700, 1090, 45, 45))
         };
 
+        public static void Configure()
+        {
+            EventSink.WorldSave += OnSave;
+            EventSink.WorldLoad += OnLoad;
+        }
+
         public static void Initialize()
         {
             EventSink.CreatureDeath += OnCreatureDeath;
-            EventSink.WorldSave += OnSave;
-            EventSink.WorldLoad += OnLoad;
 
             CommandSystem.Register("HalloweenEvent", AccessLevel.Player, OnHalloweenEventCommand);
             CommandSystem.Register("HalloweenSetup", AccessLevel.Player, OnHalloweenSetupCommand);
@@ -213,7 +217,7 @@ namespace Server.Custom.Events.HalloweenCemetery
                 return;
 
             BaseCreature bc = e.Creature as BaseCreature;
-            if (bc == null)
+            if (bc == null || bc.Controlled || bc.Summoned)
                 return;
 
             // Check if killed in cemetery or is a cemetery event creature
@@ -330,6 +334,7 @@ namespace Server.Custom.Events.HalloweenCemetery
 
             // First clean up any existing event hubs
             CleanupEventHubs(null);
+            Enabled = true;
 
             foreach (Map map in maps)
             {
@@ -395,7 +400,10 @@ namespace Server.Custom.Events.HalloweenCemetery
             }
 
             if (from != null)
-                from.SendMessage(0x22, "Removed {0} Halloween Cemetery event objects, wave spawners, and event creatures from the world.", deletedCount);
+            {
+                Enabled = false;
+                from.SendMessage(0x22, "Disabled event and removed {0} Halloween Cemetery event objects, wave spawners, and event creatures from the world.", deletedCount);
+            }
         }
 
         public static void OnSave(WorldSaveEventArgs e)
@@ -404,7 +412,7 @@ namespace Server.Custom.Events.HalloweenCemetery
                 SavePath,
                 writer =>
                 {
-                    writer.Write((int)0); // version
+                    writer.Write((int)1); // version
                     writer.Write(Enabled);
                     writer.Write(DyeDropChance);
                     writer.Write(SpiderMountChance);
@@ -427,6 +435,13 @@ namespace Server.Custom.Events.HalloweenCemetery
                     LuckAffectsDrops = reader.ReadBool();
                     MinPumpkins = reader.ReadInt();
                     MaxPumpkins = reader.ReadInt();
+
+                    // Version 0 registered OnLoad in Initialize() (after WorldLoad), resetting Enabled back
+                    // to true on every server restart and overwriting the save file after staff disabled it.
+                    if (version < 1)
+                    {
+                        Enabled = false;
+                    }
                 });
         }
     }
