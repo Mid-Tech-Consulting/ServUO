@@ -1,5 +1,6 @@
 using System;
 using Server;
+using Server.Custom.Events.HalloweenCemetery;
 using Server.Items;
 
 namespace Server.Mobiles
@@ -129,6 +130,9 @@ namespace Server.Mobiles
         public override void OnDeath(Container c)
         {
             base.OnDeath(c);
+
+            if (!HalloweenCemeteryEvent.Enabled)
+                return;
 
             if (Utility.RandomDouble() < 0.25)
                 c.DropItem(new HalloweenEventBag());
